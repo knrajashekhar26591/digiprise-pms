@@ -3,1184 +3,1393 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Digiprise PMS</title>
+<title>Digiprise Jira</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0f172a;--surface:#1e293b;--surface2:#263349;--border:#334155;
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
-  --blue:#3b82f6;--blue-dark:#1d4ed8;--blue-light:#60a5fa;
-  --green:#10b981;--yellow:#f59e0b;--red:#ef4444;--purple:#8b5cf6;
-  --orange:#f97316;
-  --radius:8px;--radius-lg:12px;
-  --shadow:0 4px 24px rgba(0,0,0,.4);
-  --transition:all .15s ease;
+  --blue:#0052cc;--blue2:#0065ff;--blue-light:#4c9aff;--blue-xlight:#e9f2ff;
+  --bg:#f4f5f7;--white:#ffffff;--border:#dfe1e6;--border2:#ebecf0;
+  --text:#172b4d;--text2:#5e6c84;--text3:#97a0af;
+  --green:#00875a;--green-light:#e3fcef;--red:#de350b;--red-light:#ffebe6;
+  --yellow:#ff991f;--yellow-light:#fffae6;--purple:#6554c0;--teal:#00b8d9;
+  --sidebar-bg:#0747a6;--sidebar-hover:rgba(255,255,255,.1);--sidebar-active:rgba(255,255,255,.15);
+  --sidebar-text:rgba(255,255,255,.85);--sidebar-text2:rgba(255,255,255,.6);
+  --topnav:#ffffff;--topnav-h:56px;--sidebar-w:240px;--sidebar-w-collapsed:64px;
+  --r:3px;--r2:6px;
+  --shadow:0 1px 2px rgba(9,30,66,.25),0 0 1px rgba(9,30,66,.31);
+  --shadow2:0 4px 8px rgba(9,30,66,.15),0 0 1px rgba(9,30,66,.31);
+  --shadow3:0 8px 24px rgba(9,30,66,.2);
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
-button{cursor:pointer;border:none;font-family:inherit}
-input,textarea,select{font-family:inherit}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:14px;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+button{cursor:pointer;border:none;font-family:inherit;font-size:14px}
+input,textarea,select{font-family:inherit;font-size:14px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 
-/* ── Login ── */
-#login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(ellipse at 60% 40%,#1e3a5f 0%,var(--bg) 70%)}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:380px;box-shadow:var(--shadow)}
-.login-logo{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,#60a5fa,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.25rem}
-.login-sub{color:var(--text3);font-size:.85rem;margin-bottom:2rem}
-.form-group{margin-bottom:1rem}
-.form-label{display:block;font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:.4rem}
-.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .75rem;color:var(--text);font-size:.875rem;outline:none;transition:var(--transition)}
-.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center}
-.form-textarea{resize:vertical;min-height:80px}
-.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:var(--radius);font-size:.875rem;font-weight:500;transition:var(--transition);white-space:nowrap}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-primary:hover{background:var(--blue-dark)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--blue-light);color:var(--blue-light)}
-.btn-ghost{background:transparent;color:var(--text2)}
-.btn-ghost:hover{background:var(--surface2);color:var(--text)}
-.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-.btn-danger:hover{background:rgba(239,68,68,.25)}
-.btn-sm{padding:.3rem .7rem;font-size:.8rem}
-.btn-icon{padding:.35rem;border-radius:var(--radius)}
-.error-msg{color:var(--red);font-size:.8rem;margin-top:.5rem;display:none}
+/* ══ LOGIN ══════════════════════════════════════════════════════ */
+#login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}
+.lw{width:400px}
+.ll{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:8px}
+.ll-icon{width:44px;height:44px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.ll-icon svg{fill:#fff}
+.ll-name{font-size:22px;font-weight:600;color:var(--text)}
+.lc{border:1px solid var(--border);border-radius:var(--r2);padding:32px;box-shadow:var(--shadow2)}
+.lc h2{font-size:20px;font-weight:600;margin-bottom:4px;text-align:center}
+.lc p{color:var(--text2);font-size:13px;text-align:center;margin-bottom:24px}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.fi{width:100%;border:2px solid var(--border);border-radius:var(--r2);padding:8px 10px;color:var(--text);outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.2)}
+.fb{width:100%;background:var(--blue2);color:#fff;border-radius:var(--r2);padding:10px;font-size:15px;font-weight:500;margin-top:8px;transition:background .15s}
+.fb:hover{background:var(--blue)}
+.lerr{color:var(--red);font-size:12px;margin-top:8px;display:none;text-align:center}
+.ldemo{margin-top:20px;padding-top:16px;border-top:1px solid var(--border2);font-size:12px;color:var(--text2);text-align:center}
+.ldemo strong{color:var(--text)}
 
-/* ── Top Nav ── */
-#app-shell{display:none;flex-direction:column;height:100vh}
-#app-shell.visible{display:flex}
-#topnav{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:.75rem;flex-shrink:0;z-index:100}
-.nav-logo{font-size:1.1rem;font-weight:700;background:linear-gradient(135deg,#60a5fa,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;cursor:pointer}
-#global-search{flex:1;max-width:380px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.4rem .75rem .4rem 2rem;color:var(--text);font-size:.875rem;outline:none;transition:var(--transition);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
-#global-search:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.nav-right{display:flex;align-items:center;gap:.5rem;margin-left:auto}
-.nav-btn{background:transparent;color:var(--text2);padding:.4rem;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;transition:var(--transition)}
-.nav-btn:hover{background:var(--surface2);color:var(--text)}
-.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;cursor:pointer;color:#fff}
-.notif-badge{position:relative}
-.badge-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--surface);display:none}
-.badge-dot.show{display:block}
+/* ══ APP SHELL ══════════════════════════════════════════════════ */
+#app{display:none;flex-direction:column;height:100vh}
+#app.on{display:flex}
 
-/* ── App Layout ── */
-#app{display:flex;flex:1;overflow:hidden}
+/* ══ TOP NAV ════════════════════════════════════════════════════ */
+#tnav{height:var(--topnav-h);background:var(--topnav);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:4px;flex-shrink:0;z-index:200;box-shadow:0 1px 0 var(--border)}
+.tn-logo{display:flex;align-items:center;gap:6px;padding:0 8px;text-decoration:none;margin-right:4px}
+.tn-logo-icon{width:28px;height:28px;background:var(--blue2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tn-logo-icon svg{fill:#fff;width:16px;height:16px}
+.tn-logo-text{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}
+.tn-logo-text span{color:var(--blue2)}
+.tn-item{display:flex;align-items:center;gap:4px;padding:0 8px;height:32px;border-radius:var(--r2);color:var(--text2);font-size:14px;font-weight:400;cursor:pointer;transition:background .1s,color .1s;white-space:nowrap;background:transparent}
+.tn-item:hover{background:var(--bg);color:var(--text)}
+.tn-item svg{opacity:.7;width:14px;height:14px}
+.tn-search{flex:1;max-width:480px;margin:0 8px;position:relative}
+.tn-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3)}
+.tn-search input{width:100%;background:var(--bg);border:2px solid var(--border);border-radius:20px;padding:6px 12px 6px 34px;color:var(--text);outline:none;font-size:14px;transition:border-color .15s,background .15s}
+.tn-search input:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+.tn-search input::placeholder{color:var(--text3)}
+.tn-right{display:flex;align-items:center;gap:4px;margin-left:auto}
+.btn-create{background:var(--red);color:#fff;border-radius:var(--r2);padding:0 16px;height:32px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-create:hover{background:#bf2600}
+.tn-icon-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;background:transparent;position:relative}
+.tn-icon-btn:hover{background:var(--bg)}
+.tn-notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff;display:none}
+.tn-notif-dot.on{display:block}
+.tn-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0052cc,#4c9aff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0}
+.tn-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
 
-/* ── Sidebar ── */
-#sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s;overflow:hidden}
-#sidebar.collapsed{width:56px}
-.sidebar-section{padding:.5rem .5rem;margin-top:.25rem}
-.sidebar-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:.5rem .75rem .25rem}
-.sidebar-item{display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;border-radius:var(--radius);color:var(--text2);font-size:.875rem;cursor:pointer;transition:var(--transition);white-space:nowrap;overflow:hidden}
-.sidebar-item:hover{background:var(--surface2);color:var(--text)}
-.sidebar-item.active{background:rgba(59,130,246,.15);color:var(--blue-light);font-weight:600}
-.sidebar-item svg{flex-shrink:0}
-.sidebar-project{display:flex;align-items:center;gap:.6rem;padding:.45rem .75rem;border-radius:var(--radius);cursor:pointer;transition:var(--transition);font-size:.8rem;color:var(--text2);white-space:nowrap;overflow:hidden}
-.sidebar-project:hover{background:var(--surface2);color:var(--text)}
-.sidebar-project.active{background:rgba(59,130,246,.1);color:var(--blue-light)}
-.proj-icon{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;background:var(--blue-dark)}
-.sidebar-new-proj{display:flex;align-items:center;gap:.6rem;padding:.4rem .75rem;border-radius:var(--radius);cursor:pointer;font-size:.8rem;color:var(--text3);transition:var(--transition)}
-.sidebar-new-proj:hover{color:var(--blue-light);background:var(--surface2)}
-.sidebar-footer{padding:.5rem .75rem;border-top:1px solid var(--border);margin-top:auto}
+/* ══ BODY ════════════════════════════════════════════════════════ */
+#body{display:flex;flex:1;overflow:hidden}
 
-/* ── Main Content ── */
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.page{flex:1;overflow-y:auto;padding:1.5rem;display:none;flex-direction:column;gap:1.25rem}
-.page.active{display:flex}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-.page-title{font-size:1.25rem;font-weight:700;color:var(--text)}
-.page-subtitle{font-size:.8rem;color:var(--text3);margin-top:.2rem}
-.flex{display:flex}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.items-center{align-items:center}.flex-wrap{flex-wrap:wrap}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}
+/* ══ LEFT SIDEBAR ════════════════════════════════════════════════ */
+#lsb{width:var(--sidebar-w);background:var(--sidebar-bg);color:var(--sidebar-text);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;transition:width .2s}
+#lsb.col{width:var(--sidebar-w-collapsed)}
+.sb-section{padding:8px 0}
+.sb-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sidebar-text2);padding:8px 16px 4px;white-space:nowrap;overflow:hidden}
+.sb-item{display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--sidebar-text);cursor:pointer;transition:background .1s;white-space:nowrap;overflow:hidden;font-size:14px;border-radius:0;position:relative}
+.sb-item:hover{background:var(--sidebar-hover)}
+.sb-item.act{background:var(--sidebar-active);font-weight:500}
+.sb-item svg{flex-shrink:0;width:16px;height:16px;opacity:.85}
+.sb-item-text{overflow:hidden;text-overflow:ellipsis}
+.sb-item-arrow{margin-left:auto;opacity:.6;flex-shrink:0}
+.sb-proj{display:flex;align-items:center;gap:8px;padding:6px 16px;color:var(--sidebar-text);cursor:pointer;transition:background .1s;white-space:nowrap;overflow:hidden;font-size:13px}
+.sb-proj:hover{background:var(--sidebar-hover)}
+.sb-proj.act{background:var(--sidebar-active)}
+.sb-proj-icon{width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:rgba(255,255,255,.2)}
+.sb-sep{height:1px;background:rgba(255,255,255,.1);margin:4px 12px}
+.sb-starred-item{display:flex;align-items:center;gap:8px;padding:5px 16px;color:var(--sidebar-text2);cursor:pointer;font-size:13px;transition:background .1s;overflow:hidden;white-space:nowrap}
+.sb-starred-item:hover{background:var(--sidebar-hover);color:var(--sidebar-text)}
+.sb-starred-item svg{flex-shrink:0;width:14px;height:14px;opacity:.6}
+.sb-filters-item{display:flex;align-items:center;gap:8px;padding:5px 16px;color:var(--sidebar-text2);cursor:pointer;font-size:13px;transition:background .1s;overflow:hidden;white-space:nowrap}
+.sb-filters-item:hover{background:var(--sidebar-hover);color:var(--sidebar-text)}
 
-/* ── Cards & Tables ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center}
-.stat-num{font-size:2rem;font-weight:800;line-height:1}
-.stat-label{font-size:.75rem;color:var(--text3);margin-top:.3rem;font-weight:500}
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.table-header{display:grid;grid-template-columns:90px 1fr 80px 80px 110px 60px 40px;gap:.75rem;padding:.6rem 1rem;background:var(--bg);border-bottom:1px solid var(--border);font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
-.table-row{display:grid;grid-template-columns:90px 1fr 80px 80px 110px 60px 40px;gap:.75rem;padding:.65rem 1rem;border-bottom:1px solid var(--border);align-items:center;font-size:.82rem;cursor:pointer;transition:var(--transition)}
-.table-row:last-child{border:none}
-.table-row:hover{background:var(--surface2)}
-.issue-key{font-family:monospace;font-size:.78rem;color:var(--blue-light);font-weight:600}
-.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ══ MAIN CONTENT ════════════════════════════════════════════════ */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--white)}
 
-/* ── Badges ── */
-.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600;white-space:nowrap}
-.badge-story{background:rgba(59,130,246,.2);color:var(--blue-light)}
-.badge-bug{background:rgba(239,68,68,.2);color:#fca5a5}
-.badge-epic{background:rgba(139,92,246,.2);color:#c4b5fd}
-.badge-task{background:rgba(16,185,129,.2);color:#6ee7b7}
-.badge-subtask{background:rgba(249,115,22,.2);color:#fdba74}
-.prio-blocker{color:var(--red)}
-.prio-critical{color:var(--orange)}
-.prio-major{color:var(--yellow)}
-.prio-minor{color:var(--green)}
-.prio-trivial{color:var(--text3)}
-.status-pill{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:4px;font-size:.72rem;font-weight:600}
-.status-todo{background:rgba(107,114,128,.2);color:#9ca3af}
-.status-inprog{background:rgba(59,130,246,.2);color:var(--blue-light)}
-.status-review{background:rgba(245,158,11,.2);color:var(--yellow)}
-.status-done{background:rgba(16,185,129,.2);color:var(--green)}
-.chip{border-radius:999px;font-size:.75rem;padding:.25rem .75rem;border:1px solid var(--border)}
+/* ══ PROJECT HEADER ══════════════════════════════════════════════ */
+#proj-header{border-bottom:1px solid var(--border);background:#fff;flex-shrink:0}
+.ph-top{display:flex;align-items:center;gap:8px;padding:12px 20px 0}
+.ph-breadcrumb{font-size:12px;color:var(--text2)}
+.ph-breadcrumb span{color:var(--text3)}
+.ph-title{display:flex;align-items:center;gap:10px;padding:4px 20px 0}
+.ph-proj-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ph-proj-name{font-size:20px;font-weight:600;color:var(--text)}
+.ph-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.ph-action-btn{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;background:transparent}
+.ph-action-btn:hover{background:var(--bg)}
 
-/* ── Kanban Board ── */
-.board-scroll{overflow-x:auto;flex:1;padding-bottom:.5rem}
-.board{display:flex;gap:1rem;min-width:max-content;height:100%;align-items:flex-start}
-.board-col{width:280px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;max-height:calc(100vh - 180px)}
-.col-header{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.col-title{font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.col-count{background:var(--surface2);color:var(--text3);border-radius:999px;padding:.1rem .5rem;font-size:.7rem;font-weight:600}
-.col-body{padding:.5rem;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:.5rem}
-.issue-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;cursor:pointer;transition:var(--transition)}
-.issue-card:hover{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
-.card-key{font-size:.7rem;font-family:monospace;color:var(--text3)}
-.card-title{font-size:.82rem;margin:.35rem 0;line-height:1.3;font-weight:500}
-.card-footer{display:flex;align-items:center;justify-content:space-between;gap:.25rem;margin-top:.5rem}
-.card-assignee{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#fff}
-.pts{font-size:.7rem;color:var(--text3);background:var(--surface);padding:.1rem .4rem;border-radius:4px;border:1px solid var(--border)}
+/* ══ PROJECT TABS ════════════════════════════════════════════════ */
+.ph-tabs{display:flex;align-items:center;padding:0 20px;overflow-x:auto;gap:0;scrollbar-width:none}
+.ph-tabs::-webkit-scrollbar{display:none}
+.ph-tab{display:flex;align-items:center;gap:5px;padding:10px 12px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .1s,border-color .1s;font-weight:400}
+.ph-tab:hover{color:var(--text);background:var(--bg);border-radius:var(--r) var(--r) 0 0}
+.ph-tab.act{color:var(--blue2);border-bottom-color:var(--blue2);font-weight:500}
+.ph-tab svg{width:14px;height:14px;opacity:.7}
+.ph-tab-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0}
 
-/* ── Sprint Cards ── */
-.sprint-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.sprint-card-header{padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.sprint-state-active{color:var(--green);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:.15rem .65rem;font-size:.7rem;font-weight:700}
-.sprint-state-created{color:var(--text3);background:var(--surface2);border-radius:999px;padding:.15rem .65rem;font-size:.7rem;font-weight:600}
-.sprint-state-closed{color:var(--text3);background:var(--surface2);border-radius:999px;padding:.15rem .65rem;font-size:.7rem;font-weight:600;text-decoration:line-through}
-.sprint-meta{display:flex;gap:1.5rem;padding:.75rem 1.25rem;flex-wrap:wrap;font-size:.8rem;color:var(--text2)}
-.sprint-meta span b{color:var(--text);font-weight:600}
-.sprint-actions{padding:.75rem 1.25rem;display:flex;gap:.5rem;border-top:1px solid var(--border)}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:.5rem 1.25rem}
-.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+/* ══ PAGES ═══════════════════════════════════════════════════════ */
+.page{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.page.on{display:flex}
 
-/* ── Project Cards ── */
-.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.project-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:var(--transition);position:relative}
-.project-card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
-.project-card.active-proj{border-color:var(--blue);background:rgba(59,130,246,.05)}
-.proj-card-icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.75rem}
-.proj-card-key{font-size:.7rem;font-family:monospace;color:var(--text3);margin-bottom:.25rem}
-.proj-card-name{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
-.proj-card-desc{font-size:.78rem;color:var(--text2);line-height:1.4;margin-bottom:.75rem}
-.proj-card-meta{display:flex;gap:.75rem;font-size:.72rem;color:var(--text3)}
-.proj-create-card{background:transparent;border:2px dashed var(--border);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:.5rem;color:var(--text3)}
-.proj-create-card:hover{border-color:var(--blue);color:var(--blue-light);background:rgba(59,130,246,.05)}
+/* ══ BACKLOG PAGE ════════════════════════════════════════════════ */
+#pg-backlog{padding:0}
+.bl-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;flex-wrap:wrap;border-bottom:1px solid var(--border2)}
+.bl-search{position:relative}
+.bl-search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3)}
+.bl-search input{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:5px 8px 5px 28px;font-size:13px;color:var(--text);outline:none;width:160px;transition:border-color .15s,width .2s}
+.bl-search input:focus{border-color:var(--blue2);width:220px}
+.bl-avatars{display:flex;align-items:center;gap:2px}
+.bl-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer;border:2px solid #fff;transition:transform .1s;margin-left:-4px}
+.bl-avatar:first-child{margin-left:0}
+.bl-avatar:hover{transform:scale(1.1);z-index:1}
+.bl-more{background:var(--bg);border:1px solid var(--border);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;margin-left:-4px}
+.bl-filter-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2);background:#fff;cursor:pointer;transition:background .1s,border-color .1s}
+.bl-filter-btn:hover{background:var(--bg);border-color:var(--text3)}
+.bl-content{flex:1;overflow-y:auto;padding:0 20px 40px}
 
-/* ── Chart ── */
-.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;overflow:hidden}
-.chart-title{font-size:.85rem;font-weight:700;margin-bottom:.75rem;color:var(--text2)}
-.burndown{width:100%;height:180px;display:block}
+/* Sprint Block */
+.sprint-block{margin-top:16px}
+.sprint-row{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;border-radius:var(--r);transition:background .1s}
+.sprint-row:hover{background:rgba(9,30,66,.04)}
+.sprint-chevron{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.sprint-chevron.open{transform:rotate(90deg)}
+.sprint-cb{width:14px;height:14px;border:2px solid var(--border);border-radius:2px;flex-shrink:0}
+.sprint-name{font-size:14px;font-weight:600;color:var(--text)}
+.sprint-dates{font-size:13px;color:var(--text2);margin-left:4px}
+.sprint-count{font-size:13px;color:var(--text2)}
+.sprint-badges{display:flex;align-items:center;gap:4px;margin-left:auto}
+.sp-badge{border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700;min-width:24px;text-align:center}
+.sp-badge.done{background:#e3fcef;color:#00875a}
+.sp-badge.inprog{background:#e9f2ff;color:#0052cc}
+.sp-badge.todo{background:#f4f5f7;color:#5e6c84}
+.sprint-btn{padding:4px 10px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap;transition:background .1s,border-color .1s}
+.sprint-btn:hover{background:var(--bg);border-color:var(--text3)}
+.sprint-btn.primary{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+.sprint-btn.primary:hover{background:var(--blue)}
+.sprint-btn.complete{background:#fff;color:var(--text2)}
+.sprint-menu{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--text3);cursor:pointer;transition:background .1s;background:transparent}
+.sprint-menu:hover{background:var(--bg)}
 
-/* ── Detail Panel ── */
-#detail-panel{position:fixed;top:0;right:-520px;width:520px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:200;display:flex;flex-direction:column;transition:right .25s ease;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4)}
-#detail-panel.open{right:0}
-.detail-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;flex-shrink:0}
-.detail-key{font-family:monospace;font-size:.85rem;color:var(--blue-light);font-weight:700}
-.detail-title{font-size:1.05rem;font-weight:700;padding:1rem 1.25rem .25rem;line-height:1.3}
-.detail-body{flex:1;overflow-y:auto;padding:0 1.25rem 1.25rem}
-.detail-section{margin-top:1.25rem}
-.detail-section-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:.6rem}
-.detail-field{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.82rem}
-.detail-field:last-child{border:none}
-.detail-field-label{color:var(--text3);font-weight:500}
-.desc-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;font-size:.82rem;line-height:1.6;color:var(--text2);min-height:60px}
-.comment{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .75rem;margin-bottom:.5rem;font-size:.82rem}
-.comment-author{font-weight:600;font-size:.75rem;color:var(--blue-light);margin-bottom:.25rem}
-.comment-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:.55rem .75rem;color:var(--text);resize:vertical;min-height:64px;outline:none;font-size:.82rem;transition:var(--transition)}
-.comment-input:focus{border-color:var(--blue)}
-.divider{height:1px;background:var(--border);margin:.25rem 0}
-.transition-btn{padding:.3rem .7rem;border-radius:var(--radius);font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:var(--transition)}
-.transition-btn:hover{border-color:var(--blue);color:var(--blue-light);background:rgba(59,130,246,.1)}
+/* Issue Rows */
+.sprint-issues{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-top:4px}
+.issue-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;background:#fff}
+.issue-row:last-child{border-bottom:none}
+.issue-row:hover{background:#f8f9fa}
+.ir-cb{width:14px;height:14px;border:2px solid var(--border);border-radius:2px;flex-shrink:0}
+.ir-type{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px}
+.ir-key{font-size:12px;color:var(--blue2);font-weight:500;white-space:nowrap;width:80px;flex-shrink:0;font-family:monospace}
+.ir-key:hover{text-decoration:underline}
+.ir-summary{flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ir-prio{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.ir-assignee{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.ir-pts{font-size:12px;color:var(--text2);width:24px;text-align:right;flex-shrink:0}
+.ir-status{font-size:11px;font-weight:600;padding:2px 6px;border-radius:2px;white-space:nowrap;flex-shrink:0}
+.ir-status.todo{background:var(--bg);color:var(--text2)}
+.ir-status.prog{background:#e9f2ff;color:var(--blue)}
+.ir-status.review{background:#fffae6;color:#974f0c}
+.ir-status.done{background:#e3fcef;color:var(--green)}
 
-/* ── Modal ── */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center}
-#modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);width:520px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
-.modal-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.modal-title{font-size:1rem;font-weight:700}
-.modal-body{padding:1.25rem;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
-.modal-footer{padding:.75rem 1.25rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.5rem;flex-shrink:0}
+/* Backlog section */
+.backlog-header{display:flex;align-items:center;gap:8px;padding:12px 0 8px;margin-top:8px}
+.backlog-title{font-size:14px;font-weight:600;color:var(--text)}
+.backlog-count{font-size:13px;color:var(--text2)}
+.backlog-badges{display:flex;align-items:center;gap:4px;margin-left:auto}
+.backlog-create-sprint{font-size:12px;color:var(--blue2);cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:background .1s}
+.backlog-create-sprint:hover{background:var(--blue-xlight)}
+.bl-create-row{padding:8px 12px;font-size:13px;color:var(--blue2);cursor:pointer;display:flex;align-items:center;gap:6px;background:#fff;border-top:1px solid var(--border2)}
+.bl-create-row:hover{background:var(--blue-xlight)}
 
-/* ── Notifications ── */
-#notif-panel{position:fixed;top:56px;right:0;width:340px;height:calc(100vh - 56px);background:var(--surface);border-left:1px solid var(--border);z-index:150;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.3)}
-#notif-panel.open{transform:translateX(0)}
-.notif-header{padding:1rem;border-bottom:1px solid var(--border);font-weight:700;display:flex;align-items:center;justify-content:space-between}
-.notif-list{overflow-y:auto;flex:1}
-.notif-item{padding:.75rem 1rem;border-bottom:1px solid var(--border);font-size:.82rem;cursor:pointer;transition:var(--transition)}
-.notif-item:hover{background:var(--surface2)}
-.notif-item.unread{background:rgba(59,130,246,.05)}
-.notif-title{font-weight:600;margin-bottom:.2rem}
-.notif-body{color:var(--text2);font-size:.78rem}
+/* Epic panel drag hint */
+.drag-hint{padding:20px;text-align:center;font-size:13px;color:var(--text3);background:#f8f9fa;border:1px dashed var(--border);border-radius:var(--r);margin:8px 0}
 
-/* ── Toast ── */
-#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
-.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem 1rem;font-size:.82rem;display:flex;align-items:center;gap:.6rem;box-shadow:var(--shadow);animation:slideIn .2s ease}
-.toast.success{border-color:rgba(16,185,129,.5)}
-.toast.error{border-color:rgba(239,68,68,.5)}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.loading{padding:2rem;text-align:center;color:var(--text3);font-size:.85rem}
-.empty{padding:3rem 1rem;text-align:center;color:var(--text3)}
-.empty-icon{font-size:2.5rem;margin-bottom:.5rem}
-.empty-title{font-weight:600;color:var(--text2);margin-bottom:.25rem}
+/* ══ BOARD PAGE ══════════════════════════════════════════════════ */
+#pg-board{padding:0;flex-direction:row;overflow:hidden}
+.board-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.board-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border2);flex-shrink:0;flex-wrap:wrap}
+.board-sprint-title{font-size:15px;font-weight:600;color:var(--text)}
+.board-scroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 20px}
+.board-cols{display:flex;gap:12px;height:100%;min-width:max-content}
+.bcol{width:280px;display:flex;flex-direction:column;flex-shrink:0}
+.bcol-header{padding:8px 4px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bcol-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.bcol-count{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 7px;font-weight:600}
+.bcol-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px}
+.bcard{background:#fff;border-radius:var(--r2);padding:10px 12px;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s,transform .1s;border:1px solid transparent}
+.bcard:hover{box-shadow:var(--shadow2);transform:translateY(-1px);border-color:var(--blue-light)}
+.bcard-summary{font-size:13px;color:var(--text);line-height:1.4;margin-bottom:10px}
+.bcard-footer{display:flex;align-items:center;justify-content:space-between}
+.bcard-left{display:flex;align-items:center;gap:6px}
+.bcard-type{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.bcard-key{font-size:11px;color:var(--text3);font-family:monospace}
+.bcard-prio{font-size:12px}
+.bcard-right{display:flex;align-items:center;gap:6px}
+.bcard-pts{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:1px 5px;font-weight:500}
+.bcard-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+
+/* ══ BOARD DONE COL ══════════════════════════════════════════════ */
+.bcol.done .bcol-title{color:var(--green)}
+
+/* ══ ISSUE DETAIL PANEL ══════════════════════════════════════════ */
+#detail-panel{position:fixed;top:var(--topnav-h);right:-680px;width:680px;height:calc(100vh - var(--topnav-h));background:#fff;border-left:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transition:right .25s ease;box-shadow:-4px 0 24px rgba(9,30,66,.15);overflow:hidden}
+#detail-panel.on{right:0}
+.dp-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dp-key{font-size:13px;color:var(--blue2);font-weight:600;font-family:monospace;cursor:pointer}
+.dp-key:hover{text-decoration:underline}
+.dp-actions{display:flex;align-items:center;gap:4px;margin-left:auto}
+.dp-action{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s}
+.dp-action:hover{background:var(--bg)}
+.dp-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 240px;gap:0}
+.dp-main{padding:20px;border-right:1px solid var(--border2);overflow-y:auto}
+.dp-sidebar{padding:16px;overflow-y:auto;background:#f8f9fa}
+.dp-title{font-size:20px;font-weight:600;line-height:1.3;color:var(--text);margin-bottom:16px;cursor:text}
+.dp-title:hover{background:var(--bg);border-radius:var(--r);padding:4px;margin:-4px}
+.dp-section{margin-bottom:20px}
+.dp-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px}
+.dp-desc{font-size:14px;color:var(--text2);line-height:1.6;background:var(--bg);border-radius:var(--r);padding:12px;min-height:60px;border:1px solid transparent;cursor:text}
+.dp-desc:hover{border-color:var(--border);background:#fff}
+.dp-field{display:flex;align-items:center;margin-bottom:12px;gap:8px}
+.dp-field-label{font-size:12px;font-weight:600;color:var(--text2);width:100px;flex-shrink:0}
+.dp-field-val{font-size:14px;color:var(--text);flex:1}
+.dp-status-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .1s}
+.dp-status-btn:hover{opacity:.85}
+.dp-transitions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dp-trans-btn{padding:4px 10px;font-size:12px;font-weight:500;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);cursor:pointer;transition:background .1s,border-color .1s}
+.dp-trans-btn:hover{background:var(--bg);border-color:var(--text3)}
+.dp-assignee-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.dp-comment{background:#fff;border:1px solid var(--border2);border-radius:var(--r2);padding:12px;margin-bottom:8px}
+.dp-comment-author{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.dp-comment-time{font-size:11px;color:var(--text3);font-weight:400}
+.dp-comment-body{font-size:13px;color:var(--text2);line-height:1.5}
+.dp-comment-input{width:100%;border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:72px;transition:border-color .15s,box-shadow .15s}
+.dp-comment-input:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+
+/* ══ MODAL ═══════════════════════════════════════════════════════ */
+#modal-bg{position:fixed;inset:0;background:rgba(9,30,66,.54);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:80px}
+#modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:var(--r2);width:600px;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--shadow3)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:600}
+.modal-close{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s;font-size:18px}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+.mf{display:flex;flex-direction:column;gap:6px}
+.ml{font-size:12px;font-weight:600;color:var(--text2)}
+.mi{border:2px solid var(--border);border-radius:var(--r2);padding:7px 10px;color:var(--text);outline:none;width:100%;transition:border-color .15s}
+.mi:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+.mi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+select.mi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+textarea.mi{resize:vertical;min-height:80px}
+.btn-jira{padding:7px 14px;border-radius:var(--r2);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,opacity .15s}
+.btn-primary{background:var(--blue2);color:#fff;border:none}
+.btn-primary:hover{background:var(--blue)}
+.btn-secondary{background:var(--bg);color:var(--text);border:none}
+.btn-secondary:hover{background:var(--border)}
+.btn-danger-jira{background:var(--red);color:#fff;border:none}
+.btn-danger-jira:hover{background:#bf2600}
+.mf-hint{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ══ NOTIFICATIONS ═══════════════════════════════════════════════ */
+#notif-panel{position:fixed;top:var(--topnav-h);right:-360px;width:360px;height:calc(100vh - var(--topnav-h));background:#fff;border-left:1px solid var(--border);z-index:400;display:flex;flex-direction:column;transition:right .2s;box-shadow:-4px 0 16px rgba(9,30,66,.12)}
+#notif-panel.on{right:0}
+.np-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.np-title{font-size:15px;font-weight:600}
+.np-mark-all{font-size:12px;color:var(--blue2);cursor:pointer}
+.np-mark-all:hover{text-decoration:underline}
+.np-item{padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;display:flex;gap:10px;align-items:flex-start}
+.np-item:hover{background:var(--bg)}
+.np-item.unread{background:#f0f4ff}
+.np-dot{width:8px;height:8px;border-radius:50%;background:var(--blue2);flex-shrink:0;margin-top:4px}
+.np-content .np-title2{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.np-content .np-body{font-size:12px;color:var(--text2)}
+.np-content .np-time{font-size:11px;color:var(--text3);margin-top:4px}
+.np-empty{padding:40px;text-align:center;color:var(--text3);font-size:13px}
+
+/* ══ TOASTS ═══════════════════════════════════════════════════════ */
+#toast-box{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#172b4d;color:#fff;border-radius:var(--r2);padding:10px 20px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow3);animation:toastIn .25s ease;pointer-events:all;min-width:240px}
+.toast.err{background:var(--red)}
+.toast.ok{background:var(--green)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ PROJECTS PAGE ═══════════════════════════════════════════════ */
+#pg-projects{padding:32px}
+.pp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.pp-title{font-size:22px;font-weight:600}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.pp-card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;transition:box-shadow .15s,transform .1s}
+.pp-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px)}
+.pp-card.act{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.2)}
+.pp-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pp-card-icon{width:40px;height:40px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pp-card-meta{flex:1}
+.pp-card-key{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.pp-card-name{font-size:15px;font-weight:600;color:var(--text)}
+.pp-card-desc{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:12px}
+.pp-card-footer{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text3)}
+.pp-card-type{display:flex;align-items:center;gap:4px;background:var(--bg);border-radius:2px;padding:2px 6px;font-weight:500}
+.pp-create{background:#fff;border:2px dashed var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;transition:border-color .15s,background .15s;color:var(--text3)}
+.pp-create:hover{border-color:var(--blue2);background:var(--blue-xlight);color:var(--blue2)}
+.pp-create-icon{font-size:28px}
+.pp-create-text{font-size:13px;font-weight:500}
+
+/* ══ DASHBOARD PAGE ══════════════════════════════════════════════ */
+#pg-dashboard{padding:32px}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.dash-card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px}
+.dash-card-num{font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+.dash-card-label{font-size:13px;color:var(--text2);font-weight:500}
+.dash-2col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.dash-table{background:#fff;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.dash-table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:600}
+.dash-table-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border2);font-size:13px;cursor:pointer;transition:background .1s}
+.dash-table-row:last-child{border:none}
+.dash-table-row:hover{background:var(--bg)}
+.dash-burndown{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.dash-burndown-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.bd-svg{width:100%;height:200px;display:block}
+
+/* ══ MISC ════════════════════════════════════════════════════════ */
+.loading{padding:40px;text-align:center;color:var(--text3);font-size:13px}
+.empty{padding:48px;text-align:center}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.empty-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty-sub{font-size:13px;color:var(--text2)}
 </style>
 </head>
 <body>
 
-<!-- ── Login Screen ── -->
+<!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">⚡ Digiprise PMS</div>
-    <div class="login-sub">Enterprise Project Management — v1.0</div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input class="form-input" type="email" id="login-email" placeholder="admin@demo.digiprise.io" value="admin@demo.digiprise.io"/>
+  <div class="lw">
+    <div class="ll">
+      <div class="ll-icon">
+        <svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg>
+      </div>
+      <div class="ll-name">Digiprise <span style="color:var(--blue2)">Jira</span></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" type="password" id="login-password" placeholder="Password" value="Admin@123!" onkeydown="if(event.key==='Enter')login()"/>
+    <div class="lc">
+      <h2>Log in to continue</h2>
+      <p style="margin-bottom:20px;color:var(--text2);font-size:13px">to Digiprise Software Projects</p>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="le" value="admin@demo.digiprise.io" placeholder="Enter email"/></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="lp" value="Admin@123!" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div id="lerr" class="lerr">Incorrect email or password. Try again.</div>
+      <button class="fb" id="lbtn" onclick="doLogin()">Log in</button>
     </div>
-    <div id="login-error" class="error-msg">Invalid credentials. Please try again.</div>
-    <button class="btn btn-primary" id="login-btn" style="width:100%;justify-content:center;padding:.65rem;margin-top:.5rem" onclick="login()">
-      <span id="login-btn-text">Sign In →</span>
-    </button>
-    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.75rem;color:var(--text3)">
-      Demo: <b style="color:var(--text2)">admin@demo.digiprise.io</b> / <b style="color:var(--text2)">Admin@123!</b>
-    </div>
+    <div class="ldemo">Demo: <strong>admin@demo.digiprise.io</strong> / <strong>Admin@123!</strong></div>
   </div>
 </div>
 
-<!-- ── App Shell ── -->
-<div id="app-shell">
-  <!-- Top Nav -->
-  <nav id="topnav">
-    <button class="nav-btn" onclick="toggleSidebar()" title="Toggle sidebar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <span class="nav-logo" onclick="showPage('dashboard')">⚡ Digiprise PMS</span>
-    <input id="global-search" type="text" placeholder="Search issues… (type & press Enter)" onkeydown="if(event.key==='Enter')quickSearch(this.value)"/>
-    <div class="nav-right">
-      <button class="btn btn-primary btn-sm" onclick="openCreateIssue()">+ Issue</button>
-      <button class="btn btn-secondary btn-sm" onclick="openCreateProject()">+ Project</button>
-      <div class="nav-btn notif-badge" onclick="toggleNotifs()" title="Notifications">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="badge-dot" id="notif-dot"></span>
+<!-- APP -->
+<div id="app">
+  <!-- TOP NAV -->
+  <nav id="tnav">
+    <a class="tn-logo" onclick="showPage('dashboard')">
+      <div class="tn-logo-icon">
+        <svg viewBox="0 0 32 32" width="16" height="16"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg>
       </div>
-      <div class="avatar" id="user-avatar" title="Logged in user">A</div>
+      <span class="tn-logo-text">Digiprise <span>Jira</span></span>
+    </a>
+    <div class="tn-sep"></div>
+    <div class="tn-item" onclick="toggleSb()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </div>
+    <div class="tn-item" onclick="showPage('dashboard')">Your work</div>
+    <div class="tn-item" onclick="showPage('projects')">Projects <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-item">Filters <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-item">Dashboards <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-item">Teams <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-item">Plans <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-search">
+      <svg class="tn-search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search" onkeydown="if(event.key==='Enter')doSearch(this.value)"/>
+    </div>
+    <div class="tn-right">
+      <button class="btn-create" onclick="openCreateIssue()">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16"/></svg>
+        Create
+      </button>
+      <div class="tn-sep"></div>
+      <div class="tn-icon-btn" onclick="toggleNotifs()" title="Notifications">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="tn-notif-dot" id="ndot"></div>
+      </div>
+      <div class="tn-icon-btn" title="Settings">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="tn-avatar" id="user-av" title="Profile">A</div>
     </div>
   </nav>
 
-  <div id="app">
-    <!-- Sidebar -->
-    <aside id="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-label">Navigation</div>
-        <div class="sidebar-item active" onclick="showPage('dashboard')" id="nav-dashboard">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Dashboard</span>
-        </div>
-        <div class="sidebar-item" onclick="showPage('projects')" id="nav-projects">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          <span>All Projects</span>
-        </div>
-        <div class="sidebar-item" onclick="showPage('board')" id="nav-board">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="12"/><rect x="17" y="3" width="5" height="16"/></svg>
-          <span>Scrum Board</span>
-        </div>
-        <div class="sidebar-item" onclick="showPage('backlog')" id="nav-backlog">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          <span>Backlog</span>
-        </div>
-        <div class="sidebar-item" onclick="showPage('sprints')" id="nav-sprints">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Sprints</span>
-        </div>
-        <div class="sidebar-item" onclick="showPage('issues')" id="nav-issues">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span>Issue Tracker</span>
-        </div>
+  <div id="body">
+    <!-- LEFT SIDEBAR -->
+    <aside id="lsb">
+      <div class="sb-section">
+        <div class="sb-item" onclick="showPage('dashboard')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><span class="sb-item-text">For you</span></div>
+        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="sb-item-text">Recent</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="sb-item-text">Starred</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+        <div class="sb-item" onclick="showPage('projects')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span class="sb-item-text">Projects</span></div>
+        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="sb-item-text">Apps</span></div>
+        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="sb-item-text">Plans</span></div>
+        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span class="sb-item-text">Spaces</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
       </div>
-
-      <div class="sidebar-section">
-        <div class="sidebar-label">Your Projects</div>
-        <div id="project-list"></div>
-        <div class="sidebar-new-proj" onclick="openCreateProject()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>New Project</span>
-        </div>
+      <div class="sb-sep"></div>
+      <div class="sb-section">
+        <div class="sb-label">Recent</div>
+        <div id="sb-recent-list"></div>
       </div>
-
-      <div class="sidebar-footer">
-        <div class="sidebar-item" onclick="logout()" style="color:var(--red)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
+      <div class="sb-sep"></div>
+      <div class="sb-section">
+        <div class="sb-label">Starred</div>
+        <div id="sb-starred-list"></div>
+      </div>
+      <div class="sb-sep"></div>
+      <div class="sb-section">
+        <div class="sb-label">Filters</div>
+        <div class="sb-filters-item" onclick="searchIssues('issuetype = Bug')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Search work items</span></div>
+        <div class="sb-filters-item" onclick="searchIssues('priority = Blocker')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><span>Blockers</span></div>
+        <div class="sb-filters-item" onclick="searchIssues('priority = Critical')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m10.29 3.86-8.6 14.9A1 1 0 0 0 2.57 20h17.06a1 1 0 0 0 .88-1.47l-8.6-14.9a1 1 0 0 0-1.72 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Critical issues</span></div>
+      </div>
+      <div class="sb-sep" style="margin-top:auto"></div>
+      <div class="sb-section">
+        <div class="sb-item" onclick="doLogout()" style="color:rgba(255,100,100,.85)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="sb-item-text">Sign out</span>
         </div>
       </div>
     </aside>
 
-    <!-- Main -->
-    <main id="main">
+    <!-- MAIN -->
+    <div id="main">
 
-      <!-- Dashboard -->
-      <div class="page active" id="page-dashboard">
-        <div class="page-header">
-          <div><div class="page-title" id="dashboard-greeting">Good morning 👋</div><div class="page-subtitle">Here's what's happening across your workspace</div></div>
-          <div class="flex gap-2">
-            <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">⟳ Refresh</button>
-            <button class="btn btn-primary btn-sm" onclick="openCreateIssue()">+ Create Issue</button>
+      <!-- PROJECT HEADER -->
+      <div id="proj-header">
+        <div class="ph-top">
+          <span class="ph-breadcrumb">Spaces <span>›</span> <span id="ph-space">Select Project</span></span>
+          <div class="ph-actions">
+            <div class="ph-action-btn" title="Share"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+            <div class="ph-action-btn" title="Automation"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <div class="ph-action-btn" title="More">•••</div>
           </div>
         </div>
-        <div class="stat-grid" id="stat-grid"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-          <div class="chart-wrap">
-            <div class="chart-title">🔥 Sprint Burndown</div>
-            <svg class="burndown" id="burndown-svg" viewBox="0 0 500 200"></svg>
+        <div class="ph-title">
+          <div class="ph-proj-icon" id="ph-icon">📁</div>
+          <div class="ph-proj-name" id="ph-name">Select a Project</div>
+        </div>
+        <div class="ph-tabs">
+          <div class="ph-tab act" id="tab-backlog" onclick="switchTab('backlog')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Backlog</div>
+          <div class="ph-tab" id="tab-board" onclick="switchTab('board')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="12"/><rect x="17" y="3" width="5" height="16"/></svg> Board</div>
+          <div class="ph-tab-sep"></div>
+          <div class="ph-tab" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Summary</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg> Timeline</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Reports</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Forms</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg> Goals</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Development</div>
+          <div class="ph-tab">+ Add</div>
+        </div>
+      </div>
+
+      <!-- PAGES -->
+
+      <!-- BACKLOG -->
+      <div class="page on" id="pg-backlog">
+        <div class="bl-toolbar">
+          <div class="bl-search">
+            <svg class="bl-search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search backlog" id="bl-search-input" oninput="filterBacklog(this.value)"/>
           </div>
-          <div class="table-wrap">
-            <div style="padding:.75rem 1rem;border-bottom:1px solid var(--border);font-size:.85rem;font-weight:600;display:flex;align-items:center;justify-content:space-between">
-              <span>📋 Assigned to Me</span>
-              <button class="btn btn-ghost btn-sm" onclick="showPage('issues')">View all →</button>
+          <div class="bl-avatars" id="bl-avatars"></div>
+          <button class="bl-filter-btn">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filter
+          </button>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="bl-filter-btn" onclick="openCreateIssue()">+ Create issue</button>
+            <button class="bl-filter-btn" onclick="openCreateSprint()">+ Create sprint</button>
+          </div>
+        </div>
+        <div class="bl-content" id="bl-content">
+          <div class="loading">Select a project to view backlog</div>
+        </div>
+      </div>
+
+      <!-- BOARD -->
+      <div class="page" id="pg-board">
+        <div class="board-wrap">
+          <div class="board-toolbar">
+            <span class="board-sprint-title" id="board-sprint-title">Active Sprint</span>
+            <div class="bl-avatars" style="margin-left:8px" id="board-avatars"></div>
+            <button class="bl-filter-btn" style="margin-left:8px">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+            </button>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="bl-filter-btn" onclick="openCreateIssue()">+ Create issue</button>
             </div>
-            <div id="my-issues-list"></div>
+          </div>
+          <div class="board-scroll">
+            <div class="board-cols" id="board-cols"></div>
           </div>
         </div>
       </div>
 
-      <!-- All Projects -->
-      <div class="page" id="page-projects">
-        <div class="page-header">
-          <div><div class="page-title">📁 All Projects</div><div class="page-subtitle">Create and manage your projects</div></div>
-          <button class="btn btn-primary" onclick="openCreateProject()">+ New Project</button>
-        </div>
-        <div class="project-grid" id="projects-grid"></div>
-      </div>
-
-      <!-- Scrum Board -->
-      <div class="page" id="page-board" style="overflow:hidden;padding-bottom:0">
-        <div class="page-header" style="flex-shrink:0;padding-bottom:1rem">
-          <div>
-            <div class="page-title">🗂 Scrum Board</div>
-            <div class="page-subtitle" id="board-sprint-name">Select a project to view its active sprint</div>
-          </div>
-          <div class="flex gap-2">
-            <button class="btn btn-secondary btn-sm" onclick="loadBoard()">⟳ Refresh</button>
-            <button class="btn btn-primary btn-sm" onclick="openCreateIssue()">+ Issue</button>
-          </div>
-        </div>
-        <div class="board-scroll"><div class="board" id="kanban-board"></div></div>
-      </div>
-
-      <!-- Backlog -->
-      <div class="page" id="page-backlog">
-        <div class="page-header">
-          <div><div class="page-title">📦 Backlog</div><div class="page-subtitle">Issues not assigned to any sprint</div></div>
-          <div class="flex gap-2">
-            <button class="btn btn-secondary btn-sm" onclick="loadBacklog()">⟳ Refresh</button>
-            <button class="btn btn-primary btn-sm" onclick="openCreateIssue()">+ Issue</button>
+      <!-- DASHBOARD -->
+      <div class="page" id="pg-dashboard">
+        <div id="pg-dashboard-inner" style="padding:32px;flex:1;overflow-y:auto">
+          <div style="font-size:22px;font-weight:600;margin-bottom:4px" id="dash-greeting">Good morning 👋</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:24px">Here's what's on your plate</div>
+          <div class="dash-grid" id="dash-stats"></div>
+          <div class="dash-2col">
+            <div class="dash-table">
+              <div class="dash-table-header">
+                <span>Assigned to me</span>
+                <span style="font-size:12px;color:var(--blue2);cursor:pointer;font-weight:400" onclick="searchIssues('')">View all →</span>
+              </div>
+              <div id="dash-my-issues"></div>
+            </div>
+            <div class="dash-burndown">
+              <div class="dash-burndown-title">Sprint Burndown</div>
+              <svg class="bd-svg" id="bd-svg" viewBox="0 0 300 200"></svg>
+            </div>
           </div>
         </div>
-        <div class="table-wrap">
-          <div class="table-header"><span>Key</span><span>Summary</span><span>Type</span><span>Priority</span><span>Assignee</span><span>Points</span><span></span></div>
-          <div id="backlog-list"></div>
-        </div>
       </div>
 
-      <!-- Sprints -->
-      <div class="page" id="page-sprints">
-        <div class="page-header">
-          <div><div class="page-title">⚡ Sprints</div><div class="page-subtitle">Sprint lifecycle, velocity & burndown</div></div>
-          <div class="flex gap-2">
-            <button class="btn btn-secondary btn-sm" onclick="loadSprints()">⟳ Refresh</button>
-            <button class="btn btn-primary btn-sm" onclick="openCreateSprint()">+ Sprint</button>
-          </div>
+      <!-- PROJECTS -->
+      <div class="page" id="pg-projects">
+        <div class="pp-header">
+          <div class="pp-title">Projects</div>
+          <button class="btn-jira btn-primary" onclick="openCreateProject()">Create project</button>
         </div>
-        <div id="sprints-list" style="display:flex;flex-direction:column;gap:1rem"></div>
+        <div class="pp-grid" id="pp-grid"></div>
       </div>
 
-      <!-- Issue Tracker -->
-      <div class="page" id="page-issues">
-        <div class="page-header">
-          <div><div class="page-title">🎫 Issue Tracker</div><div class="page-subtitle">Search and filter with IQL</div></div>
-          <button class="btn btn-primary btn-sm" onclick="openCreateIssue()">+ Issue</button>
-        </div>
-        <div class="flex gap-2 items-center" style="flex-wrap:wrap">
-          <input class="form-input" id="iql-input" style="flex:1;min-width:260px" placeholder='IQL: issuetype = Bug AND priority = Critical'/>
-          <button class="btn btn-primary btn-sm" onclick="runIQL()">🔍 Search</button>
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById(&quot;iql-input&quot;).value=&quot;&quot;;loadAllIssues()">✕ Clear</button>
-        </div>
-        <div class="flex gap-2 flex-wrap">
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('issuetype = Bug')">🐛 Bugs</button>
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('issuetype = Epic')">🏔 Epics</button>
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('issuetype = Story')">📖 Stories</button>
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('priority = Critical')">🔴 Critical</button>
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('priority = Blocker')">🚨 Blockers</button>
-          <button class="btn btn-ghost btn-sm chip" onclick="setIQL('sprint = openSprints()')">⚡ In Sprint</button>
-        </div>
-        <div class="table-wrap">
-          <div class="table-header"><span>Key</span><span>Summary</span><span>Type</span><span>Priority</span><span>Assignee</span><span>Points</span><span></span></div>
-          <div id="all-issues-list"></div>
-        </div>
-      </div>
+    </div><!-- /main -->
+  </div><!-- /body -->
+</div><!-- /app -->
 
-    </main>
-  </div>
-</div>
-
-<!-- Issue Detail Side Panel -->
+<!-- ISSUE DETAIL PANEL -->
 <div id="detail-panel">
-  <div class="detail-header">
-    <span class="detail-key" id="dp-key"></span>
-    <div class="flex gap-2 items-center" style="margin-left:auto">
-      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeDetail()" title="Close">✕</button>
+  <div class="dp-header">
+    <span class="dp-key" id="dp-key"></span>
+    <div class="dp-actions">
+      <button class="dp-action" title="Open in full page"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></button>
+      <button class="dp-action" title="Give feedback"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+      <button class="dp-action" title="Close" onclick="closeDetail()" style="font-size:18px;color:var(--text3)">✕</button>
     </div>
   </div>
-  <div class="detail-title" id="dp-title"></div>
-  <div class="detail-body">
-    <div class="flex gap-2 mt-2 flex-wrap" id="dp-badges"></div>
-    <div class="divider mt-2"></div>
-    <div class="detail-section">
-      <div class="detail-section-title">Details</div>
-      <div id="dp-fields"></div>
+  <div class="dp-body">
+    <div class="dp-main">
+      <div class="dp-title" id="dp-title">Loading…</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="dp-badges"></div>
+      <div class="dp-section">
+        <div class="dp-section-title">Description</div>
+        <div class="dp-desc" id="dp-desc">No description provided.</div>
+      </div>
+      <div class="dp-section">
+        <div class="dp-section-title">Transition Status</div>
+        <div class="dp-transitions" id="dp-transitions"></div>
+      </div>
+      <div class="dp-section">
+        <div class="dp-section-title">Activity</div>
+        <div id="dp-comments"></div>
+        <div style="margin-top:12px">
+          <textarea class="dp-comment-input" id="comment-input" placeholder="Add a comment… Ctrl+Enter to save" onkeydown="if(event.ctrlKey&&event.key==='Enter')postComment()" rows="2"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:8px">
+            <button class="btn-jira btn-secondary" onclick="document.getElementById('comment-input').value=''">Cancel</button>
+            <button class="btn-jira btn-primary" onclick="postComment()">Save</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Description</div>
-      <div class="desc-box" id="dp-desc">No description provided.</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Transition Status</div>
-      <div class="flex gap-2 flex-wrap" id="dp-transitions"></div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Comments</div>
-      <div id="dp-comments"></div>
-      <div class="mt-2">
-        <textarea class="comment-input" id="comment-input" placeholder="Add a comment… (Ctrl+Enter to post)" rows="2" onkeydown="if(event.ctrlKey&&event.key==='Enter')submitComment()"></textarea>
-        <button class="btn btn-primary btn-sm mt-2" onclick="submitComment()">Post Comment</button>
+    <div class="dp-sidebar">
+      <div class="dp-section">
+        <div class="dp-section-title">Details</div>
+        <div id="dp-fields"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Create Issue Modal -->
-<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+<!-- MODAL -->
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modal-box">
     <div class="modal-header">
-      <div class="modal-title" id="modal-title">✨ Create Issue</div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal()">✕</button>
+      <div class="modal-title" id="modal-title">Create issue</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer" id="modal-footer"></div>
   </div>
 </div>
 
-<!-- Notification Panel -->
+<!-- NOTIFICATION PANEL -->
 <div id="notif-panel">
-  <div class="notif-header">
-    <span>🔔 Notifications</span>
-    <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+  <div class="np-header">
+    <span class="np-title">Notifications</span>
+    <span class="np-mark-all" onclick="markAllRead()">Mark all as read</span>
   </div>
-  <div class="notif-list" id="notif-list"></div>
+  <div id="notif-list"></div>
 </div>
 
-<div id="toast-container"></div>
+<div id="toast-box"></div>
 
 <script>
 const API = '';
-let token = null, currentUser = null;
-let projects = [], allIssues = [], sprints = [], notifications = [];
-let currentProject = null, currentIssueId = null;
+let token=null, currentUser=null, projects=[], currentProject=null, sprints=[], currentIssueId=null, allIssues=[];
 
-/* ── API Helper ── */
-async function api(method, path, body) {
-  const opts = { method, headers: { 'Content-Type': 'application/json' } };
-  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(API + path, opts);
-  if (r.status === 401) { logout(); throw new Error('Session expired — please log in again'); }
-  if (!r.ok) { const e = await r.json().catch(()=>({title:'Error',detail:r.statusText})); throw new Error(e.detail||e.title||r.statusText); }
-  if (r.status === 204) return null;
+/* ── COLOURS ── */
+const AV_COLORS=['#0052cc','#00875a','#6554c0','#de350b','#ff991f','#00b8d9','#403294'];
+const avatarColor = (name='') => AV_COLORS[name.charCodeAt(0)%AV_COLORS.length];
+const avatarInitial = (name='') => name.trim()[0]?.toUpperCase()||'?';
+
+/* ── API ── */
+async function api(method,path,body){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(token) opts.headers['Authorization']='Bearer '+token;
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API+path,opts);
+  if(r.status===401){doLogout();throw new Error('Session expired');}
+  if(!r.ok){const e=await r.json().catch(()=>({title:'Error'}));throw new Error(e.detail||e.title||r.statusText);}
+  if(r.status===204) return null;
   return r.json();
 }
 
-/* ── Auth ── */
-async function login() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-password').value;
-  const btn   = document.getElementById('login-btn-text');
-  const errEl = document.getElementById('login-error');
-  errEl.style.display = 'none';
-  btn.textContent = 'Signing in…';
-  try {
-    const data = await api('POST', `/api/v1/auth/login?tenantId=1`, { email, password: pass });
-    token = data.accessToken;
-    currentUser = data.user;
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-shell').classList.add('visible');
-    document.getElementById('user-avatar').textContent = (data.user.displayName||'U')[0].toUpperCase();
-    document.getElementById('user-avatar').title = data.user.displayName + ' (' + data.user.email + ')';
+/* ── LOGIN ── */
+async function doLogin(){
+  const email=document.getElementById('le').value.trim();
+  const pass=document.getElementById('lp').value;
+  const btn=document.getElementById('lbtn');
+  document.getElementById('lerr').style.display='none';
+  btn.textContent='Logging in…';btn.disabled=true;
+  try{
+    const d=await api('POST','/api/v1/auth/login?tenantId=1',{email,password:pass});
+    token=d.accessToken; currentUser=d.user;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').classList.add('on');
+    const av=document.getElementById('user-av');
+    av.textContent=avatarInitial(d.user.displayName);
+    av.style.background=avatarColor(d.user.displayName);
+    av.title=d.user.displayName;
     onLoggedIn();
-  } catch(e) {
-    errEl.textContent = e.message; errEl.style.display = 'block';
-  } finally { btn.textContent = 'Sign In →'; }
+  }catch(e){
+    document.getElementById('lerr').style.display='block';
+    document.getElementById('lerr').textContent=e.message;
+  }finally{btn.textContent='Log in';btn.disabled=false;}
 }
 
-function logout() {
-  token = null; currentUser = null; currentProject = null;
-  document.getElementById('app-shell').classList.remove('visible');
-  document.getElementById('login-screen').style.display = '';
-  toast('Signed out', 'success');
+function doLogout(){
+  token=null;currentUser=null;currentProject=null;
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('login-screen').style.display='';
+  toast('Signed out','info');
 }
 
-async function onLoggedIn() {
-  const h = new Date().getHours();
-  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('dashboard-greeting').textContent = `${greet}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
+async function onLoggedIn(){
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('dash-greeting').textContent=`${g}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
   await loadProjects();
   loadDashboard();
   loadNotifications();
 }
 
-/* ── Navigation ── */
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item[id^=nav-]').forEach(i => i.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  const navEl = document.getElementById('nav-' + name);
-  if (navEl) navEl.classList.add('active');
-  closeDetail(); closeNotifs();
-  if (name === 'board')    loadBoard();
-  if (name === 'backlog')  loadBacklog();
-  if (name === 'sprints')  loadSprints();
-  if (name === 'issues')   loadAllIssues();
-  if (name === 'projects') loadProjectsPage();
-  if (name === 'dashboard') loadDashboard();
+/* ── SIDEBAR ── */
+function toggleSb(){ document.getElementById('lsb').classList.toggle('col'); }
+
+function renderSbProjects(){
+  const rl=document.getElementById('sb-recent-list');
+  const sl=document.getElementById('sb-starred-list');
+  rl.innerHTML=projects.slice(0,5).map(p=>`
+    <div class="sb-proj ${currentProject?.id===p.id?'act':''}" onclick="selectProject(${p.id})">
+      <div class="sb-proj-icon" style="background:${p.color||'#0052cc'}">${p.icon||'📁'}</div>
+      <span style="overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+    </div>`).join('');
+  sl.innerHTML=projects.slice(0,4).map(p=>`
+    <div class="sb-starred-item" onclick="selectProject(${p.id})">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span style="overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+    </div>`).join('');
 }
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
+/* ── PROJECTS ── */
+async function loadProjects(){
+  try{
+    projects=await api('GET','/api/v1/projects');
+    renderSbProjects();
+    if(projects.length>0 && !currentProject) selectProject(projects[0].id,false);
+  }catch(e){console.error(e);}
 }
 
-/* ── Projects ── */
-async function loadProjects() {
-  try {
-    projects = await api('GET', '/api/v1/projects');
-    const el = document.getElementById('project-list');
-    el.innerHTML = projects.map(p => `
-      <div class="sidebar-project ${currentProject?.id===p.id?'active':''}" onclick="selectProject(${p.id})" id="sproj-${p.id}">
-        <div class="proj-icon" style="background:${p.color||'#1d4ed8'}">${p.icon||'📁'}</div>
-        <span>${p.name}</span>
-      </div>`).join('');
-    if (projects.length > 0 && !currentProject) currentProject = projects[0];
-  } catch(e) { console.error(e); }
-}
-
-function selectProject(id) {
-  currentProject = projects.find(p => p.id === id);
-  document.querySelectorAll('.sidebar-project').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('sproj-' + id);
-  if (el) el.classList.add('active');
-  toast(`📁 Switched to "${currentProject?.name}"`, 'success');
-  const activePage = document.querySelector('.page.active')?.id?.replace('page-','');
-  if (activePage && activePage !== 'dashboard' && activePage !== 'projects') {
-    showPage(activePage);
+function selectProject(id,reload=true){
+  currentProject=projects.find(p=>p.id===id);
+  if(!currentProject) return;
+  document.getElementById('ph-name').textContent=currentProject.name;
+  document.getElementById('ph-icon').textContent=currentProject.icon||'📁';
+  document.getElementById('ph-space').textContent=currentProject.name;
+  renderSbProjects();
+  if(reload){
+    const active=document.querySelector('.page.on');
+    if(active?.id==='pg-backlog') loadBacklog();
+    else if(active?.id==='pg-board') loadBoard();
+    else switchTab('backlog');
   }
+  toast(`Switched to "${currentProject.name}"`, 'info');
 }
 
-async function loadProjectsPage() {
-  const grid = document.getElementById('projects-grid');
-  grid.innerHTML = '<div class="loading">Loading projects…</div>';
-  try {
-    projects = await api('GET', '/api/v1/projects');
-    grid.innerHTML = projects.map(p => `
-      <div class="project-card ${currentProject?.id===p.id?'active-proj':''}" onclick="selectProject(${p.id});showPage('board')">
-        <div class="proj-card-icon" style="background:${p.color||'#1d4ed8'}">${p.icon||'📁'}</div>
-        <div class="proj-card-key">${p.key}</div>
-        <div class="proj-card-name">${p.name}</div>
-        <div class="proj-card-desc">${p.description||'No description'}</div>
-        <div class="proj-card-meta">
-          <span>📋 ${p.boardType||'Scrum'}</span>
-          <span>👤 ${p.leadName||'—'}</span>
-          <span>📅 ${p.createdAt?new Date(p.createdAt).toLocaleDateString():''}</span>
+/* ── TABS & PAGES ── */
+function switchTab(tab){
+  document.querySelectorAll('.ph-tab').forEach(t=>t.classList.remove('act'));
+  document.getElementById('tab-'+tab)?.classList.add('act');
+  showPage('pg-'+tab==='pg-backlog'?'backlog':'board', tab);
+}
+
+function showPage(name, tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  const pg=document.getElementById('pg-'+name);
+  if(pg) pg.classList.add('on');
+  closeDetail(); closeNotifs();
+  if(name==='backlog') loadBacklog();
+  else if(name==='board') loadBoard();
+  else if(name==='dashboard') loadDashboard();
+  else if(name==='projects') loadProjectsPage();
+}
+
+/* ── BACKLOG ── */
+const STATUSES=[
+  {id:1,name:'To Do',cls:'todo'},
+  {id:2,name:'In Progress',cls:'prog'},
+  {id:3,name:'In Review',cls:'review'},
+  {id:4,name:'Done',cls:'done'},
+];
+
+function typeIcon(t){
+  const icons={Story:'<div class="ir-type" style="background:#0052cc;color:#fff;font-size:10px">S</div>',Bug:'<div class="ir-type" style="background:#de350b;color:#fff;font-size:10px">B</div>',Epic:'<div class="ir-type" style="background:#6554c0;color:#fff;font-size:10px">E</div>',Task:'<div class="ir-type" style="background:#00875a;color:#fff;font-size:10px">T</div>',Subtask:'<div class="ir-type" style="background:#0065ff;color:#fff;font-size:9px">↳</div>'};
+  return icons[t]||icons.Story;
+}
+function prioIcon(p){
+  const icons={Blocker:'<span style="color:#de350b;font-size:14px">⛔</span>',Critical:'<span style="color:#de350b;font-size:13px">▲</span>',Major:'<span style="color:#ff991f;font-size:13px">▲</span>',Minor:'<span style="color:#0065ff;font-size:13px">▼</span>',Trivial:'<span style="color:#97a0af;font-size:13px">▼</span>'};
+  return icons[p]||icons.Major;
+}
+function statusCls(s){
+  const l=(s||'').toLowerCase();
+  if(l.includes('done')||l.includes('closed')) return 'done';
+  if(l.includes('review')) return 'review';
+  if(l.includes('progress')) return 'prog';
+  return 'todo';
+}
+function statusLabel(s){ return s||'To Do'; }
+
+function issueRow(i){
+  const av=i.assigneeName?`<div class="ir-assignee" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>`:'<div class="ir-assignee" style="background:var(--border);"></div>';
+  return `<div class="issue-row" onclick="openDetail(${i.id})">
+    <div class="ir-cb"></div>
+    ${typeIcon(i.issueType)}
+    <span class="ir-key">${i.issueKey}</span>
+    <span class="ir-summary">${i.summary}</span>
+    <span class="ir-prio">${prioIcon(i.priority)}</span>
+    ${av}
+    <span class="ir-pts">${i.storyPoints??''}</span>
+    <span class="ir-status ${statusCls(i.statusName)}">${statusLabel(i.statusName)}</span>
+  </div>`;
+}
+
+async function loadBacklog(){
+  const el=document.getElementById('bl-content');
+  if(!currentProject){el.innerHTML='<div class="loading">Select a project from the sidebar to view its backlog</div>';return;}
+  el.innerHTML='<div class="loading">Loading backlog…</div>';
+  try{
+    const [issues,sprintList]=await Promise.all([
+      api('GET',`/api/v1/issues/project/${currentProject.id}`),
+      api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
+    ]);
+    sprints=sprintList;
+    allIssues=issues;
+    renderBacklog(issues,sprintList);
+    renderAvatarFilter(issues,'bl-avatars');
+  }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
+}
+
+function renderBacklog(issues,sprintList){
+  const el=document.getElementById('bl-content');
+  let html='';
+
+  // Sprint blocks
+  sprintList.forEach(s=>{
+    const sIssues=issues.filter(i=>i.sprintId===s.id);
+    const done=sIssues.filter(i=>statusCls(i.statusName)==='done').length;
+    const inprog=sIssues.filter(i=>statusCls(i.statusName)==='prog').length;
+    const todo=sIssues.filter(i=>statusCls(i.statusName)==='todo').length;
+    const isActive=s.state==='Active';
+    const isClosed=s.state==='Closed';
+    const dates=s.startDate&&s.endDate?`${new Date(s.startDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${new Date(s.endDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:s.startDate?'Add dates':'Add dates';
+
+    html+=`<div class="sprint-block">
+      <div class="sprint-row" onclick="toggleSprint('sp-${s.id}','spc-${s.id}')">
+        <div class="ir-cb"></div>
+        <div class="sprint-chevron open" id="spc-${s.id}"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+        <span class="sprint-name">${s.name}</span>
+        <span class="sprint-dates">${isActive?`<span style="background:#e3fcef;color:#00875a;border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700">ACTIVE</span> `:''} ${dates}</span>
+        <span class="sprint-count">(${sIssues.length} work item${sIssues.length!==1?'s':''})</span>
+        <div class="sprint-badges">
+          <span class="sp-badge done">${done}</span>
+          <span class="sp-badge inprog">${inprog}</span>
+          <span class="sp-badge todo">${todo}</span>
         </div>
-      </div>`).join('') + `
-      <div class="proj-create-card" onclick="openCreateProject()">
-        <div style="font-size:2rem">➕</div>
-        <div style="font-weight:600">New Project</div>
-        <div style="font-size:.8rem">Start tracking work</div>
-      </div>`;
-  } catch(e) { grid.innerHTML = `<div class="loading">Error: ${e.message}</div>`; }
+        ${isClosed?`<button class="sprint-btn complete" onclick="event.stopPropagation()">Complete sprint</button>`:isActive?`<button class="sprint-btn complete" onclick="event.stopPropagation();doCloseSprint(${s.id})">Complete sprint</button>`:`<button class="sprint-btn primary" onclick="event.stopPropagation();doStartSprint(${s.id})">Start sprint</button>`}
+        <button class="sprint-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
+      </div>
+      <div id="sp-${s.id}" class="sprint-issues">
+        ${sIssues.length?sIssues.map(i=>issueRow(i)).join(''):`<div style="padding:12px 16px;font-size:13px;color:var(--text3)">No issues in this sprint. Drag issues from the backlog below.</div>`}
+        <div class="bl-create-row" onclick="openCreateIssue()">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create issue
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Backlog section
+  const backlogIssues=issues.filter(i=>!i.sprintId);
+  const bDone=backlogIssues.filter(i=>statusCls(i.statusName)==='done').length;
+  const bInprog=backlogIssues.filter(i=>statusCls(i.statusName)==='prog').length;
+  const bTodo=backlogIssues.filter(i=>statusCls(i.statusName)==='todo'||statusCls(i.statusName)==='review').length;
+
+  html+=`<div class="sprint-block">
+    <div class="backlog-header" onclick="toggleSprint('sp-backlog','spc-backlog')">
+      <div class="ir-cb"></div>
+      <div class="sprint-chevron open" id="spc-backlog"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+      <span class="backlog-title">Backlog</span>
+      <span class="backlog-count">(${backlogIssues.length} work items)</span>
+      <div class="backlog-badges">
+        <span class="sp-badge done">${bDone}</span>
+        <span class="sp-badge inprog">${bInprog}</span>
+        <span class="sp-badge todo">${bTodo}</span>
+      </div>
+      <span class="backlog-create-sprint" onclick="event.stopPropagation();openCreateSprint()">Create sprint</span>
+      <button class="sprint-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
+    </div>
+    <div id="sp-backlog" class="sprint-issues">
+      ${backlogIssues.length?backlogIssues.map(i=>issueRow(i)).join(''):`<div class="drag-hint">Plan a sprint by dragging work items into it, or by dragging the sprint footer.</div>`}
+      <div class="bl-create-row" onclick="openCreateIssue()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create issue
+      </div>
+    </div>
+  </div>`;
+
+  // Estimate footer
+  const total=issues.reduce((s,i)=>s+(i.storyPoints||0),0);
+  const visible=issues.length;
+  html+=`<div style="padding:16px 0;font-size:12px;color:var(--text3);text-align:right">${visible} of ${visible} work items visible | Estimate: ${total} of ${total}</div>`;
+
+  el.innerHTML=html;
 }
 
-function openCreateProject() {
-  document.getElementById('modal-title').textContent = '📁 Create New Project';
-  document.getElementById('modal-body').innerHTML = `
-    <div class="form-group">
-      <label class="form-label">Project Key <span style="color:var(--red)">*</span></label>
-      <input class="form-input" id="cp-key" placeholder="e.g. APP, CRM, HR" maxlength="10" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"/>
-      <div style="font-size:.72rem;color:var(--text3);margin-top:.3rem">2–10 uppercase letters/numbers. Used in issue keys like APP-1.</div>
+function toggleSprint(bodyId, chevId){
+  const body=document.getElementById(bodyId);
+  const chev=document.getElementById(chevId);
+  if(!body) return;
+  body.style.display=body.style.display==='none'?'':'none';
+  chev?.classList.toggle('open');
+}
+
+function filterBacklog(q){
+  const filtered=q?allIssues.filter(i=>i.summary?.toLowerCase().includes(q.toLowerCase())||i.issueKey?.toLowerCase().includes(q.toLowerCase())):allIssues;
+  renderBacklog(filtered,sprints);
+}
+
+function renderAvatarFilter(issues,elId){
+  const el=document.getElementById(elId);
+  const names=[...new Set(issues.filter(i=>i.assigneeName).map(i=>i.assigneeName))].slice(0,5);
+  el.innerHTML=names.map(n=>`<div class="bl-avatar" style="background:${avatarColor(n)}" title="${n}">${avatarInitial(n)}</div>`).join('')+(names.length>=5?`<div class="bl-more">+${issues.filter(i=>i.assigneeName).length-5}</div>`:``);
+}
+
+/* ── BOARD ── */
+async function loadBoard(){
+  const el=document.getElementById('board-cols');
+  if(!currentProject){el.innerHTML='<div class="loading">Select a project</div>';return;}
+  el.innerHTML='';
+  try{
+    const [issues,sprintList]=await Promise.all([
+      api('GET',`/api/v1/issues/project/${currentProject.id}`),
+      api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
+    ]);
+    const active=sprintList.find(s=>s.state==='Active');
+    document.getElementById('board-sprint-title').textContent=active?`${currentProject.name} · ${active.name}`:`${currentProject.name} · Board`;
+    renderAvatarFilter(issues,'board-avatars');
+
+    const COLS=[
+      {id:1,title:'TO DO',key:'todo'},
+      {id:2,title:'IN PROGRESS',key:'prog'},
+      {id:3,title:'IN REVIEW',key:'review'},
+      {id:4,title:'DONE',key:'done'},
+    ];
+    el.innerHTML=COLS.map(col=>{
+      const colIssues=issues.filter(i=>statusCls(i.statusName)===col.key);
+      const cards=colIssues.length?colIssues.map(i=>{
+        const av=i.assigneeName?`<div class="bcard-av" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>`:'';
+        return `<div class="bcard" onclick="openDetail(${i.id})">
+          <div class="bcard-summary">${i.summary}</div>
+          <div class="bcard-footer">
+            <div class="bcard-left">
+              ${col.key==='bug'?`<div class="bcard-type" style="background:#de350b;color:#fff">B</div>`:col.key==='epic'?`<div class="bcard-type" style="background:#6554c0;color:#fff">E</div>`:`<div class="bcard-type" style="background:#0052cc;color:#fff;font-size:10px">${(i.issueType||'S')[0]}</div>`}
+              <span class="bcard-key">${i.issueKey}</span>
+              <span class="bcard-prio">${prioIcon(i.priority)}</span>
+            </div>
+            <div class="bcard-right">
+              ${i.storyPoints!=null?`<span class="bcard-pts">${i.storyPoints}</span>`:''}
+              ${av}
+            </div>
+          </div>
+        </div>`;
+      }).join(''):`<div style="padding:16px;font-size:12px;color:var(--text3);text-align:center">No issues</div>`;
+      return `<div class="bcol ${col.key==='done'?'done':''}">
+        <div class="bcol-header">
+          <span class="bcol-title">${col.title}</span>
+          <span class="bcol-count">${colIssues.length}</span>
+        </div>
+        <div class="bcol-body">${cards}</div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
+}
+
+/* ── DASHBOARD ── */
+async function loadDashboard(){
+  try{
+    const [summary,mine]=await Promise.all([
+      api('GET','/api/v1/dashboard/summary'),
+      api('GET','/api/v1/dashboard/assigned-to-me')
+    ]);
+    const colors=[{num:'var(--blue)',bg:'#e9f2ff'},{num:'var(--yellow)',bg:'#fffae6'},{num:'var(--red)',bg:'#ffebe6'},{num:'var(--green)',bg:'#e3fcef'}];
+    const stats=[
+      {label:'Total Issues',num:summary.totalIssues,icon:'📋'},
+      {label:'Open',num:summary.openIssues,icon:'🔵'},
+      {label:'In Progress',num:summary.inProgressIssues,icon:'🟠'},
+      {label:'Done',num:summary.doneIssues,icon:'✅'},
+    ];
+    document.getElementById('dash-stats').innerHTML=stats.map((s,i)=>`
+      <div class="dash-card" style="border-top:3px solid ${colors[i].num}">
+        <div class="dash-card-num" style="color:${colors[i].num}">${s.num}</div>
+        <div class="dash-card-label">${s.icon} ${s.label}</div>
+      </div>`).join('');
+    const mi=document.getElementById('dash-my-issues');
+    mi.innerHTML=mine.length?mine.slice(0,8).map(i=>`
+      <div class="dash-table-row" onclick="openDetail(${i.id})">
+        ${typeIcon(i.issueType)}
+        <span style="font-family:monospace;font-size:12px;color:var(--blue2);width:80px;flex-shrink:0">${i.issueKey}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${i.summary}</span>
+        <span class="ir-status ${statusCls(i.statusName)}">${statusLabel(i.statusName)}</span>
+      </div>`).join(''):`<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">You're all caught up!</div></div>`;
+    renderBurndown();
+  }catch(e){console.error(e);}
+}
+
+function renderBurndown(){
+  const svg=document.getElementById('bd-svg');
+  const W=300,H=200,PAD=28,pts=50,days=14;
+  const iW=W-PAD*2,iH=H-PAD*2;
+  let ideal=[],actual=[];
+  for(let d=0;d<=days;d++){
+    const x=PAD+(d/days)*iW;
+    const iY=PAD+((pts-pts*d/days)/pts)*iH;
+    const noise=Math.sin(d*1.5)*3+Math.cos(d*.8)*2;
+    const aY=PAD+Math.max(0,(pts-Math.max(0,pts*d/days*.88+noise))/pts)*iH;
+    ideal.push([x,iY]);actual.push([x,aY]);
+  }
+  const p=pts=>`${pts.map((p,i)=>`${i?'L':'M'}${p[0]},${p[1]}`).join(' ')}`;
+  const gridPts=[0,25,50];
+  svg.innerHTML=`
+    ${gridPts.map(gp=>{const y=PAD+(1-gp/100)*iH;return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="#ebecf0" stroke-width="1"/>
+    <text x="${PAD-4}" y="${y+4}" fill="#97a0af" font-size="9" text-anchor="end">${Math.round(pts*gp/100)}</text>`;}).join('')}
+    <path d="${p(ideal)}" stroke="#dfe1e6" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+    <path d="${p(actual)} L${actual[actual.length-1][0]},${H-PAD} L${PAD},${H-PAD}" fill="#0052cc" opacity=".08"/>
+    <path d="${p(actual)}" stroke="#0052cc" stroke-width="2" fill="none"/>
+    <text x="${W/2}" y="${H-2}" fill="#97a0af" font-size="9" text-anchor="middle">Days remaining</text>`;
+}
+
+/* ── PROJECTS PAGE ── */
+async function loadProjectsPage(){
+  const grid=document.getElementById('pp-grid');
+  grid.innerHTML='<div class="loading">Loading…</div>';
+  try{
+    projects=await api('GET','/api/v1/projects');
+    renderSbProjects();
+    grid.innerHTML=projects.map(p=>`
+      <div class="pp-card ${currentProject?.id===p.id?'act':''}" onclick="selectProject(${p.id});switchTab('backlog')">
+        <div class="pp-card-top">
+          <div class="pp-card-icon" style="background:${p.color||'#e9f2ff'}">${p.icon||'📁'}</div>
+          <div class="pp-card-meta">
+            <div class="pp-card-key">${p.key}</div>
+            <div class="pp-card-name">${p.name}</div>
+          </div>
+        </div>
+        <div class="pp-card-desc">${p.description||'Software project'}</div>
+        <div class="pp-card-footer">
+          <div class="pp-card-type"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>${p.boardType||'Scrum'}</div>
+          <span>by ${p.leadName||'Admin'}</span>
+        </div>
+      </div>`).join('')+`
+      <div class="pp-create" onclick="openCreateProject()">
+        <div class="pp-create-icon">＋</div>
+        <div class="pp-create-text">Create project</div>
+        <div style="font-size:12px">Scrum, Kanban, or custom</div>
+      </div>`;
+  }catch(e){grid.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
+}
+
+/* ── SPRINT ACTIONS ── */
+async function doStartSprint(id){
+  try{
+    await api('POST',`/api/v1/sprints/${id}/start`,{startDate:new Date().toISOString(),endDate:new Date(Date.now()+14*86400000).toISOString()});
+    toast('Sprint started!','ok'); loadBacklog();
+  }catch(e){toast(e.message,'err');}
+}
+async function doCloseSprint(id){
+  if(!confirm('Complete this sprint? Incomplete issues will move to the backlog.')) return;
+  try{
+    await api('POST',`/api/v1/sprints/${id}/close`);
+    toast('Sprint completed!','ok'); loadBacklog();
+  }catch(e){toast(e.message,'err');}
+}
+
+/* ── ISSUE DETAIL ── */
+async function openDetail(id){
+  currentIssueId=id;
+  const panel=document.getElementById('detail-panel');
+  panel.classList.add('on');
+  document.getElementById('dp-title').textContent='Loading…';
+  document.getElementById('dp-key').textContent='';
+  document.getElementById('dp-badges').innerHTML='';
+  document.getElementById('dp-fields').innerHTML='';
+  document.getElementById('dp-desc').textContent='';
+  document.getElementById('dp-transitions').innerHTML='';
+  document.getElementById('dp-comments').innerHTML='<div class="loading">Loading…</div>';
+  try{
+    const i=await api('GET',`/api/v1/issues/${id}`);
+    document.getElementById('dp-key').textContent=i.issueKey;
+    document.getElementById('dp-title').textContent=i.summary;
+
+    const typeBadge=`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;background:#e9f2ff;color:#0052cc">${typeIcon(i.issueType)} ${i.issueType}</span>`;
+    const prioBg={Blocker:'#ffebe6',Critical:'#ffebe6',Major:'#fffae6',Minor:'#e3fcef',Trivial:'#f4f5f7'};
+    const prioCol={Blocker:'#de350b',Critical:'#de350b',Major:'#ff991f',Minor:'#00875a',Trivial:'#97a0af'};
+    const prioBadge=`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;background:${prioBg[i.priority]||'#fffae6'};color:${prioCol[i.priority]||'#ff991f'}">${prioIcon(i.priority)} ${i.priority}</span>`;
+    document.getElementById('dp-badges').innerHTML=typeBadge+' '+prioBadge;
+
+    const statusColors={todo:{bg:'#f4f5f7',col:'#5e6c84'},prog:{bg:'#e9f2ff',col:'#0052cc'},review:{bg:'#fffae6',col:'#974f0c'},done:{bg:'#e3fcef',col:'#00875a'}};
+    const sc=statusCls(i.statusName);
+    const sc2=statusColors[sc]||statusColors.todo;
+
+    const fields=[
+      {l:'Status',v:`<span class="dp-status-btn" style="background:${sc2.bg};color:${sc2.col}">${i.statusName||'To Do'} ▾</span>`},
+      {l:'Assignee',v:i.assigneeName?`<div style="display:flex;align-items:center;gap:6px"><div class="dp-assignee-av" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>${i.assigneeName}</div>`:'<span style="color:var(--text3)">Unassigned</span>'},
+      {l:'Reporter',v:i.reporterName||'—'},
+      {l:'Sprint',v:i.sprintName||'<span style="color:var(--text3)">None</span>'},
+      {l:'Story points',v:i.storyPoints!=null?i.storyPoints:'<span style="color:var(--text3)">None</span>'},
+      {l:'Priority',v:`<span style="display:inline-flex;align-items:center;gap:4px">${prioIcon(i.priority)} ${i.priority}</span>`},
+      {l:'Due date',v:i.dueDate?new Date(i.dueDate).toLocaleDateString():'<span style="color:var(--text3)">None</span>'},
+      {l:'Created',v:new Date(i.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})},
+    ];
+    document.getElementById('dp-fields').innerHTML=fields.map(f=>`
+      <div class="dp-field">
+        <div class="dp-field-label">${f.l}</div>
+        <div class="dp-field-val">${f.v}</div>
+      </div>`).join('');
+    document.getElementById('dp-desc').innerHTML=i.description||'<span style="color:var(--text3)">Add a description…</span>';
+
+    const transitions=[{id:1,name:'To Do'},{id:2,name:'In Progress'},{id:3,name:'In Review'},{id:4,name:'Done'}].filter(t=>t.id!==i.statusId);
+    document.getElementById('dp-transitions').innerHTML=transitions.map(t=>`<button class="dp-trans-btn" onclick="doTransition(${i.id},${t.id},'${t.name}')">→ ${t.name}</button>`).join('');
+
+    const comments=await api('GET',`/api/v1/issues/${id}/comments`).catch(()=>[]);
+    renderComments(comments);
+  }catch(e){document.getElementById('dp-title').textContent='Error: '+e.message;}
+}
+
+function renderComments(comments){
+  const el=document.getElementById('dp-comments');
+  if(!comments?.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:4px 0">No activity yet</div>';return;}
+  el.innerHTML=comments.map(c=>`
+    <div class="dp-comment">
+      <div class="dp-comment-author">
+        <div class="dp-assignee-av" style="background:${avatarColor(c.authorName)};width:24px;height:24px;font-size:10px">${avatarInitial(c.authorName)}</div>
+        ${c.authorName} <span class="dp-comment-time">${new Date(c.createdAt).toLocaleString()}</span>
+      </div>
+      <div class="dp-comment-body">${c.body}</div>
+    </div>`).join('');
+}
+
+async function postComment(){
+  const body=document.getElementById('comment-input').value.trim();
+  if(!body) return;
+  try{
+    await api('POST',`/api/v1/issues/${currentIssueId}/comments`,{body});
+    document.getElementById('comment-input').value='';
+    const comments=await api('GET',`/api/v1/issues/${currentIssueId}/comments`).catch(()=>[]);
+    renderComments(comments);
+    toast('Comment saved','ok');
+  }catch(e){toast(e.message,'err');}
+}
+
+async function doTransition(id,statusId,name){
+  try{
+    await api('POST',`/api/v1/issues/${id}/transitions`,{transitionId:statusId});
+    toast(`Moved to "${name}"`, 'ok');
+    openDetail(id);
+    loadBacklog(); loadBoard();
+  }catch(e){toast(e.message,'err');}
+}
+
+function closeDetail(){document.getElementById('detail-panel').classList.remove('on');}
+
+/* ── CREATE ISSUE MODAL ── */
+function openCreateIssue(){
+  document.getElementById('modal-title').textContent='Create issue';
+  const projOpts=projects.map(p=>`<option value="${p.key}" ${p.id===currentProject?.id?'selected':''}>${p.name} (${p.key})</option>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mf">
+      <label class="ml">Project <span style="color:var(--red)">*</span></label>
+      <select class="mi" id="ci-proj">${projOpts||'<option>No projects yet</option>'}</select>
     </div>
-    <div class="form-group">
-      <label class="form-label">Project Name <span style="color:var(--red)">*</span></label>
-      <input class="form-input" id="cp-name" placeholder="e.g. Customer Portal" maxlength="200"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Description</label>
-      <textarea class="form-input form-textarea" id="cp-desc" placeholder="What is this project about?"></textarea>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="form-group">
-        <label class="form-label">Board Type</label>
-        <select class="form-input form-select" id="cp-board">
-          <option value="Scrum">Scrum (sprints)</option>
-          <option value="Kanban">Kanban (flow)</option>
+    <div class="mi-grid">
+      <div class="mf">
+        <label class="ml">Issue type</label>
+        <select class="mi" id="ci-type">
+          <option value="Story">Story</option>
+          <option value="Bug">Bug</option>
+          <option value="Epic">Epic</option>
+          <option value="Task">Task</option>
+          <option value="Subtask">Subtask</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Accent Color</label>
-        <input class="form-input" id="cp-color" type="color" value="#3b82f6" style="height:40px;padding:.25rem"/>
+      <div class="mf">
+        <label class="ml">Priority</label>
+        <select class="mi" id="ci-prio">
+          <option value="Blocker">Blocker</option>
+          <option value="Critical">Critical</option>
+          <option value="Major" selected>Major</option>
+          <option value="Minor">Minor</option>
+          <option value="Trivial">Trivial</option>
+        </select>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Project Icon (emoji)</label>
-      <input class="form-input" id="cp-icon" placeholder="e.g. 🚀 🛒 💼 🏗" maxlength="4"/>
+    <div class="mf">
+      <label class="ml">Summary <span style="color:var(--red)">*</span></label>
+      <input class="mi" id="ci-summary" placeholder="What needs to be done?" maxlength="255"/>
+    </div>
+    <div class="mf">
+      <label class="ml">Description</label>
+      <textarea class="mi" id="ci-desc" placeholder="Add details, steps to reproduce, acceptance criteria…" rows="4"></textarea>
+    </div>
+    <div class="mi-grid">
+      <div class="mf">
+        <label class="ml">Story points</label>
+        <input class="mi" type="number" id="ci-pts" placeholder="e.g. 3, 5, 8" min="0" max="999"/>
+      </div>
+      <div class="mf">
+        <label class="ml">Due date</label>
+        <input class="mi" type="date" id="ci-due"/>
+      </div>
+    </div>
+    <div class="mf">
+      <label class="ml">Labels</label>
+      <input class="mi" id="ci-labels" placeholder="e.g. frontend, regression, urgent"/>
+      <div class="mf-hint">Comma-separated</div>
     </div>`;
-  document.getElementById('modal-footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary" onclick="createProject()">Create Project</button>`;
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('cp-key')?.focus(), 50);
+  document.getElementById('modal-footer').innerHTML=`
+    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn-jira btn-primary" onclick="submitCreateIssue()">Create</button>`;
+  document.getElementById('modal-bg').classList.add('on');
+  setTimeout(()=>document.getElementById('ci-summary')?.focus(),50);
 }
 
-async function createProject() {
-  const key   = document.getElementById('cp-key').value.trim().toUpperCase();
-  const name  = document.getElementById('cp-name').value.trim();
-  const desc  = document.getElementById('cp-desc').value.trim();
-  const board = document.getElementById('cp-board').value;
-  const color = document.getElementById('cp-color').value;
-  const icon  = document.getElementById('cp-icon').value.trim() || '📁';
-  if (!key || key.length < 2) { toast('Project key must be 2-10 characters', 'error'); return; }
-  if (!name)  { toast('Project name is required', 'error'); return; }
-  try {
-    const p = await api('POST', '/api/v1/projects', { key, name, description: desc, boardType: board, color, icon });
-    toast(`✅ Project "${p.name}" created!`, 'success');
+async function submitCreateIssue(){
+  const projKey=document.getElementById('ci-proj').value;
+  const summary=document.getElementById('ci-summary').value.trim();
+  if(!summary){toast('Summary is required','err');return;}
+  const pts=document.getElementById('ci-pts').value;
+  const due=document.getElementById('ci-due').value;
+  const labels=document.getElementById('ci-labels').value.split(',').map(l=>l.trim()).filter(Boolean);
+  try{
+    const issue=await api('POST','/api/v1/issues',{
+      projectKey:projKey,
+      issueType:document.getElementById('ci-type').value,
+      priority:document.getElementById('ci-prio').value,
+      summary,
+      description:document.getElementById('ci-desc').value.trim()||null,
+      storyPoints:pts?parseInt(pts):null,
+      dueDate:due?new Date(due).toISOString():null,
+      labels:labels.length?labels:null,
+    });
+    toast(`${issue.issueKey} created`,'ok');
+    closeModal(); loadBacklog(); loadBoard();
+  }catch(e){toast(e.message,'err');}
+}
+
+/* ── CREATE PROJECT ── */
+function openCreateProject(){
+  document.getElementById('modal-title').textContent='Create project';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mf">
+      <label class="ml">Project name <span style="color:var(--red)">*</span></label>
+      <input class="mi" id="cp-name" placeholder="e.g. Customer Portal, Mobile App"/>
+    </div>
+    <div class="mi-grid">
+      <div class="mf">
+        <label class="ml">Key <span style="color:var(--red)">*</span></label>
+        <input class="mi" id="cp-key" placeholder="e.g. CP, APP" maxlength="10" oninput="this.value=this.value.toUpperCase()"/>
+        <div class="mf-hint">Used in issue identifiers like CP-1</div>
+      </div>
+      <div class="mf">
+        <label class="ml">Board type</label>
+        <select class="mi" id="cp-board">
+          <option value="Scrum">Scrum</option>
+          <option value="Kanban">Kanban</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <label class="ml">Description</label>
+      <textarea class="mi" id="cp-desc" placeholder="What is this project about?" rows="3"></textarea>
+    </div>
+    <div class="mi-grid">
+      <div class="mf">
+        <label class="ml">Icon (emoji)</label>
+        <input class="mi" id="cp-icon" placeholder="🚀" maxlength="4"/>
+      </div>
+      <div class="mf">
+        <label class="ml">Color</label>
+        <input class="mi" type="color" id="cp-color" value="#0052cc" style="height:40px;padding:4px"/>
+      </div>
+    </div>`;
+  document.getElementById('modal-footer').innerHTML=`
+    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn-jira btn-primary" onclick="submitCreateProject()">Create project</button>`;
+  document.getElementById('modal-bg').classList.add('on');
+  setTimeout(()=>document.getElementById('cp-name')?.focus(),50);
+}
+
+async function submitCreateProject(){
+  const key=document.getElementById('cp-key').value.trim().toUpperCase();
+  const name=document.getElementById('cp-name').value.trim();
+  if(!key||key.length<2){toast('Project key must be 2–10 chars','err');return;}
+  if(!name){toast('Project name is required','err');return;}
+  try{
+    const p=await api('POST','/api/v1/projects',{
+      key,name,
+      description:document.getElementById('cp-desc').value.trim()||null,
+      boardType:document.getElementById('cp-board').value,
+      color:document.getElementById('cp-color').value,
+      icon:document.getElementById('cp-icon').value.trim()||'📁',
+    });
+    toast(`Project "${p.name}" created`,'ok');
     closeModal();
     await loadProjects();
     selectProject(p.id);
     showPage('projects');
-  } catch(e) { toast(e.message, 'error'); }
+  }catch(e){toast(e.message,'err');}
 }
 
-/* ── Dashboard ── */
-async function loadDashboard() {
-  document.getElementById('stat-grid').innerHTML = '<div class="loading">Loading…</div>';
-  try {
-    const [summary, myIssues] = await Promise.all([
-      api('GET', '/api/v1/dashboard/summary'),
-      api('GET', '/api/v1/dashboard/assigned-to-me')
-    ]);
-    renderStats(summary);
-    renderMyIssues(myIssues);
-    if (currentProject) renderBurndown();
-  } catch(e) { document.getElementById('stat-grid').innerHTML = `<div class="loading">Could not load: ${e.message}</div>`; }
-}
-
-function renderStats(s) {
-  const colors = ['var(--blue)','var(--yellow)','var(--orange)','var(--green)'];
-  const stats = [
-    { label:'Total Issues',    num: s.totalIssues,      icon:'📋', color:colors[0] },
-    { label:'Open',            num: s.openIssues,       icon:'🔵', color:colors[1] },
-    { label:'In Progress',     num: s.inProgressIssues, icon:'🟠', color:colors[2] },
-    { label:'Done This Sprint',num: s.doneIssues,       icon:'✅', color:colors[3] },
-  ];
-  document.getElementById('stat-grid').innerHTML = stats.map(s => `
-    <div class="stat-card">
-      <div style="font-size:1.5rem">${s.icon}</div>
-      <div class="stat-num" style="color:${s.color};margin-top:.4rem">${s.num}</div>
-      <div class="stat-label">${s.label}</div>
-    </div>`).join('');
-}
-
-function renderMyIssues(issues) {
-  const el = document.getElementById('my-issues-list');
-  if (!issues?.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">All clear!</div><div>No issues assigned to you</div></div>'; return; }
-  el.innerHTML = issues.slice(0,8).map(i => `
-    <div class="table-row" style="grid-template-columns:90px 1fr 80px 60px" onclick="openDetail(${i.id})">
-      <span class="issue-key">${i.issueKey}</span>
-      <span class="truncate" title="${i.summary}">${i.summary}</span>
-      <span>${statusPill(i.statusName)}</span>
-      <span>${prioIcon(i.priority)}</span>
-    </div>`).join('');
-}
-
-function renderBurndown() {
-  const svg = document.getElementById('burndown-svg');
-  const days = 14, pts = 50;
-  const W = 500, H = 200, PAD = 30;
-  const iW = W - PAD * 2, iH = H - PAD * 2;
-  let ideal = [], actual = [];
-  for (let d = 0; d <= days; d++) {
-    const x = PAD + (d / days) * iW;
-    const iY = PAD + ((pts - (pts * d / days)) / pts) * iH;
-    const noise = Math.sin(d * 1.3) * 4 + Math.cos(d * 0.7) * 3;
-    const aY = PAD + Math.max(0, (pts - Math.max(0, pts * d / days * 0.85 + noise)) / pts) * iH;
-    ideal.push([x, iY]); actual.push([x, aY]);
-  }
-  const toPath = pts => pts.map((p,i) => `${i===0?'M':'L'}${p[0]},${p[1]}`).join(' ');
-  const gridY = [0, 25, 50, 75, 100];
-  svg.innerHTML = `
-    ${gridY.map(p => { const y = PAD + (1 - p/100) * iH; return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="var(--border)" stroke-width="1" opacity=".5"/>
-    <text x="${PAD-5}" y="${y+4}" fill="var(--text3)" font-size="9" text-anchor="end">${Math.round(pts*p/100)}</text>`; }).join('')}
-    <path d="${toPath(ideal)}" stroke="var(--border)" stroke-width="1.5" fill="none" stroke-dasharray="6,3"/>
-    <path d="${toPath(actual)}" stroke="var(--blue)" stroke-width="2" fill="none"/>
-    <path d="${toPath(actual)} L${actual[actual.length-1][0]},${H-PAD} L${PAD},${H-PAD}" fill="var(--blue)" opacity=".08"/>
-    <text x="${W-PAD}" y="${H-PAD+18}" fill="var(--text3)" font-size="9" text-anchor="end">Day ${days}</text>
-    <text x="${PAD}" y="${H-PAD+18}" fill="var(--text3)" font-size="9">Day 0</text>
-    <text x="${W/2}" y="${PAD-8}" fill="var(--text2)" font-size="10" text-anchor="middle">Remaining Story Points</text>`;
-}
-
-/* ── Board ── */
-const STATUSES = [
-  { id:1, name:'To Do',       color:'#6b7280', key:'todo'    },
-  { id:2, name:'In Progress', color:'#3b82f6', key:'inprog'  },
-  { id:3, name:'In Review',   color:'#f59e0b', key:'review'  },
-  { id:4, name:'Done',        color:'#10b981', key:'done'    },
-];
-
-async function loadBoard() {
-  const board = document.getElementById('kanban-board');
-  if (!currentProject) { board.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">No project selected</div><div>Pick a project from the sidebar</div></div>'; return; }
-  board.innerHTML = STATUSES.map(s => `
-    <div class="board-col">
-      <div class="col-header">
-        <div class="col-title"><span style="width:10px;height:10px;border-radius:50%;background:${s.color};display:inline-block"></span>${s.name}</div>
-        <span class="col-count" id="col-count-${s.id}">0</span>
-      </div>
-      <div class="col-body" id="col-${s.id}"><div class="loading">Loading…</div></div>
-    </div>`).join('');
-  try {
-    const issues = await api('GET', `/api/v1/issues/project/${currentProject.id}`);
-    const sprList = await api('GET', `/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[]);
-    const active = sprList.find(s => s.state === 'Active');
-    document.getElementById('board-sprint-name').textContent = active
-      ? `${currentProject.name} · Sprint: ${active.name} · ${active.totalStoryPoints} pts`
-      : `${currentProject.name} · No active sprint`;
-    STATUSES.forEach(status => {
-      const col = document.getElementById('col-' + status.id);
-      const colIssues = issues.filter(i => matchStatus(i, status));
-      document.getElementById('col-count-' + status.id).textContent = colIssues.length;
-      col.innerHTML = colIssues.length ? colIssues.map(i => issueCard(i)).join('') :
-        `<div style="padding:1rem;text-align:center;color:var(--text3);font-size:.78rem">No issues</div>`;
-    });
-  } catch(e) { board.innerHTML = `<div class="loading">Error: ${e.message}</div>`; }
-}
-
-function matchStatus(issue, status) {
-  const s = (issue.statusName||'').toLowerCase();
-  if (status.id === 1) return s.includes('to do') || s.includes('todo') || issue.statusId === 1;
-  if (status.id === 2) return (s.includes('progress') || issue.statusId === 2) && !s.includes('review');
-  if (status.id === 3) return s.includes('review') || issue.statusId === 3;
-  if (status.id === 4) return s.includes('done') || s.includes('closed') || issue.statusId === 4;
-  return issue.statusId === status.id;
-}
-
-function issueCard(i) {
-  return `<div class="issue-card" onclick="openDetail(${i.id})">
-    <div class="card-key">${i.issueKey}</div>
-    <div class="card-title">${i.summary}</div>
-    <div class="card-footer">
-      <div class="flex gap-2 items-center">
-        ${typeBadge(i.issueType)}
-        <span class="${prioClass(i.priority)}" title="${i.priority}">${prioIcon(i.priority)}</span>
-      </div>
-      <div class="flex gap-2 items-center">
-        ${i.storyPoints != null ? `<span class="pts">${i.storyPoints}p</span>` : ''}
-        ${i.assigneeName ? `<div class="card-assignee" title="${i.assigneeName}">${i.assigneeName[0]}</div>` : ''}
-      </div>
+/* ── CREATE SPRINT ── */
+function openCreateSprint(){
+  if(!currentProject){toast('Select a project first','err');return;}
+  const today=new Date().toISOString().split('T')[0];
+  const twoW=new Date(Date.now()+14*86400000).toISOString().split('T')[0];
+  document.getElementById('modal-title').textContent='Create sprint';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mf">
+      <label class="ml">Sprint name <span style="color:var(--red)">*</span></label>
+      <input class="mi" id="cs-name" value="${currentProject.key} Sprint ${(sprints.length||0)+1}"/>
     </div>
-  </div>`;
-}
-
-/* ── Backlog ── */
-async function loadBacklog() {
-  const el = document.getElementById('backlog-list');
-  if (!currentProject) { el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">Select a project</div></div>'; return; }
-  el.innerHTML = '<div class="loading">Loading…</div>';
-  try {
-    const issues = await api('GET', `/api/v1/issues/project/${currentProject.id}/backlog`);
-    renderIssueTable(el, issues);
-  } catch(e) { el.innerHTML = `<div class="loading">Error: ${e.message}</div>`; }
-}
-
-/* ── Sprints ── */
-async function loadSprints() {
-  const el = document.getElementById('sprints-list');
-  if (!currentProject) { el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">Select a project</div></div>'; return; }
-  el.innerHTML = '<div class="loading">Loading…</div>';
-  try {
-    sprints = await api('GET', `/api/v1/projects/${currentProject.id}/sprints`);
-    el.innerHTML = sprints.length ? sprints.map(s => {
-      const pct = s.totalStoryPoints > 0 ? Math.round((s.totalStoryPoints - (s.totalStoryPoints * 0.4)) / s.totalStoryPoints * 100) : 0;
-      const stateClass = s.state === 'Active' ? 'sprint-state-active' : s.state === 'Closed' ? 'sprint-state-closed' : 'sprint-state-created';
-      return `<div class="sprint-card">
-        <div class="sprint-card-header">
-          <div>
-            <div style="font-size:.95rem;font-weight:700">${s.name}</div>
-            ${s.goal ? `<div style="font-size:.78rem;color:var(--text3);margin-top:.2rem">🎯 ${s.goal}</div>` : ''}
-          </div>
-          <span class="${stateClass}">${s.state}</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <div class="sprint-meta">
-          <span>📋 Issues: <b>${s.issueCount}</b></span>
-          <span>⚡ Points: <b>${s.totalStoryPoints}</b></span>
-          ${s.velocityPoints != null ? `<span>🏁 Velocity: <b>${s.velocityPoints}</b></span>` : ''}
-          ${s.startDate ? `<span>📅 ${new Date(s.startDate).toLocaleDateString()} → ${s.endDate ? new Date(s.endDate).toLocaleDateString() : '?'}</span>` : ''}
-        </div>
-        <div class="sprint-actions">
-          ${s.state === 'Created' ? `<button class="btn btn-primary btn-sm" onclick="startSprint(${s.id})">▶ Start Sprint</button>` : ''}
-          ${s.state === 'Active'  ? `<button class="btn btn-danger btn-sm" onclick="closeSprint(${s.id})">⏹ Close Sprint</button>` : ''}
-          <button class="btn btn-ghost btn-sm" onclick="viewSprintBurndown(${s.id})">📈 Burndown</button>
-        </div>
-      </div>`;
-    }).join('') : '<div class="empty"><div class="empty-icon">⚡</div><div class="empty-title">No sprints yet</div><div>Create your first sprint to get started</div></div>';
-  } catch(e) { el.innerHTML = `<div class="loading">Error: ${e.message}</div>`; }
-}
-
-async function startSprint(id) {
-  try {
-    await api('POST', `/api/v1/sprints/${id}/start`, {
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 14 * 86400000).toISOString()
-    });
-    toast('Sprint started! 🚀', 'success'); loadSprints();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function closeSprint(id) {
-  if (!confirm('Close this sprint? Incomplete issues will remain in the backlog.')) return;
-  try {
-    await api('POST', `/api/v1/sprints/${id}/close`);
-    toast('Sprint closed ✅', 'success'); loadSprints();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function viewSprintBurndown(id) {
-  try {
-    const pts = await api('GET', `/api/v1/sprints/${id}/burndown`);
-    toast(`Burndown: ${pts.length} data points loaded`, 'success');
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-/* ── Issue Tracker ── */
-async function loadAllIssues() {
-  const el = document.getElementById('all-issues-list');
-  if (!currentProject) { el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">Select a project</div></div>'; return; }
-  el.innerHTML = '<div class="loading">Loading…</div>';
-  try {
-    allIssues = await api('GET', `/api/v1/issues/project/${currentProject.id}`);
-    renderIssueTable(el, allIssues);
-  } catch(e) { el.innerHTML = `<div class="loading">Error: ${e.message}</div>`; }
-}
-
-async function runIQL() {
-  const iql = document.getElementById('iql-input').value.trim();
-  const el = document.getElementById('all-issues-list');
-  el.innerHTML = '<div class="loading">Searching…</div>';
-  try {
-    const r = await api('POST', '/api/v1/issues/search', { iql, maxResults: 50, startAt: 0 });
-    renderIssueTable(el, r.issues || r);
-    toast(`🔍 Found ${(r.issues||r).length} issues`, 'success');
-  } catch(e) { el.innerHTML = `<div class="loading">Error: ${e.message}</div>`; toast(e.message, 'error'); }
-}
-
-function setIQL(q) { document.getElementById('iql-input').value = q; showPage('issues'); runIQL(); }
-
-async function quickSearch(q) {
-  if (!q.trim()) return;
-  document.getElementById('iql-input').value = q;
-  showPage('issues'); runIQL();
-}
-
-function renderIssueTable(el, issues) {
-  if (!issues?.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No issues found</div></div>'; return; }
-  el.innerHTML = issues.map(i => `
-    <div class="table-row" onclick="openDetail(${i.id})">
-      <span class="issue-key">${i.issueKey}</span>
-      <span class="truncate" title="${i.summary}">${i.summary}</span>
-      <span>${typeBadge(i.issueType)}</span>
-      <span class="${prioClass(i.priority)}">${prioIcon(i.priority)} ${i.priority}</span>
-      <span class="truncate">${i.assigneeName||'—'}</span>
-      <span>${i.storyPoints != null ? `<span class="pts">${i.storyPoints}p</span>` : '—'}</span>
-      <span>${statusPill(i.statusName)}</span>
-    </div>`).join('');
-}
-
-/* ── Issue Detail ── */
-async function openDetail(id) {
-  currentIssueId = id;
-  document.getElementById('detail-panel').classList.add('open');
-  document.getElementById('dp-title').textContent = 'Loading…';
-  document.getElementById('dp-key').textContent = '';
-  document.getElementById('dp-badges').innerHTML = '';
-  document.getElementById('dp-fields').innerHTML = '';
-  document.getElementById('dp-desc').textContent = '';
-  document.getElementById('dp-transitions').innerHTML = '';
-  document.getElementById('dp-comments').innerHTML = '<div class="loading">Loading…</div>';
-  try {
-    const i = await api('GET', `/api/v1/issues/${id}`);
-    document.getElementById('dp-key').textContent = i.issueKey;
-    document.getElementById('dp-title').textContent = i.summary;
-    document.getElementById('dp-badges').innerHTML = typeBadge(i.issueType) + ' ' + priorityBadge(i.priority) + ' ' + statusPill(i.statusName || 'To Do');
-    const fields = [
-      { l: 'Status',    v: statusPill(i.statusName||'To Do') },
-      { l: 'Priority',  v: `${prioIcon(i.priority)} ${i.priority}` },
-      { l: 'Assignee',  v: i.assigneeName || '<i>Unassigned</i>' },
-      { l: 'Reporter',  v: i.reporterName || '—' },
-      { l: 'Sprint',    v: i.sprintName || 'Backlog' },
-      { l: 'Points',    v: i.storyPoints != null ? `${i.storyPoints} pts` : '—' },
-      { l: 'Due Date',  v: i.dueDate ? new Date(i.dueDate).toLocaleDateString() : '—' },
-      { l: 'Created',   v: new Date(i.createdAt).toLocaleString() },
-    ];
-    document.getElementById('dp-fields').innerHTML = fields.map(f =>
-      `<div class="detail-field"><span class="detail-field-label">${f.l}</span><span>${f.v}</span></div>`).join('');
-    document.getElementById('dp-desc').innerHTML = i.description || '<i>No description provided.</i>';
-    const transitions = [
-      { id:1, name:'To Do' },{ id:2, name:'In Progress' },{ id:3, name:'In Review' },{ id:4, name:'Done' }
-    ].filter(t => t.id !== i.statusId);
-    document.getElementById('dp-transitions').innerHTML = transitions.map(t =>
-      `<button class="transition-btn" onclick="transitionIssue(${i.id},${t.id},'${t.name}')">→ ${t.name}</button>`).join('');
-    const comments = await api('GET', `/api/v1/issues/${id}/comments`).catch(()=>[]);
-    renderComments(comments);
-  } catch(e) { document.getElementById('dp-title').textContent = 'Error loading issue: ' + e.message; }
-}
-
-function renderComments(comments) {
-  const el = document.getElementById('dp-comments');
-  if (!comments?.length) { el.innerHTML = '<div style="color:var(--text3);font-size:.8rem;padding:.5rem 0">No comments yet</div>'; return; }
-  el.innerHTML = comments.map(c => `
-    <div class="comment">
-      <div class="comment-author">${c.authorName} · ${new Date(c.createdAt).toLocaleString()}</div>
-      <div>${c.body}</div>
-    </div>`).join('');
-}
-
-async function submitComment() {
-  const body = document.getElementById('comment-input').value.trim();
-  if (!body) return;
-  try {
-    await api('POST', `/api/v1/issues/${currentIssueId}/comments`, { body });
-    document.getElementById('comment-input').value = '';
-    toast('Comment posted ✅', 'success');
-    const comments = await api('GET', `/api/v1/issues/${currentIssueId}/comments`).catch(()=>[]);
-    renderComments(comments);
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-async function transitionIssue(id, statusId, name) {
-  try {
-    await api('POST', `/api/v1/issues/${id}/transitions`, { transitionId: statusId });
-    toast(`Moved to ${name} ✅`, 'success');
-    openDetail(id);
-    loadBoard();
-  } catch(e) { toast(e.message, 'error'); }
-}
-
-function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
-
-/* ── Create Issue Modal ── */
-function openCreateIssue() {
-  document.getElementById('modal-title').textContent = '✨ Create Issue';
-  const projOptions = projects.map(p => `<option value="${p.key}" ${p.id===currentProject?.id?'selected':''}>${p.key} — ${p.name}</option>`).join('');
-  document.getElementById('modal-body').innerHTML = `
-    <div class="form-group">
-      <label class="form-label">Project <span style="color:var(--red)">*</span></label>
-      <select class="form-input form-select" id="ci-proj">${projOptions}</select>
+    <div class="mf">
+      <label class="ml">Sprint goal</label>
+      <input class="mi" id="cs-goal" placeholder="What will this sprint achieve?"/>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="form-group">
-        <label class="form-label">Issue Type</label>
-        <select class="form-input form-select" id="ci-type">
-          <option value="Story">📖 Story</option><option value="Bug">🐛 Bug</option>
-          <option value="Epic">🏔 Epic</option><option value="Task">✅ Task</option>
-          <option value="Subtask">🔗 Subtask</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Priority</label>
-        <select class="form-input form-select" id="ci-prio">
-          <option value="Blocker">🚨 Blocker</option><option value="Critical">🔴 Critical</option>
-          <option value="Major" selected>🟡 Major</option><option value="Minor">🟢 Minor</option>
-          <option value="Trivial">⬜ Trivial</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Summary <span style="color:var(--red)">*</span></label>
-      <input class="form-input" id="ci-summary" placeholder="Brief one-line description" maxlength="255"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Description</label>
-      <textarea class="form-input form-textarea" id="ci-desc" placeholder="Detailed description, steps to reproduce, acceptance criteria…" rows="4"></textarea>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="form-group">
-        <label class="form-label">Story Points</label>
-        <input class="form-input" type="number" id="ci-pts" placeholder="e.g. 3, 5, 8" min="0" max="100"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Due Date</label>
-        <input class="form-input" type="date" id="ci-due"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Labels (comma separated)</label>
-      <input class="form-input" id="ci-labels" placeholder="e.g. frontend, api, urgent"/>
+    <div class="mi-grid">
+      <div class="mf"><label class="ml">Start date</label><input class="mi" type="date" id="cs-start" value="${today}"/></div>
+      <div class="mf"><label class="ml">End date</label><input class="mi" type="date" id="cs-end" value="${twoW}"/></div>
     </div>`;
-  document.getElementById('modal-footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary" onclick="createIssue()">Create Issue</button>`;
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('ci-summary')?.focus(), 50);
+  document.getElementById('modal-footer').innerHTML=`
+    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn-jira btn-primary" onclick="submitCreateSprint()">Create sprint</button>`;
+  document.getElementById('modal-bg').classList.add('on');
 }
 
-async function createIssue() {
-  const projKey = document.getElementById('ci-proj').value;
-  const summary = document.getElementById('ci-summary').value.trim();
-  if (!summary) { toast('Summary is required', 'error'); return; }
-  const pts     = document.getElementById('ci-pts').value;
-  const due     = document.getElementById('ci-due').value;
-  const labels  = document.getElementById('ci-labels').value.split(',').map(l=>l.trim()).filter(Boolean);
-  try {
-    const issue = await api('POST', '/api/v1/issues', {
-      projectKey: projKey,
-      issueType:  document.getElementById('ci-type').value,
-      priority:   document.getElementById('ci-prio').value,
-      summary,
-      description: document.getElementById('ci-desc').value.trim() || null,
-      storyPoints: pts ? parseInt(pts) : null,
-      dueDate:     due ? new Date(due).toISOString() : null,
-      labels:      labels.length ? labels : null,
+async function submitCreateSprint(){
+  const name=document.getElementById('cs-name').value.trim();
+  if(!name){toast('Sprint name required','err');return;}
+  try{
+    await api('POST',`/api/v1/projects/${currentProject.id}/sprints`,{
+      name,
+      goal:document.getElementById('cs-goal').value.trim()||null,
+      startDate:new Date(document.getElementById('cs-start').value).toISOString(),
+      endDate:new Date(document.getElementById('cs-end').value).toISOString(),
     });
-    toast(`✅ ${issue.issueKey} created!`, 'success');
-    closeModal();
-    loadBoard(); loadAllIssues();
-  } catch(e) { toast(e.message, 'error'); }
+    toast('Sprint created','ok'); closeModal(); loadBacklog();
+  }catch(e){toast(e.message,'err');}
 }
 
-/* ── Create Sprint Modal ── */
-async function openCreateSprint() {
-  if (!currentProject) { toast('Select a project first', 'error'); return; }
-  const today = new Date().toISOString().split('T')[0];
-  const twoW  = new Date(Date.now() + 14*86400000).toISOString().split('T')[0];
-  document.getElementById('modal-title').textContent = '⚡ Create Sprint';
-  document.getElementById('modal-body').innerHTML = `
-    <div class="form-group">
-      <label class="form-label">Sprint Name <span style="color:var(--red)">*</span></label>
-      <input class="form-input" id="cs-name" placeholder="e.g. Sprint 1" value="Sprint ${(sprints.length||0)+1}"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Sprint Goal</label>
-      <input class="form-input" id="cs-goal" placeholder="What will be achieved in this sprint?"/>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="form-group"><label class="form-label">Start Date</label><input class="form-input" type="date" id="cs-start" value="${today}"/></div>
-      <div class="form-group"><label class="form-label">End Date</label><input class="form-input" type="date" id="cs-end" value="${twoW}"/></div>
-    </div>`;
-  document.getElementById('modal-footer').innerHTML = `
-    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary" onclick="submitCreateSprint()">Create Sprint</button>`;
-  document.getElementById('modal-overlay').classList.add('open');
+function closeModal(){document.getElementById('modal-bg').classList.remove('on');}
+
+/* ── SEARCH ── */
+function doSearch(q){if(q.trim()) searchIssues(q);}
+async function searchIssues(iql){
+  showPage('backlog');
+  const el=document.getElementById('bl-content');
+  el.innerHTML='<div class="loading">Searching…</div>';
+  try{
+    const r=await api('POST','/api/v1/issues/search',{iql,maxResults:50,startAt:0});
+    const issues=r.issues||r;
+    allIssues=issues;
+    renderBacklog(issues,[]);
+    toast(`${issues.length} result${issues.length!==1?'s':''} found`,'info');
+  }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
 
-async function submitCreateSprint() {
-  const name  = document.getElementById('cs-name').value.trim();
-  const goal  = document.getElementById('cs-goal').value.trim();
-  const start = document.getElementById('cs-start').value;
-  const end   = document.getElementById('cs-end').value;
-  if (!name) { toast('Sprint name is required', 'error'); return; }
-  try {
-    await api('POST', `/api/v1/projects/${currentProject.id}/sprints`, {
-      name, goal: goal || null,
-      startDate: start ? new Date(start).toISOString() : null,
-      endDate:   end   ? new Date(end).toISOString()   : null,
-    });
-    toast('Sprint created ✅', 'success');
-    closeModal(); loadSprints();
-  } catch(e) { toast(e.message, 'error'); }
+/* ── NOTIFICATIONS ── */
+async function loadNotifications(){
+  try{
+    const notes=await api('GET','/api/v1/notifications/unread');
+    document.getElementById('ndot').classList.toggle('on',notes.length>0);
+    const el=document.getElementById('notif-list');
+    el.innerHTML=notes.length?notes.map(n=>`
+      <div class="np-item unread" onclick="markRead(${n.id})">
+        <div class="np-dot"></div>
+        <div class="np-content">
+          <div class="np-title2">${n.title}</div>
+          <div class="np-body">${n.body}</div>
+          <div class="np-time">${new Date(n.createdAt).toLocaleString()}</div>
+        </div>
+      </div>`).join(''):`<div class="np-empty">🔔 You're all caught up!</div>`;
+  }catch(e){}
+}
+function toggleNotifs(){
+  document.getElementById('notif-panel').classList.toggle('on');
+  if(document.getElementById('notif-panel').classList.contains('on')) loadNotifications();
+}
+function closeNotifs(){document.getElementById('notif-panel').classList.remove('on');}
+async function markRead(id){try{await api('POST',`/api/v1/notifications/${id}/read`);loadNotifications();}catch(e){}}
+async function markAllRead(){try{await api('POST','/api/v1/notifications/read-all');loadNotifications();toast('All marked read','ok');}catch(e){}}
+
+/* ── TOAST ── */
+function toast(msg,type='info'){
+  const box=document.getElementById('toast-box');
+  const d=document.createElement('div');
+  d.className=`toast ${type}`;
+  const icon=type==='err'?'✕':type==='ok'?'✓':'ℹ';
+  d.innerHTML=`<span>${icon}</span> ${msg}`;
+  box.appendChild(d);
+  setTimeout(()=>d.remove(),3500);
 }
 
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-
-/* ── Notifications ── */
-async function loadNotifications() {
-  try {
-    notifications = await api('GET', '/api/v1/notifications/unread');
-    const dot = document.getElementById('notif-dot');
-    dot.classList.toggle('show', notifications.length > 0);
-    const list = document.getElementById('notif-list');
-    list.innerHTML = notifications.length ? notifications.map(n => `
-      <div class="notif-item unread" onclick="markRead(${n.id})">
-        <div class="notif-title">${n.title}</div>
-        <div class="notif-body">${n.body}</div>
-        <div style="font-size:.7rem;color:var(--text3);margin-top:.25rem">${new Date(n.createdAt).toLocaleString()}</div>
-      </div>`).join('') :
-      '<div class="empty" style="padding:2rem"><div class="empty-icon">🔔</div><div class="empty-title">All caught up!</div></div>';
-  } catch(e) { /* silently ignore */ }
-}
-
-function toggleNotifs() {
-  document.getElementById('notif-panel').classList.toggle('open');
-  if (document.getElementById('notif-panel').classList.contains('open')) loadNotifications();
-}
-
-function closeNotifs() { document.getElementById('notif-panel').classList.remove('open'); }
-
-async function markRead(id) {
-  try { await api('POST', `/api/v1/notifications/${id}/read`); loadNotifications(); } catch(e) {}
-}
-
-async function markAllRead() {
-  try { await api('POST', '/api/v1/notifications/read-all'); toast('All marked read ✅','success'); loadNotifications(); } catch(e) {}
-}
-
-/* ── Helpers ── */
-function typeBadge(t) {
-  const m = { Story:'badge-story', Bug:'badge-bug', Epic:'badge-epic', Task:'badge-task', Subtask:'badge-subtask' };
-  const icons = { Story:'📖', Bug:'🐛', Epic:'🏔', Task:'✅', Subtask:'🔗' };
-  return `<span class="badge ${m[t]||'badge-task'}">${icons[t]||'📋'} ${t||'Issue'}</span>`;
-}
-
-function priorityBadge(p) {
-  const c = { Blocker:'var(--red)', Critical:'var(--orange)', Major:'var(--yellow)', Minor:'var(--green)', Trivial:'var(--text3)' };
-  return `<span class="badge" style="background:${c[p]||'var(--text3)'}25;color:${c[p]||'var(--text3)'};">${prioIcon(p)} ${p||'Major'}</span>`;
-}
-
-function prioIcon(p) {
-  return { Blocker:'🚨', Critical:'🔴', Major:'🟡', Minor:'🟢', Trivial:'⬜' }[p] || '🟡';
-}
-
-function prioClass(p) {
-  return { Blocker:'prio-blocker', Critical:'prio-critical', Major:'prio-major', Minor:'prio-minor', Trivial:'prio-trivial' }[p] || 'prio-major';
-}
-
-function statusPill(s) {
-  const l = (s||'').toLowerCase();
-  const cls = l.includes('done')||l.includes('closed') ? 'status-done'
-    : l.includes('review') ? 'status-review'
-    : l.includes('progress') ? 'status-inprog'
-    : 'status-todo';
-  return `<span class="status-pill ${cls}">${s||'To Do'}</span>`;
-}
-
-function toast(msg, type = 'success') {
-  const c = document.getElementById('toast-container');
-  const d = document.createElement('div');
-  d.className = `toast ${type}`;
-  d.innerHTML = `${type==='error'?'❌':'✅'} ${msg}`;
-  c.appendChild(d);
-  setTimeout(() => d.remove(), 3500);
-}
-
-// Kick off
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeDetail(); closeModal(); closeNotifs(); }
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); document.getElementById('global-search').focus(); }
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeDetail();closeModal();closeNotifs();}
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.querySelector('#tnav .tn-search input')?.focus();}
 });
+document.getElementById('login-screen').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 </script>
 </body>
 </html>
