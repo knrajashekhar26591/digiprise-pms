@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Digiprise.PMS.API/Digiprise.PMS.API.csproj",
+      "use": "@vercel/community-builders/net8"
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "Digiprise.PMS.API/Digiprise.PMS.API.csproj" }
+  ]
+}
