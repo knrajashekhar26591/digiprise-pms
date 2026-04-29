@@ -8,36 +8,31 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --blue:#0052cc;--blue2:#0065ff;--blue-light:#4c9aff;--blue-xlight:#e9f2ff;
-  --bg:#f4f5f7;--white:#ffffff;--border:#dfe1e6;--border2:#ebecf0;
+  --bg:#f4f5f7;--white:#fff;--border:#dfe1e6;--border2:#ebecf0;
   --text:#172b4d;--text2:#5e6c84;--text3:#97a0af;
-  --green:#00875a;--green-light:#e3fcef;--red:#de350b;--red-light:#ffebe6;
-  --yellow:#ff991f;--yellow-light:#fffae6;--purple:#6554c0;--teal:#00b8d9;
-  --sidebar-bg:#0747a6;--sidebar-hover:rgba(255,255,255,.1);--sidebar-active:rgba(255,255,255,.15);
-  --sidebar-text:rgba(255,255,255,.85);--sidebar-text2:rgba(255,255,255,.6);
-  --topnav:#ffffff;--topnav-h:56px;--sidebar-w:240px;--sidebar-w-collapsed:64px;
-  --r:3px;--r2:6px;
-  --shadow:0 1px 2px rgba(9,30,66,.25),0 0 1px rgba(9,30,66,.31);
-  --shadow2:0 4px 8px rgba(9,30,66,.15),0 0 1px rgba(9,30,66,.31);
-  --shadow3:0 8px 24px rgba(9,30,66,.2);
+  --green:#00875a;--green-bg:#e3fcef;--red:#de350b;--red-bg:#ffebe6;
+  --yellow:#ff991f;--yellow-bg:#fffae6;--purple:#6554c0;--teal:#00b8d9;
+  --sidebar:#0747a6;--r:3px;--r2:6px;
+  --sh:0 1px 2px rgba(9,30,66,.25),0 0 1px rgba(9,30,66,.31);
+  --sh2:0 4px 8px rgba(9,30,66,.15);--sh3:0 8px 24px rgba(9,30,66,.2);
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:14px;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:var(--text);background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
 button{cursor:pointer;border:none;font-family:inherit;font-size:14px}
 input,textarea,select{font-family:inherit;font-size:14px}
-::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar{width:7px;height:7px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+::-webkit-scrollbar-thumb{background:#c1c7d0;border-radius:4px}
 
-/* ══ LOGIN ══════════════════════════════════════════════════════ */
+/* ── LOGIN ── */
 #login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}
 .lw{width:400px}
 .ll{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:8px}
 .ll-icon{width:44px;height:44px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center}
 .ll-icon svg{fill:#fff}
-.ll-name{font-size:22px;font-weight:600;color:var(--text)}
-.lc{border:1px solid var(--border);border-radius:var(--r2);padding:32px;box-shadow:var(--shadow2)}
+.ll-name{font-size:22px;font-weight:700;color:var(--text)}
+.lc{border:1px solid var(--border);border-radius:var(--r2);padding:32px;box-shadow:var(--sh2)}
 .lc h2{font-size:20px;font-weight:600;margin-bottom:4px;text-align:center}
-.lc p{color:var(--text2);font-size:13px;text-align:center;margin-bottom:24px}
+.lc-sub{color:var(--text2);font-size:13px;text-align:center;margin-bottom:24px}
 .fg{margin-bottom:16px}
 .fl{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px}
 .fi{width:100%;border:2px solid var(--border);border-radius:var(--r2);padding:8px 10px;color:var(--text);outline:none;transition:border-color .15s}
@@ -46,314 +41,336 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .fb:hover{background:var(--blue)}
 .lerr{color:var(--red);font-size:12px;margin-top:8px;display:none;text-align:center}
 .ldemo{margin-top:20px;padding-top:16px;border-top:1px solid var(--border2);font-size:12px;color:var(--text2);text-align:center}
-.ldemo strong{color:var(--text)}
 
-/* ══ APP SHELL ══════════════════════════════════════════════════ */
+/* ── APP ── */
 #app{display:none;flex-direction:column;height:100vh}
 #app.on{display:flex}
 
-/* ══ TOP NAV ════════════════════════════════════════════════════ */
-#tnav{height:var(--topnav-h);background:var(--topnav);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:4px;flex-shrink:0;z-index:200;box-shadow:0 1px 0 var(--border)}
-.tn-logo{display:flex;align-items:center;gap:6px;padding:0 8px;text-decoration:none;margin-right:4px}
-.tn-logo-icon{width:28px;height:28px;background:var(--blue2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* ── TOPNAV ── */
+#tnav{height:56px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:4px;flex-shrink:0;z-index:200}
+.tn-logo{display:flex;align-items:center;gap:6px;padding:0 8px;cursor:pointer;text-decoration:none}
+.tn-logo-icon{width:28px;height:28px;background:var(--blue2);border-radius:6px;display:flex;align-items:center;justify-content:center}
 .tn-logo-icon svg{fill:#fff;width:16px;height:16px}
-.tn-logo-text{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap}
+.tn-logo-text{font-size:15px;font-weight:700;color:var(--text)}
 .tn-logo-text span{color:var(--blue2)}
-.tn-item{display:flex;align-items:center;gap:4px;padding:0 8px;height:32px;border-radius:var(--r2);color:var(--text2);font-size:14px;font-weight:400;cursor:pointer;transition:background .1s,color .1s;white-space:nowrap;background:transparent}
-.tn-item:hover{background:var(--bg);color:var(--text)}
-.tn-item svg{opacity:.7;width:14px;height:14px}
+.tn-btn{display:flex;align-items:center;gap:4px;padding:0 8px;height:32px;border-radius:var(--r2);color:var(--text2);font-size:14px;background:transparent;cursor:pointer;white-space:nowrap;transition:background .1s}
+.tn-btn:hover{background:var(--bg);color:var(--text)}
+.tn-btn svg{width:12px;height:12px}
+.tn-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
 .tn-search{flex:1;max-width:480px;margin:0 8px;position:relative}
-.tn-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3)}
-.tn-search input{width:100%;background:var(--bg);border:2px solid var(--border);border-radius:20px;padding:6px 12px 6px 34px;color:var(--text);outline:none;font-size:14px;transition:border-color .15s,background .15s}
+.tn-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3)}
+.tn-search input{width:100%;background:var(--bg);border:2px solid var(--border);border-radius:20px;padding:6px 12px 6px 32px;color:var(--text);outline:none;font-size:14px;transition:all .15s}
 .tn-search input:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15)}
 .tn-search input::placeholder{color:var(--text3)}
 .tn-right{display:flex;align-items:center;gap:4px;margin-left:auto}
 .btn-create{background:var(--red);color:#fff;border-radius:var(--r2);padding:0 16px;height:32px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;transition:background .15s}
 .btn-create:hover{background:#bf2600}
-.tn-icon-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;background:transparent;position:relative}
-.tn-icon-btn:hover{background:var(--bg)}
-.tn-notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff;display:none}
-.tn-notif-dot.on{display:block}
-.tn-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0052cc,#4c9aff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0}
-.tn-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.tn-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;position:relative}
+.tn-icon:hover{background:var(--bg)}
+.tn-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff;display:none}
+.tn-dot.on{display:block}
+.tn-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
 
-/* ══ BODY ════════════════════════════════════════════════════════ */
+/* ── BODY ── */
 #body{display:flex;flex:1;overflow:hidden}
 
-/* ══ LEFT SIDEBAR ════════════════════════════════════════════════ */
-#lsb{width:var(--sidebar-w);background:var(--sidebar-bg);color:var(--sidebar-text);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;transition:width .2s}
-#lsb.col{width:var(--sidebar-w-collapsed)}
-.sb-section{padding:8px 0}
-.sb-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sidebar-text2);padding:8px 16px 4px;white-space:nowrap;overflow:hidden}
-.sb-item{display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--sidebar-text);cursor:pointer;transition:background .1s;white-space:nowrap;overflow:hidden;font-size:14px;border-radius:0;position:relative}
-.sb-item:hover{background:var(--sidebar-hover)}
-.sb-item.act{background:var(--sidebar-active);font-weight:500}
-.sb-item svg{flex-shrink:0;width:16px;height:16px;opacity:.85}
-.sb-item-text{overflow:hidden;text-overflow:ellipsis}
-.sb-item-arrow{margin-left:auto;opacity:.6;flex-shrink:0}
-.sb-proj{display:flex;align-items:center;gap:8px;padding:6px 16px;color:var(--sidebar-text);cursor:pointer;transition:background .1s;white-space:nowrap;overflow:hidden;font-size:13px}
-.sb-proj:hover{background:var(--sidebar-hover)}
-.sb-proj.act{background:var(--sidebar-active)}
-.sb-proj-icon{width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:rgba(255,255,255,.2)}
+/* ── SIDEBAR ── */
+#lsb{width:240px;background:var(--sidebar);color:rgba(255,255,255,.85);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;transition:width .2s}
+#lsb.col{width:64px}
+.sb-sec{padding:8px 0}
+.sb-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.5);padding:8px 16px 4px;white-space:nowrap;overflow:hidden}
+.sb-row{display:flex;align-items:center;gap:10px;padding:8px 16px;color:rgba(255,255,255,.85);cursor:pointer;font-size:14px;transition:background .1s;white-space:nowrap;overflow:hidden}
+.sb-row:hover{background:rgba(255,255,255,.1)}
+.sb-row.act{background:rgba(255,255,255,.15);font-weight:500}
+.sb-row svg{flex-shrink:0;width:16px;height:16px;opacity:.8}
+.sb-row-arr{margin-left:auto;opacity:.5;flex-shrink:0}
+.sb-proj-row{display:flex;align-items:center;gap:8px;padding:6px 16px;color:rgba(255,255,255,.8);cursor:pointer;font-size:13px;transition:background .1s;white-space:nowrap;overflow:hidden}
+.sb-proj-row:hover{background:rgba(255,255,255,.1)}
+.sb-proj-row.act{background:rgba(255,255,255,.15)}
+.sb-proj-ic{width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
 .sb-sep{height:1px;background:rgba(255,255,255,.1);margin:4px 12px}
-.sb-starred-item{display:flex;align-items:center;gap:8px;padding:5px 16px;color:var(--sidebar-text2);cursor:pointer;font-size:13px;transition:background .1s;overflow:hidden;white-space:nowrap}
-.sb-starred-item:hover{background:var(--sidebar-hover);color:var(--sidebar-text)}
-.sb-starred-item svg{flex-shrink:0;width:14px;height:14px;opacity:.6}
-.sb-filters-item{display:flex;align-items:center;gap:8px;padding:5px 16px;color:var(--sidebar-text2);cursor:pointer;font-size:13px;transition:background .1s;overflow:hidden;white-space:nowrap}
-.sb-filters-item:hover{background:var(--sidebar-hover);color:var(--sidebar-text)}
+.sb-filter-row{display:flex;align-items:center;gap:8px;padding:5px 16px;color:rgba(255,255,255,.6);cursor:pointer;font-size:13px;transition:background .1s;overflow:hidden;white-space:nowrap}
+.sb-filter-row:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.sb-filter-row svg{width:14px;height:14px;flex-shrink:0}
 
-/* ══ MAIN CONTENT ════════════════════════════════════════════════ */
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--white)}
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff}
 
-/* ══ PROJECT HEADER ══════════════════════════════════════════════ */
-#proj-header{border-bottom:1px solid var(--border);background:#fff;flex-shrink:0}
-.ph-top{display:flex;align-items:center;gap:8px;padding:12px 20px 0}
-.ph-breadcrumb{font-size:12px;color:var(--text2)}
-.ph-breadcrumb span{color:var(--text3)}
-.ph-title{display:flex;align-items:center;gap:10px;padding:4px 20px 0}
-.ph-proj-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.ph-proj-name{font-size:20px;font-weight:600;color:var(--text)}
+/* ── PROJ HEADER ── */
+#ph{border-bottom:1px solid var(--border);background:#fff;flex-shrink:0}
+.ph-bc{font-size:12px;color:var(--text2);padding:12px 20px 0}
+.ph-bc span{color:var(--text3)}
+.ph-title-row{display:flex;align-items:center;gap:10px;padding:4px 20px 0}
+.ph-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ph-name{font-size:20px;font-weight:600}
 .ph-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
-.ph-action-btn{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;background:transparent}
-.ph-action-btn:hover{background:var(--bg)}
-
-/* ══ PROJECT TABS ════════════════════════════════════════════════ */
-.ph-tabs{display:flex;align-items:center;padding:0 20px;overflow-x:auto;gap:0;scrollbar-width:none}
+.ph-act-btn{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s}
+.ph-act-btn:hover{background:var(--bg)}
+.ph-tabs{display:flex;align-items:center;padding:0 20px;overflow-x:auto;scrollbar-width:none}
 .ph-tabs::-webkit-scrollbar{display:none}
-.ph-tab{display:flex;align-items:center;gap:5px;padding:10px 12px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .1s,border-color .1s;font-weight:400}
+.ph-tab{display:flex;align-items:center;gap:5px;padding:10px 12px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .1s}
 .ph-tab:hover{color:var(--text);background:var(--bg);border-radius:var(--r) var(--r) 0 0}
 .ph-tab.act{color:var(--blue2);border-bottom-color:var(--blue2);font-weight:500}
-.ph-tab svg{width:14px;height:14px;opacity:.7}
+.ph-tab svg{width:14px;height:14px}
 .ph-tab-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0}
 
-/* ══ PAGES ═══════════════════════════════════════════════════════ */
-.page{display:none;flex:1;overflow-y:auto;flex-direction:column}
-.page.on{display:flex}
+/* ── PAGES ── */
+.pg{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.pg.on{display:flex}
 
-/* ══ BACKLOG PAGE ════════════════════════════════════════════════ */
-#pg-backlog{padding:0}
-.bl-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;flex-wrap:wrap;border-bottom:1px solid var(--border2)}
-.bl-search{position:relative}
-.bl-search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3)}
-.bl-search input{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:5px 8px 5px 28px;font-size:13px;color:var(--text);outline:none;width:160px;transition:border-color .15s,width .2s}
-.bl-search input:focus{border-color:var(--blue2);width:220px}
-.bl-avatars{display:flex;align-items:center;gap:2px}
-.bl-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer;border:2px solid #fff;transition:transform .1s;margin-left:-4px}
-.bl-avatar:first-child{margin-left:0}
-.bl-avatar:hover{transform:scale(1.1);z-index:1}
-.bl-more{background:var(--bg);border:1px solid var(--border);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;margin-left:-4px}
-.bl-filter-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2);background:#fff;cursor:pointer;transition:background .1s,border-color .1s}
-.bl-filter-btn:hover{background:var(--bg);border-color:var(--text3)}
+/* ── BACKLOG ── */
+.bl-bar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border2);flex-wrap:wrap;flex-shrink:0}
+.bl-search-wrap{position:relative}
+.bl-search-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3)}
+.bl-search-wrap input{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:5px 8px 5px 26px;font-size:13px;color:var(--text);outline:none;width:160px;transition:all .2s}
+.bl-search-wrap input:focus{border-color:var(--blue2);width:220px}
+.bl-avs{display:flex;align-items:center}
+.bl-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer;border:2px solid #fff;margin-left:-4px;transition:transform .1s}
+.bl-av:first-child{margin-left:0}
+.bl-av:hover{transform:scale(1.1);z-index:1}
+.bl-more{background:var(--bg);border:1px solid var(--border);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text2);cursor:pointer;margin-left:-4px}
+.bl-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text2);background:#fff;cursor:pointer;transition:all .1s}
+.bl-btn:hover{background:var(--bg);border-color:var(--text3)}
 .bl-content{flex:1;overflow-y:auto;padding:0 20px 40px}
 
-/* Sprint Block */
-.sprint-block{margin-top:16px}
-.sprint-row{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;border-radius:var(--r);transition:background .1s}
-.sprint-row:hover{background:rgba(9,30,66,.04)}
-.sprint-chevron{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:transform .2s;flex-shrink:0}
-.sprint-chevron.open{transform:rotate(90deg)}
-.sprint-cb{width:14px;height:14px;border:2px solid var(--border);border-radius:2px;flex-shrink:0}
-.sprint-name{font-size:14px;font-weight:600;color:var(--text)}
-.sprint-dates{font-size:13px;color:var(--text2);margin-left:4px}
-.sprint-count{font-size:13px;color:var(--text2)}
-.sprint-badges{display:flex;align-items:center;gap:4px;margin-left:auto}
-.sp-badge{border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700;min-width:24px;text-align:center}
-.sp-badge.done{background:#e3fcef;color:#00875a}
-.sp-badge.inprog{background:#e9f2ff;color:#0052cc}
-.sp-badge.todo{background:#f4f5f7;color:#5e6c84}
-.sprint-btn{padding:4px 10px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap;transition:background .1s,border-color .1s}
-.sprint-btn:hover{background:var(--bg);border-color:var(--text3)}
-.sprint-btn.primary{background:var(--blue2);color:#fff;border-color:var(--blue2)}
-.sprint-btn.primary:hover{background:var(--blue)}
-.sprint-btn.complete{background:#fff;color:var(--text2)}
-.sprint-menu{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--text3);cursor:pointer;transition:background .1s;background:transparent}
-.sprint-menu:hover{background:var(--bg)}
+/* Sprint rows */
+.sp-block{margin-top:16px}
+.sp-hdr{display:flex;align-items:center;gap:8px;padding:7px 4px;cursor:pointer;border-radius:var(--r);transition:background .1s}
+.sp-hdr:hover{background:rgba(9,30,66,.04)}
+.sp-chev{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.sp-chev.open{transform:rotate(90deg)}
+.sp-cb{width:14px;height:14px;border:2px solid var(--border);border-radius:2px;flex-shrink:0;cursor:pointer}
+.sp-name{font-size:14px;font-weight:600}
+.sp-dates{font-size:13px;color:var(--text2)}
+.sp-count{font-size:13px;color:var(--text2)}
+.sp-badges{display:flex;align-items:center;gap:4px;margin-left:auto}
+.spb{border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700;min-width:22px;text-align:center}
+.spb.done{background:var(--green-bg);color:var(--green)}
+.spb.prog{background:var(--blue-xlight);color:var(--blue)}
+.spb.todo{background:var(--bg);color:var(--text2)}
+.sp-act-badge{background:var(--green-bg);color:var(--green);border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700}
+.sp-btn{padding:4px 10px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;white-space:nowrap;transition:all .1s}
+.sp-btn:hover{background:var(--bg);border-color:var(--text3)}
+.sp-btn.primary{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+.sp-btn.primary:hover{background:var(--blue)}
+.sp-menu{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--text3);cursor:pointer;background:transparent}
+.sp-menu:hover{background:var(--bg)}
+.sp-issues{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-top:4px}
 
-/* Issue Rows */
-.sprint-issues{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-top:4px}
-.issue-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;background:#fff}
-.issue-row:last-child{border-bottom:none}
-.issue-row:hover{background:#f8f9fa}
+/* Issue rows */
+.ir{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;background:#fff}
+.ir:last-child{border-bottom:none}
+.ir:hover{background:#f8f9fa}
 .ir-cb{width:14px;height:14px;border:2px solid var(--border);border-radius:2px;flex-shrink:0}
-.ir-type{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px}
-.ir-key{font-size:12px;color:var(--blue2);font-weight:500;white-space:nowrap;width:80px;flex-shrink:0;font-family:monospace}
-.ir-key:hover{text-decoration:underline}
-.ir-summary{flex:1;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ir-prio{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
-.ir-assignee{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.ir-type-ic{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:#fff}
+.ir-key{font-size:12px;color:var(--blue2);font-weight:500;white-space:nowrap;width:82px;flex-shrink:0;font-family:monospace}
+.ir-sum{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ir-epics{font-size:11px;color:var(--text2);background:#f4f5f7;border-radius:2px;padding:1px 6px;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.ir-status-pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:2px;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer;position:relative}
+.ir-prio{width:16px;height:16px;flex-shrink:0;font-size:12px;display:flex;align-items:center;justify-content:center}
+.ir-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
 .ir-pts{font-size:12px;color:var(--text2);width:24px;text-align:right;flex-shrink:0}
-.ir-status{font-size:11px;font-weight:600;padding:2px 6px;border-radius:2px;white-space:nowrap;flex-shrink:0}
-.ir-status.todo{background:var(--bg);color:var(--text2)}
-.ir-status.prog{background:#e9f2ff;color:var(--blue)}
-.ir-status.review{background:#fffae6;color:#974f0c}
-.ir-status.done{background:#e3fcef;color:var(--green)}
-
-/* Backlog section */
-.backlog-header{display:flex;align-items:center;gap:8px;padding:12px 0 8px;margin-top:8px}
-.backlog-title{font-size:14px;font-weight:600;color:var(--text)}
-.backlog-count{font-size:13px;color:var(--text2)}
-.backlog-badges{display:flex;align-items:center;gap:4px;margin-left:auto}
-.backlog-create-sprint{font-size:12px;color:var(--blue2);cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:background .1s}
-.backlog-create-sprint:hover{background:var(--blue-xlight)}
+.ir-hov{opacity:0;display:flex;align-items:center;gap:2px;flex-shrink:0;transition:opacity .1s}
+.ir:hover .ir-hov{opacity:1}
+.ir-hov-btn{width:22px;height:22px;border-radius:2px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--text3);font-size:11px;transition:background .1s}
+.ir-hov-btn:hover{background:var(--border)}
 .bl-create-row{padding:8px 12px;font-size:13px;color:var(--blue2);cursor:pointer;display:flex;align-items:center;gap:6px;background:#fff;border-top:1px solid var(--border2)}
 .bl-create-row:hover{background:var(--blue-xlight)}
+.drag-hint{padding:20px;text-align:center;font-size:13px;color:var(--text3);background:#fafbfc;border:1px dashed var(--border);border-radius:var(--r);margin:8px}
+.bl-footer{padding:12px 0;font-size:12px;color:var(--text3);text-align:right;border-top:1px solid var(--border2);margin-top:8px}
 
-/* Epic panel drag hint */
-.drag-hint{padding:20px;text-align:center;font-size:13px;color:var(--text3);background:#f8f9fa;border:1px dashed var(--border);border-radius:var(--r);margin:8px 0}
-
-/* ══ BOARD PAGE ══════════════════════════════════════════════════ */
-#pg-board{padding:0;flex-direction:row;overflow:hidden}
+/* ── BOARD ── */
+#pg-board{flex-direction:row;padding:0;overflow:hidden}
 .board-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.board-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border2);flex-shrink:0;flex-wrap:wrap}
-.board-sprint-title{font-size:15px;font-weight:600;color:var(--text)}
+.board-bar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border2);flex-shrink:0;flex-wrap:wrap}
+.board-sprint-name{font-size:15px;font-weight:600}
 .board-scroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:16px 20px}
 .board-cols{display:flex;gap:12px;height:100%;min-width:max-content}
-.bcol{width:280px;display:flex;flex-direction:column;flex-shrink:0}
-.bcol-header{padding:8px 4px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bcol{width:275px;display:flex;flex-direction:column;flex-shrink:0}
+.bcol-hdr{padding:8px 4px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .bcol-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
-.bcol-count{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 7px;font-weight:600}
+.bcol-cnt{font-size:11px;color:var(--text3);background:var(--bg);border-radius:999px;padding:1px 7px;font-weight:600}
 .bcol-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px}
-.bcard{background:#fff;border-radius:var(--r2);padding:10px 12px;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s,transform .1s;border:1px solid transparent}
-.bcard:hover{box-shadow:var(--shadow2);transform:translateY(-1px);border-color:var(--blue-light)}
-.bcard-summary{font-size:13px;color:var(--text);line-height:1.4;margin-bottom:10px}
-.bcard-footer{display:flex;align-items:center;justify-content:space-between}
+.bcard{background:#fff;border-radius:var(--r2);padding:10px 12px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .15s,transform .1s;border:1px solid transparent}
+.bcard:hover{box-shadow:var(--sh2);transform:translateY(-1px);border-color:var(--blue-light)}
+.bcard-sum{font-size:13px;line-height:1.4;margin-bottom:10px}
+.bcard-foot{display:flex;align-items:center;justify-content:space-between}
 .bcard-left{display:flex;align-items:center;gap:6px}
-.bcard-type{width:16px;height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
-.bcard-key{font-size:11px;color:var(--text3);font-family:monospace}
-.bcard-prio{font-size:12px}
-.bcard-right{display:flex;align-items:center;gap:6px}
+.bcard-right{display:flex;align-items:center;gap:5px}
 .bcard-pts{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:1px 5px;font-weight:500}
 .bcard-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
 
-/* ══ BOARD DONE COL ══════════════════════════════════════════════ */
-.bcol.done .bcol-title{color:var(--green)}
-
-/* ══ ISSUE DETAIL PANEL ══════════════════════════════════════════ */
-#detail-panel{position:fixed;top:var(--topnav-h);right:-680px;width:680px;height:calc(100vh - var(--topnav-h));background:#fff;border-left:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transition:right .25s ease;box-shadow:-4px 0 24px rgba(9,30,66,.15);overflow:hidden}
-#detail-panel.on{right:0}
-.dp-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+/* ── DETAIL PANEL ── */
+#dp{position:fixed;top:56px;right:-760px;width:760px;height:calc(100vh - 56px);background:#fff;border-left:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transition:right .25s ease;box-shadow:-4px 0 24px rgba(9,30,66,.15);overflow:hidden}
+#dp.on{right:0}
+.dp-hdr{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
 .dp-key{font-size:13px;color:var(--blue2);font-weight:600;font-family:monospace;cursor:pointer}
 .dp-key:hover{text-decoration:underline}
-.dp-actions{display:flex;align-items:center;gap:4px;margin-left:auto}
-.dp-action{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s}
-.dp-action:hover{background:var(--bg)}
-.dp-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 240px;gap:0}
-.dp-main{padding:20px;border-right:1px solid var(--border2);overflow-y:auto}
-.dp-sidebar{padding:16px;overflow-y:auto;background:#f8f9fa}
-.dp-title{font-size:20px;font-weight:600;line-height:1.3;color:var(--text);margin-bottom:16px;cursor:text}
-.dp-title:hover{background:var(--bg);border-radius:var(--r);padding:4px;margin:-4px}
-.dp-section{margin-bottom:20px}
-.dp-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px}
-.dp-desc{font-size:14px;color:var(--text2);line-height:1.6;background:var(--bg);border-radius:var(--r);padding:12px;min-height:60px;border:1px solid transparent;cursor:text}
+.dp-hdr-acts{display:flex;align-items:center;gap:4px;margin-left:auto}
+.dp-hdr-btn{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s}
+.dp-hdr-btn:hover{background:var(--bg)}
+.dp-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 260px;min-height:0}
+.dp-main{padding:20px;border-right:1px solid var(--border2);overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.dp-side{padding:16px;overflow-y:auto;background:#fafbfc;display:flex;flex-direction:column;gap:0}
+
+/* Editable title */
+.dp-title-wrap{position:relative}
+.dp-title{font-size:20px;font-weight:600;line-height:1.3;color:var(--text);padding:6px 8px;border-radius:var(--r);border:2px solid transparent;outline:none;width:100%;resize:none;background:transparent;font-family:inherit;overflow:hidden}
+.dp-title:hover{border-color:var(--border);background:#fff}
+.dp-title:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+
+/* Section headers */
+.dp-sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px}
+
+/* Status bar */
+.dp-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.status-select-wrap{position:relative;display:inline-block}
+.status-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .1s}
+.status-btn:hover{opacity:.85}
+.status-btn .arr{opacity:.7;margin-left:2px}
+.status-drop{position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--sh3);z-index:100;min-width:160px;overflow:hidden;display:none}
+.status-drop.on{display:block}
+.status-drop-item{padding:8px 14px;font-size:13px;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:8px}
+.status-drop-item:hover{background:var(--bg)}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Description */
+.dp-desc{font-size:14px;color:var(--text);line-height:1.7;padding:10px 12px;border-radius:var(--r);border:2px solid transparent;outline:none;min-height:80px;width:100%;resize:vertical;background:transparent;font-family:inherit}
 .dp-desc:hover{border-color:var(--border);background:#fff}
-.dp-field{display:flex;align-items:center;margin-bottom:12px;gap:8px}
-.dp-field-label{font-size:12px;font-weight:600;color:var(--text2);width:100px;flex-shrink:0}
-.dp-field-val{font-size:14px;color:var(--text);flex:1}
-.dp-status-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .1s}
-.dp-status-btn:hover{opacity:.85}
-.dp-transitions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.dp-trans-btn{padding:4px 10px;font-size:12px;font-weight:500;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);cursor:pointer;transition:background .1s,border-color .1s}
-.dp-trans-btn:hover{background:var(--bg);border-color:var(--text3)}
-.dp-assignee-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
-.dp-comment{background:#fff;border:1px solid var(--border2);border-radius:var(--r2);padding:12px;margin-bottom:8px}
+.dp-desc:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+
+/* Issue links */
+.link-add-row{display:flex;align-items:center;gap:8px;padding:10px 0;flex-wrap:wrap}
+.link-type-select{border:1px solid var(--border);border-radius:var(--r);padding:5px 8px;font-size:13px;color:var(--text);background:#fff;outline:none;cursor:pointer}
+.link-type-select:focus{border-color:var(--blue2)}
+.link-issue-input{flex:1;border:1px solid var(--border);border-radius:var(--r);padding:5px 8px;font-size:13px;outline:none;min-width:120px}
+.link-issue-input:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.15)}
+.link-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border2);font-size:13px}
+.link-item:last-child{border:none}
+.link-type-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;width:90px;flex-shrink:0}
+.link-key{color:var(--blue2);font-family:monospace;font-size:12px;cursor:pointer}
+.link-key:hover{text-decoration:underline}
+.link-rm{margin-left:auto;color:var(--text3);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;border-radius:2px;background:transparent}
+.link-rm:hover{background:var(--red-bg);color:var(--red)}
+
+/* Child issues */
+.child-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:13px;cursor:pointer}
+.child-item:last-child{border:none}
+.child-item:hover{background:rgba(9,30,66,.04);padding-left:4px;margin-left:-4px;border-radius:2px}
+
+/* Activity */
+.dp-comment{background:#f4f5f7;border-radius:var(--r2);padding:12px;margin-bottom:8px}
 .dp-comment-author{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .dp-comment-time{font-size:11px;color:var(--text3);font-weight:400}
 .dp-comment-body{font-size:13px;color:var(--text2);line-height:1.5}
-.dp-comment-input{width:100%;border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:72px;transition:border-color .15s,box-shadow .15s}
+.dp-comment-input{width:100%;border:2px solid var(--border);border-radius:var(--r2);padding:10px 12px;font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:72px;transition:all .15s;background:#fff}
 .dp-comment-input:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.15)}
 
-/* ══ MODAL ═══════════════════════════════════════════════════════ */
+/* Sidebar fields */
+.dp-field{margin-bottom:14px}
+.dp-field-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;display:block}
+.dp-field-val{font-size:14px;color:var(--text)}
+/* Inline editable field */
+.dp-edit-wrap{position:relative}
+.dp-inline{width:100%;border:2px solid transparent;border-radius:var(--r);padding:4px 6px;font-size:14px;color:var(--text);background:transparent;outline:none;cursor:pointer;font-family:inherit}
+.dp-inline:hover{border-color:var(--border);background:#fff;cursor:text}
+.dp-inline:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15);cursor:text}
+select.dp-inline{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;padding-right:22px;cursor:pointer}
+select.dp-inline:hover{border-color:var(--border);background-color:#fff}
+.dp-unset{color:var(--text3);font-style:italic}
+
+/* Priority icon inline */
+.prio-display{display:flex;align-items:center;gap:5px;font-size:13px}
+
+/* Assignee picker */
+.av-pick{display:flex;align-items:center;gap:8px}
+.av-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+
+/* ── DASHBOARD ── */
+#pg-dashboard{padding:0}
+.dash-inner{padding:32px;flex:1;overflow-y:auto}
+.dash-h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.dash-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.dash-stat{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px;border-top-width:3px}
+.dash-stat-num{font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+.dash-stat-lbl{font-size:13px;color:var(--text2);font-weight:500}
+.dash-2col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.dash-tbl{background:#fff;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.dash-tbl-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:600}
+.dash-tbl-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border2);font-size:13px;cursor:pointer;transition:background .1s}
+.dash-tbl-row:last-child{border:none}
+.dash-tbl-row:hover{background:var(--bg)}
+.dash-burn{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.dash-burn-title{font-size:14px;font-weight:600;margin-bottom:12px}
+
+/* ── PROJECTS PAGE ── */
+#pg-projects{padding:32px;flex-direction:column}
+.pp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.pp-h1{font-size:22px;font-weight:600}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.pp-card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;transition:box-shadow .15s,transform .1s}
+.pp-card:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.pp-card.act{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.2)}
+.pp-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.pp-card-icon{width:40px;height:40px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pp-card-key{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.pp-card-name{font-size:15px;font-weight:600}
+.pp-card-desc{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:12px}
+.pp-card-footer{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text3)}
+.pp-new{background:#fff;border:2px dashed var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;transition:all .15s;color:var(--text3)}
+.pp-new:hover{border-color:var(--blue2);background:var(--blue-xlight);color:var(--blue2)}
+
+/* ── MODAL ── */
 #modal-bg{position:fixed;inset:0;background:rgba(9,30,66,.54);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:80px}
 #modal-bg.on{display:flex}
-.modal{background:#fff;border-radius:var(--r2);width:600px;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--shadow3)}
-.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal{background:#fff;border-radius:var(--r2);width:600px;max-height:82vh;display:flex;flex-direction:column;box-shadow:var(--sh3)}
+.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .modal-title{font-size:18px;font-weight:600}
-.modal-close{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;transition:background .1s;font-size:18px}
-.modal-close:hover{background:var(--bg)}
+.modal-x{width:28px;height:28px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;background:transparent;font-size:18px;transition:background .1s}
+.modal-x:hover{background:var(--bg)}
 .modal-body{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
 .mf{display:flex;flex-direction:column;gap:6px}
 .ml{font-size:12px;font-weight:600;color:var(--text2)}
-.mi{border:2px solid var(--border);border-radius:var(--r2);padding:7px 10px;color:var(--text);outline:none;width:100%;transition:border-color .15s}
+.mf-hint{font-size:11px;color:var(--text3);margin-top:2px}
+.mi{border:2px solid var(--border);border-radius:var(--r2);padding:7px 10px;color:var(--text);outline:none;width:100%;transition:all .15s;background:#fff}
 .mi:focus{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.15)}
 .mi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 select.mi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235e6c84' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 textarea.mi{resize:vertical;min-height:80px}
-.btn-jira{padding:7px 14px;border-radius:var(--r2);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,opacity .15s}
-.btn-primary{background:var(--blue2);color:#fff;border:none}
-.btn-primary:hover{background:var(--blue)}
-.btn-secondary{background:var(--bg);color:var(--text);border:none}
-.btn-secondary:hover{background:var(--border)}
-.btn-danger-jira{background:var(--red);color:#fff;border:none}
-.btn-danger-jira:hover{background:#bf2600}
-.mf-hint{font-size:11px;color:var(--text3);margin-top:2px}
+.btn-p{padding:7px 14px;border-radius:var(--r2);font-size:14px;font-weight:500;cursor:pointer;background:var(--blue2);color:#fff;border:none;transition:background .15s}
+.btn-p:hover{background:var(--blue)}
+.btn-s{padding:7px 14px;border-radius:var(--r2);font-size:14px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text);border:none;transition:background .15s}
+.btn-s:hover{background:var(--border)}
 
-/* ══ NOTIFICATIONS ═══════════════════════════════════════════════ */
-#notif-panel{position:fixed;top:var(--topnav-h);right:-360px;width:360px;height:calc(100vh - var(--topnav-h));background:#fff;border-left:1px solid var(--border);z-index:400;display:flex;flex-direction:column;transition:right .2s;box-shadow:-4px 0 16px rgba(9,30,66,.12)}
-#notif-panel.on{right:0}
-.np-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.np-title{font-size:15px;font-weight:600}
-.np-mark-all{font-size:12px;color:var(--blue2);cursor:pointer}
-.np-mark-all:hover{text-decoration:underline}
-.np-item{padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;display:flex;gap:10px;align-items:flex-start}
+/* ── NOTIF PANEL ── */
+#np{position:fixed;top:56px;right:-360px;width:360px;height:calc(100vh - 56px);background:#fff;border-left:1px solid var(--border);z-index:400;display:flex;flex-direction:column;transition:right .2s;box-shadow:-4px 0 16px rgba(9,30,66,.12)}
+#np.on{right:0}
+.np-hdr{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.np-hdr-title{font-size:15px;font-weight:600}
+.np-mark{font-size:12px;color:var(--blue2);cursor:pointer}
+.np-mark:hover{text-decoration:underline}
+.np-item{padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;display:flex;gap:10px}
 .np-item:hover{background:var(--bg)}
 .np-item.unread{background:#f0f4ff}
 .np-dot{width:8px;height:8px;border-radius:50%;background:var(--blue2);flex-shrink:0;margin-top:4px}
-.np-content .np-title2{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
-.np-content .np-body{font-size:12px;color:var(--text2)}
-.np-content .np-time{font-size:11px;color:var(--text3);margin-top:4px}
+.np-title{font-size:13px;font-weight:500;margin-bottom:2px}
+.np-body2{font-size:12px;color:var(--text2)}
+.np-time{font-size:11px;color:var(--text3);margin-top:4px}
 .np-empty{padding:40px;text-align:center;color:var(--text3);font-size:13px}
 
-/* ══ TOASTS ═══════════════════════════════════════════════════════ */
+/* ── TOAST ── */
 #toast-box{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{background:#172b4d;color:#fff;border-radius:var(--r2);padding:10px 20px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow3);animation:toastIn .25s ease;pointer-events:all;min-width:240px}
-.toast.err{background:var(--red)}
-.toast.ok{background:var(--green)}
-@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.toast{background:#172b4d;color:#fff;border-radius:var(--r2);padding:10px 20px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--sh3);animation:tIn .25s ease;pointer-events:all;min-width:220px}
+.toast.err{background:var(--red)}.toast.ok{background:var(--green)}.toast.info{background:#0052cc}
+@keyframes tIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══ PROJECTS PAGE ═══════════════════════════════════════════════ */
-#pg-projects{padding:32px}
-.pp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.pp-title{font-size:22px;font-weight:600}
-.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.pp-card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;transition:box-shadow .15s,transform .1s}
-.pp-card:hover{box-shadow:var(--shadow2);transform:translateY(-2px)}
-.pp-card.act{border-color:var(--blue2);box-shadow:0 0 0 2px rgba(0,101,255,.2)}
-.pp-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
-.pp-card-icon{width:40px;height:40px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.pp-card-meta{flex:1}
-.pp-card-key{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
-.pp-card-name{font-size:15px;font-weight:600;color:var(--text)}
-.pp-card-desc{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:12px}
-.pp-card-footer{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text3)}
-.pp-card-type{display:flex;align-items:center;gap:4px;background:var(--bg);border-radius:2px;padding:2px 6px;font-weight:500}
-.pp-create{background:#fff;border:2px dashed var(--border);border-radius:var(--r2);padding:20px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;transition:border-color .15s,background .15s;color:var(--text3)}
-.pp-create:hover{border-color:var(--blue2);background:var(--blue-xlight);color:var(--blue2)}
-.pp-create-icon{font-size:28px}
-.pp-create-text{font-size:13px;font-weight:500}
-
-/* ══ DASHBOARD PAGE ══════════════════════════════════════════════ */
-#pg-dashboard{padding:32px}
-.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.dash-card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:20px}
-.dash-card-num{font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
-.dash-card-label{font-size:13px;color:var(--text2);font-weight:500}
-.dash-2col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
-.dash-table{background:#fff;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
-.dash-table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border2);font-size:14px;font-weight:600}
-.dash-table-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border2);font-size:13px;cursor:pointer;transition:background .1s}
-.dash-table-row:last-child{border:none}
-.dash-table-row:hover{background:var(--bg)}
-.dash-burndown{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:16px}
-.dash-burndown-title{font-size:14px;font-weight:600;margin-bottom:12px}
-.bd-svg{width:100%;height:200px;display:block}
-
-/* ══ MISC ════════════════════════════════════════════════════════ */
 .loading{padding:40px;text-align:center;color:var(--text3);font-size:13px}
-.empty{padding:48px;text-align:center}
-.empty-icon{font-size:32px;margin-bottom:8px}
-.empty-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
-.empty-sub{font-size:13px;color:var(--text2)}
+.empty-state{padding:48px;text-align:center}
+.empty-state-icon{font-size:32px;margin-bottom:8px}
+.empty-state-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.empty-state-sub{font-size:13px;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -362,17 +379,15 @@ textarea.mi{resize:vertical;min-height:80px}
 <div id="login-screen">
   <div class="lw">
     <div class="ll">
-      <div class="ll-icon">
-        <svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg>
-      </div>
+      <div class="ll-icon"><svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 2C8.27 2 2 8.27 2 16s6.27 14 14 14 14-6.27 14-14S23.73 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg></div>
       <div class="ll-name">Digiprise <span style="color:var(--blue2)">Jira</span></div>
     </div>
     <div class="lc">
       <h2>Log in to continue</h2>
-      <p style="margin-bottom:20px;color:var(--text2);font-size:13px">to Digiprise Software Projects</p>
-      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="le" value="admin@demo.digiprise.io" placeholder="Enter email"/></div>
-      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="lp" value="Admin@123!" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-      <div id="lerr" class="lerr">Incorrect email or password. Try again.</div>
+      <p class="lc-sub">to Digiprise Software Projects</p>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="le" value="admin@demo.digiprise.io"/></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="lp" value="Admin@123!" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div id="lerr" class="lerr"></div>
       <button class="fb" id="lbtn" onclick="doLogin()">Log in</button>
     </div>
     <div class="ldemo">Demo: <strong>admin@demo.digiprise.io</strong> / <strong>Admin@123!</strong></div>
@@ -381,233 +396,322 @@ textarea.mi{resize:vertical;min-height:80px}
 
 <!-- APP -->
 <div id="app">
-  <!-- TOP NAV -->
   <nav id="tnav">
-    <a class="tn-logo" onclick="showPage('dashboard')">
-      <div class="tn-logo-icon">
-        <svg viewBox="0 0 32 32" width="16" height="16"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg>
-      </div>
+    <div class="tn-logo" onclick="showPg('dashboard')">
+      <div class="tn-logo-icon"><svg viewBox="0 0 32 32" width="16" height="16"><path d="M16 2C8.27 2 2 8.27 2 16s6.27 14 14 14 14-6.27 14-14S23.73 2 16 2zm6.4 15.6l-7.2 7.2c-.4.4-1 .4-1.4 0l-7.2-7.2c-.4-.4-.4-1 0-1.4l7.2-7.2c.4-.4 1-.4 1.4 0l7.2 7.2c.4.4.4 1 0 1.4z"/></svg></div>
       <span class="tn-logo-text">Digiprise <span>Jira</span></span>
-    </a>
-    <div class="tn-sep"></div>
-    <div class="tn-item" onclick="toggleSb()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
-    <div class="tn-item" onclick="showPage('dashboard')">Your work</div>
-    <div class="tn-item" onclick="showPage('projects')">Projects <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
-    <div class="tn-item">Filters <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
-    <div class="tn-item">Dashboards <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
-    <div class="tn-item">Teams <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
-    <div class="tn-item">Plans <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-sep"></div>
+    <div class="tn-btn" onclick="toggleSb()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+    <div class="tn-btn" onclick="showPg('dashboard')">Your work</div>
+    <div class="tn-btn" onclick="showPg('projects')">Projects <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-btn">Filters <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-btn">Dashboards <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-btn">Teams <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="tn-btn">Plans <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
     <div class="tn-search">
-      <svg class="tn-search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search" onkeydown="if(event.key==='Enter')doSearch(this.value)"/>
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search" onkeydown="if(event.key==='Enter')doSearchNav(this.value)"/>
     </div>
     <div class="tn-right">
       <button class="btn-create" onclick="openCreateIssue()">
-        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16"/></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Create
       </button>
       <div class="tn-sep"></div>
-      <div class="tn-icon-btn" onclick="toggleNotifs()" title="Notifications">
+      <div class="tn-icon" onclick="toggleNotifs()" title="Notifications">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <div class="tn-notif-dot" id="ndot"></div>
+        <div class="tn-dot" id="ndot"></div>
       </div>
-      <div class="tn-icon-btn" title="Settings">
+      <div class="tn-icon" title="Settings">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </div>
-      <div class="tn-avatar" id="user-av" title="Profile">A</div>
+      <div class="tn-av" id="user-av">A</div>
     </div>
   </nav>
 
   <div id="body">
-    <!-- LEFT SIDEBAR -->
+    <!-- SIDEBAR -->
     <aside id="lsb">
-      <div class="sb-section">
-        <div class="sb-item" onclick="showPage('dashboard')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><span class="sb-item-text">For you</span></div>
-        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="sb-item-text">Recent</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
-        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="sb-item-text">Starred</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
-        <div class="sb-item" onclick="showPage('projects')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span class="sb-item-text">Projects</span></div>
-        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="sb-item-text">Apps</span></div>
-        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span class="sb-item-text">Plans</span></div>
-        <div class="sb-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span class="sb-item-text">Spaces</span><span class="sb-item-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+      <div class="sb-sec">
+        <div class="sb-row" onclick="showPg('dashboard')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>For you</div>
+        <div class="sb-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Recent<span class="sb-row-arr"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+        <div class="sb-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Starred<span class="sb-row-arr"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+        <div class="sb-row" onclick="showPg('projects')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Projects</div>
+        <div class="sb-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Apps</div>
+        <div class="sb-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Plans<span class="sb-row-arr"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
+        <div class="sb-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Spaces<span class="sb-row-arr"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></span></div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-section">
-        <div class="sb-label">Recent</div>
-        <div id="sb-recent-list"></div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Recent</div>
+        <div id="sb-recent"></div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-section">
-        <div class="sb-label">Starred</div>
-        <div id="sb-starred-list"></div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Starred</div>
+        <div id="sb-starred"></div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-section">
-        <div class="sb-label">Filters</div>
-        <div class="sb-filters-item" onclick="searchIssues('issuetype = Bug')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Search work items</span></div>
-        <div class="sb-filters-item" onclick="searchIssues('priority = Blocker')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><span>Blockers</span></div>
-        <div class="sb-filters-item" onclick="searchIssues('priority = Critical')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m10.29 3.86-8.6 14.9A1 1 0 0 0 2.57 20h17.06a1 1 0 0 0 .88-1.47l-8.6-14.9a1 1 0 0 0-1.72 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Critical issues</span></div>
+      <div class="sb-sec">
+        <div class="sb-lbl">Filters</div>
+        <div class="sb-filter-row" onclick="doSearchNav('issuetype = Bug')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Search work items</div>
+        <div class="sb-filter-row" onclick="doSearchNav('priority = Blocker')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Blockers</div>
+        <div class="sb-filter-row" onclick="doSearchNav('priority = Critical')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m10.29 3.86-8.6 14.9A1 1 0 0 0 2.57 20h17.06a1 1 0 0 0 .88-1.47l-8.6-14.9a1 1 0 0 0-1.72 0z"/></svg>Critical issues</div>
       </div>
       <div class="sb-sep" style="margin-top:auto"></div>
-      <div class="sb-section">
-        <div class="sb-item" onclick="doLogout()" style="color:rgba(255,100,100,.85)">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span class="sb-item-text">Sign out</span>
-        </div>
+      <div class="sb-sec">
+        <div class="sb-row" onclick="doLogout()" style="color:rgba(255,120,120,.9)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</div>
       </div>
     </aside>
 
     <!-- MAIN -->
     <div id="main">
-
-      <!-- PROJECT HEADER -->
-      <div id="proj-header">
-        <div class="ph-top">
-          <span class="ph-breadcrumb">Spaces <span>›</span> <span id="ph-space">Select Project</span></span>
+      <!-- Project Header -->
+      <div id="ph">
+        <div class="ph-bc">Spaces <span>›</span> <span id="ph-space">—</span></div>
+        <div class="ph-title-row">
+          <div class="ph-icon" id="ph-icon">📁</div>
+          <div class="ph-name" id="ph-name">Select a project</div>
           <div class="ph-actions">
-            <div class="ph-action-btn" title="Share"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
-            <div class="ph-action-btn" title="Automation"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-            <div class="ph-action-btn" title="More">•••</div>
+            <div class="ph-act-btn" title="Share"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+            <div class="ph-act-btn" title="Automation"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <div class="ph-act-btn" style="font-weight:700;font-size:16px" title="More">···</div>
           </div>
-        </div>
-        <div class="ph-title">
-          <div class="ph-proj-icon" id="ph-icon">📁</div>
-          <div class="ph-proj-name" id="ph-name">Select a Project</div>
         </div>
         <div class="ph-tabs">
           <div class="ph-tab act" id="tab-backlog" onclick="switchTab('backlog')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Backlog</div>
           <div class="ph-tab" id="tab-board" onclick="switchTab('board')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18"/><rect x="10" y="3" width="5" height="12"/><rect x="17" y="3" width="5" height="16"/></svg> Board</div>
           <div class="ph-tab-sep"></div>
-          <div class="ph-tab" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Summary</div>
+          <div class="ph-tab" onclick="showPg('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Summary</div>
           <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg> Timeline</div>
-          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</div>
+          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</div>
           <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Reports</div>
           <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</div>
-          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Forms</div>
           <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg> Goals</div>
-          <div class="ph-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Development</div>
           <div class="ph-tab">+ Add</div>
         </div>
       </div>
 
-      <!-- PAGES -->
-
-      <!-- BACKLOG -->
-      <div class="page on" id="pg-backlog">
-        <div class="bl-toolbar">
-          <div class="bl-search">
-            <svg class="bl-search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" placeholder="Search backlog" id="bl-search-input" oninput="filterBacklog(this.value)"/>
+      <!-- BACKLOG PAGE -->
+      <div class="pg on" id="pg-backlog">
+        <div class="bl-bar">
+          <div class="bl-search-wrap">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search backlog" id="bl-q" oninput="filterBL(this.value)"/>
           </div>
-          <div class="bl-avatars" id="bl-avatars"></div>
-          <button class="bl-filter-btn">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-            Filter
-          </button>
+          <div class="bl-avs" id="bl-avs"></div>
+          <button class="bl-btn"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
           <div style="margin-left:auto;display:flex;gap:8px">
-            <button class="bl-filter-btn" onclick="openCreateIssue()">+ Create issue</button>
-            <button class="bl-filter-btn" onclick="openCreateSprint()">+ Create sprint</button>
+            <button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button>
+            <button class="bl-btn" onclick="openCreateSprint()">+ Create sprint</button>
           </div>
         </div>
-        <div class="bl-content" id="bl-content">
-          <div class="loading">Select a project to view backlog</div>
-        </div>
+        <div class="bl-content" id="bl-content"><div class="loading">Select a project to view its backlog</div></div>
       </div>
 
-      <!-- BOARD -->
-      <div class="page" id="pg-board">
+      <!-- BOARD PAGE -->
+      <div class="pg" id="pg-board">
         <div class="board-wrap">
-          <div class="board-toolbar">
-            <span class="board-sprint-title" id="board-sprint-title">Active Sprint</span>
-            <div class="bl-avatars" style="margin-left:8px" id="board-avatars"></div>
-            <button class="bl-filter-btn" style="margin-left:8px">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-              Filter
-            </button>
-            <div style="margin-left:auto;display:flex;gap:8px">
-              <button class="bl-filter-btn" onclick="openCreateIssue()">+ Create issue</button>
-            </div>
+          <div class="board-bar">
+            <span class="board-sprint-name" id="board-sprint-name">Board</span>
+            <div class="bl-avs" style="margin-left:8px" id="board-avs"></div>
+            <button class="bl-btn" style="margin-left:8px"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+            <div style="margin-left:auto"><button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button></div>
           </div>
-          <div class="board-scroll">
-            <div class="board-cols" id="board-cols"></div>
-          </div>
+          <div class="board-scroll"><div class="board-cols" id="board-cols"></div></div>
         </div>
       </div>
 
-      <!-- DASHBOARD -->
-      <div class="page" id="pg-dashboard">
-        <div id="pg-dashboard-inner" style="padding:32px;flex:1;overflow-y:auto">
-          <div style="font-size:22px;font-weight:600;margin-bottom:4px" id="dash-greeting">Good morning 👋</div>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:24px">Here's what's on your plate</div>
-          <div class="dash-grid" id="dash-stats"></div>
+      <!-- DASHBOARD PAGE -->
+      <div class="pg" id="pg-dashboard">
+        <div class="dash-inner">
+          <div class="dash-h1" id="dash-greet">Good morning 👋</div>
+          <div class="dash-sub">Here's what's on your plate</div>
+          <div class="dash-stats" id="dash-stats"></div>
           <div class="dash-2col">
-            <div class="dash-table">
-              <div class="dash-table-header">
-                <span>Assigned to me</span>
-                <span style="font-size:12px;color:var(--blue2);cursor:pointer;font-weight:400" onclick="searchIssues('')">View all →</span>
-              </div>
-              <div id="dash-my-issues"></div>
+            <div class="dash-tbl">
+              <div class="dash-tbl-hdr"><span>Assigned to me</span><span style="font-size:12px;color:var(--blue2);font-weight:400;cursor:pointer" onclick="showPg('backlog')">View all →</span></div>
+              <div id="dash-mine"></div>
             </div>
-            <div class="dash-burndown">
-              <div class="dash-burndown-title">Sprint Burndown</div>
-              <svg class="bd-svg" id="bd-svg" viewBox="0 0 300 200"></svg>
-            </div>
+            <div class="dash-burn"><div class="dash-burn-title">Sprint Burndown</div><svg viewBox="0 0 300 200" style="width:100%;height:180px;display:block" id="bd-svg"></svg></div>
           </div>
         </div>
       </div>
 
-      <!-- PROJECTS -->
-      <div class="page" id="pg-projects">
-        <div class="pp-header">
-          <div class="pp-title">Projects</div>
-          <button class="btn-jira btn-primary" onclick="openCreateProject()">Create project</button>
-        </div>
+      <!-- PROJECTS PAGE -->
+      <div class="pg" id="pg-projects">
+        <div class="pp-hdr"><div class="pp-h1">Projects</div><button class="btn-p" onclick="openCreateProject()">Create project</button></div>
         <div class="pp-grid" id="pp-grid"></div>
       </div>
 
-    </div><!-- /main -->
-  </div><!-- /body -->
-</div><!-- /app -->
+    </div>
+  </div>
+</div>
 
 <!-- ISSUE DETAIL PANEL -->
-<div id="detail-panel">
-  <div class="dp-header">
+<div id="dp">
+  <div class="dp-hdr">
     <span class="dp-key" id="dp-key"></span>
-    <div class="dp-actions">
-      <button class="dp-action" title="Open in full page"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></button>
-      <button class="dp-action" title="Give feedback"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-      <button class="dp-action" title="Close" onclick="closeDetail()" style="font-size:18px;color:var(--text3)">✕</button>
+    <div class="dp-hdr-acts">
+      <button class="dp-hdr-btn" title="Open full page"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></button>
+      <button class="dp-hdr-btn" title="Comment"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+      <button class="dp-hdr-btn" onclick="closeDP()" style="font-size:18px;color:var(--text3);width:32px;height:32px">✕</button>
     </div>
   </div>
   <div class="dp-body">
+    <!-- Main column -->
     <div class="dp-main">
-      <div class="dp-title" id="dp-title">Loading…</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="dp-badges"></div>
-      <div class="dp-section">
-        <div class="dp-section-title">Description</div>
-        <div class="dp-desc" id="dp-desc">No description provided.</div>
+      <!-- Editable title -->
+      <div class="dp-title-wrap">
+        <textarea class="dp-title" id="dp-title" rows="2" onblur="saveTitle()" placeholder="Issue summary"></textarea>
       </div>
-      <div class="dp-section">
-        <div class="dp-section-title">Transition Status</div>
-        <div class="dp-transitions" id="dp-transitions"></div>
+      <!-- Status row -->
+      <div>
+        <div class="dp-sec-title">Status</div>
+        <div class="dp-status-row">
+          <div class="status-select-wrap" id="status-wrap">
+            <button class="status-btn" id="status-btn" onclick="toggleStatusDrop()"></button>
+            <div class="status-drop" id="status-drop">
+              <div class="status-drop-item" onclick="setStatus(1,'To Do','#5e6c84','#f4f5f7')"><div class="status-dot" style="background:#5e6c84"></div>To Do</div>
+              <div class="status-drop-item" onclick="setStatus(2,'In Progress','#0052cc','#e9f2ff')"><div class="status-dot" style="background:#0052cc"></div>In Progress</div>
+              <div class="status-drop-item" onclick="setStatus(3,'In Review','#ff991f','#fffae6')"><div class="status-dot" style="background:#ff991f"></div>In Review</div>
+              <div class="status-drop-item" onclick="setStatus(4,'Done','#00875a','#e3fcef')"><div class="status-dot" style="background:#00875a"></div>Done</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="dp-section">
-        <div class="dp-section-title">Activity</div>
+      <!-- Description -->
+      <div>
+        <div class="dp-sec-title">Description</div>
+        <textarea class="dp-desc" id="dp-desc" placeholder="Add a description…" onblur="saveDesc()"></textarea>
+      </div>
+      <!-- Child issues -->
+      <div id="dp-children-sec" style="display:none">
+        <div class="dp-sec-title">Child issues</div>
+        <div id="dp-children"></div>
+        <button class="bl-btn" style="margin-top:8px;font-size:12px" onclick="openCreateChildIssue()">+ Create child issue</button>
+      </div>
+      <!-- Issue links -->
+      <div>
+        <div class="dp-sec-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Linked issues</span>
+          <button class="bl-btn" style="font-size:12px" onclick="toggleLinkForm()">+ Link issue</button>
+        </div>
+        <div id="link-form" style="display:none;padding:10px 0;border-bottom:1px solid var(--border2);margin-bottom:8px">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select class="link-type-select" id="link-type">
+              <option value="Blocks">blocks</option>
+              <option value="IsBlockedBy">is blocked by</option>
+              <option value="RelatesTo" selected>relates to</option>
+              <option value="Duplicates">duplicates</option>
+              <option value="IsDuplicatedBy">is duplicated by</option>
+              <option value="Clones">clones</option>
+              <option value="CausedBy">is caused by</option>
+            </select>
+            <input class="link-issue-input" id="link-issue-input" placeholder="Issue key or search (e.g. DEMO-1)" list="link-suggestions"/>
+            <datalist id="link-suggestions"></datalist>
+            <button class="btn-p" style="padding:5px 12px;font-size:13px" onclick="submitLink()">Link</button>
+            <button class="btn-s" style="padding:5px 10px;font-size:13px" onclick="toggleLinkForm()">Cancel</button>
+          </div>
+        </div>
+        <div id="dp-links"></div>
+      </div>
+      <!-- Activity -->
+      <div>
+        <div class="dp-sec-title">Activity</div>
         <div id="dp-comments"></div>
         <div style="margin-top:12px">
-          <textarea class="dp-comment-input" id="comment-input" placeholder="Add a comment… Ctrl+Enter to save" onkeydown="if(event.ctrlKey&&event.key==='Enter')postComment()" rows="2"></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:8px">
-            <button class="btn-jira btn-secondary" onclick="document.getElementById('comment-input').value=''">Cancel</button>
-            <button class="btn-jira btn-primary" onclick="postComment()">Save</button>
+          <textarea class="dp-comment-input" id="comment-inp" placeholder="Add a comment… (Ctrl+Enter to save)" rows="2" onkeydown="if(event.ctrlKey&&event.key==='Enter')postComment()"></textarea>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+            <button class="btn-s" onclick="document.getElementById('comment-inp').value=''">Cancel</button>
+            <button class="btn-p" onclick="postComment()">Save</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="dp-sidebar">
-      <div class="dp-section">
-        <div class="dp-section-title">Details</div>
-        <div id="dp-fields"></div>
+
+    <!-- Sidebar (Details) -->
+    <div class="dp-side">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border2)">Details</div>
+
+      <!-- Assignee -->
+      <div class="dp-field">
+        <label class="dp-field-label">Assignee</label>
+        <div id="dp-assignee-field">
+          <select class="dp-inline" id="dp-assignee-sel" onchange="saveField('assignee',this.value)">
+            <option value="">Unassigned</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Reporter -->
+      <div class="dp-field">
+        <label class="dp-field-label">Reporter</label>
+        <div id="dp-reporter-field" class="dp-field-val"></div>
+      </div>
+
+      <!-- Priority -->
+      <div class="dp-field">
+        <label class="dp-field-label">Priority</label>
+        <select class="dp-inline" id="dp-prio-sel" onchange="saveField('priority',this.value)">
+          <option value="Blocker">⛔ Blocker</option>
+          <option value="Critical">▲ Critical</option>
+          <option value="Major">▲ Major</option>
+          <option value="Minor">▼ Minor</option>
+          <option value="Trivial">▼ Trivial</option>
+        </select>
+      </div>
+
+      <!-- Sprint -->
+      <div class="dp-field">
+        <label class="dp-field-label">Sprint</label>
+        <select class="dp-inline" id="dp-sprint-sel" onchange="saveField('sprint',this.value)">
+          <option value="">None</option>
+        </select>
+      </div>
+
+      <!-- Story points -->
+      <div class="dp-field">
+        <label class="dp-field-label">Story points</label>
+        <input class="dp-inline" type="number" id="dp-pts-inp" min="0" max="999" placeholder="None" onblur="saveField('points',this.value)"/>
+      </div>
+
+      <!-- Issue type -->
+      <div class="dp-field">
+        <label class="dp-field-label">Issue type</label>
+        <select class="dp-inline" id="dp-type-sel" onchange="saveField('type',this.value)">
+          <option value="Story">Story</option>
+          <option value="Bug">Bug</option>
+          <option value="Epic">Epic</option>
+          <option value="Task">Task</option>
+          <option value="Subtask">Subtask</option>
+        </select>
+      </div>
+
+      <!-- Labels -->
+      <div class="dp-field">
+        <label class="dp-field-label">Labels</label>
+        <input class="dp-inline" type="text" id="dp-labels-inp" placeholder="None" onblur="saveField('labels',this.value)"/>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Comma-separated</div>
+      </div>
+
+      <!-- Due date -->
+      <div class="dp-field">
+        <label class="dp-field-label">Due date</label>
+        <input class="dp-inline" type="date" id="dp-due-inp" onchange="saveField('due',this.value)"/>
+      </div>
+
+      <!-- Created -->
+      <div class="dp-field">
+        <label class="dp-field-label">Created</label>
+        <div class="dp-field-val" id="dp-created" style="font-size:13px;color:var(--text2)"></div>
+      </div>
+
+      <!-- Updated -->
+      <div class="dp-field">
+        <label class="dp-field-label">Updated</label>
+        <div class="dp-field-val" id="dp-updated" style="font-size:13px;color:var(--text2)"></div>
       </div>
     </div>
   </div>
@@ -615,37 +719,54 @@ textarea.mi{resize:vertical;min-height:80px}
 
 <!-- MODAL -->
 <div id="modal-bg" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modal-box">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title">Create issue</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title" id="modal-title">Create issue</div><button class="modal-x" onclick="closeModal()">✕</button></div>
     <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer" id="modal-footer"></div>
+    <div class="modal-foot" id="modal-foot"></div>
   </div>
 </div>
 
-<!-- NOTIFICATION PANEL -->
-<div id="notif-panel">
-  <div class="np-header">
-    <span class="np-title">Notifications</span>
-    <span class="np-mark-all" onclick="markAllRead()">Mark all as read</span>
-  </div>
-  <div id="notif-list"></div>
+<!-- NOTIF PANEL -->
+<div id="np">
+  <div class="np-hdr"><span class="np-hdr-title">Notifications</span><span class="np-mark" onclick="markAllRead()">Mark all as read</span></div>
+  <div id="np-list"></div>
 </div>
 
 <div id="toast-box"></div>
 
 <script>
-const API = '';
-let token=null, currentUser=null, projects=[], currentProject=null, sprints=[], currentIssueId=null, allIssues=[];
+const API='';
+let token=null,currentUser=null,projects=[],currentProject=null,sprints=[],allIssues=[],tenantUsers=[];
+let currentIssueId=null,currentIssueData=null,issueLinks=[];
 
-/* ── COLOURS ── */
-const AV_COLORS=['#0052cc','#00875a','#6554c0','#de350b','#ff991f','#00b8d9','#403294'];
-const avatarColor = (name='') => AV_COLORS[name.charCodeAt(0)%AV_COLORS.length];
-const avatarInitial = (name='') => name.trim()[0]?.toUpperCase()||'?';
+// ── COLOURS ──
+const AVC=['#0052cc','#00875a','#6554c0','#de350b','#ff991f','#00b8d9','#403294'];
+const avc=n=>AVC[(n||'').charCodeAt(0)%AVC.length];
+const avi=n=>(n||'?').trim()[0].toUpperCase();
 
-/* ── API ── */
+const STATUS_MAP={
+  1:{name:'To Do',color:'#5e6c84',bg:'#f4f5f7'},
+  2:{name:'In Progress',color:'#0052cc',bg:'#e9f2ff'},
+  3:{name:'In Review',color:'#ff991f',bg:'#fffae6'},
+  4:{name:'Done',color:'#00875a',bg:'#e3fcef'},
+};
+const statusById=id=>STATUS_MAP[id]||STATUS_MAP[1];
+const statusByName=name=>{
+  const l=(name||'').toLowerCase();
+  if(l.includes('done')||l.includes('closed')) return STATUS_MAP[4];
+  if(l.includes('review')) return STATUS_MAP[3];
+  if(l.includes('progress')) return STATUS_MAP[2];
+  return STATUS_MAP[1];
+};
+const statusIdByName=name=>{
+  const l=(name||'').toLowerCase();
+  if(l.includes('done')||l.includes('closed')) return 4;
+  if(l.includes('review')) return 3;
+  if(l.includes('progress')) return 2;
+  return 1;
+};
+
+// ── API ──
 async function api(method,path,body){
   const opts={method,headers:{'Content-Type':'application/json'}};
   if(token) opts.headers['Authorization']='Bearer '+token;
@@ -657,7 +778,7 @@ async function api(method,path,body){
   return r.json();
 }
 
-/* ── LOGIN ── */
+// ── LOGIN ──
 async function doLogin(){
   const email=document.getElementById('le').value.trim();
   const pass=document.getElementById('lp').value;
@@ -666,446 +787,466 @@ async function doLogin(){
   btn.textContent='Logging in…';btn.disabled=true;
   try{
     const d=await api('POST','/api/v1/auth/login?tenantId=1',{email,password:pass});
-    token=d.accessToken; currentUser=d.user;
+    token=d.accessToken;currentUser=d.user;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').classList.add('on');
     const av=document.getElementById('user-av');
-    av.textContent=avatarInitial(d.user.displayName);
-    av.style.background=avatarColor(d.user.displayName);
+    av.textContent=avi(d.user.displayName);
+    av.style.background=avc(d.user.displayName);
     av.title=d.user.displayName;
     onLoggedIn();
   }catch(e){
-    document.getElementById('lerr').style.display='block';
     document.getElementById('lerr').textContent=e.message;
+    document.getElementById('lerr').style.display='block';
   }finally{btn.textContent='Log in';btn.disabled=false;}
 }
-
 function doLogout(){
   token=null;currentUser=null;currentProject=null;
   document.getElementById('app').classList.remove('on');
   document.getElementById('login-screen').style.display='';
   toast('Signed out','info');
 }
-
 async function onLoggedIn(){
   const h=new Date().getHours();
-  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-  document.getElementById('dash-greeting').textContent=`${g}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
+  document.getElementById('dash-greet').textContent=`${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
   await loadProjects();
   loadDashboard();
   loadNotifications();
+  // Pre-load tenant users for assignee dropdowns
+  api('GET','/api/v1/users').then(u=>{tenantUsers=u||[];}).catch(()=>{});
 }
 
-/* ── SIDEBAR ── */
-function toggleSb(){ document.getElementById('lsb').classList.toggle('col'); }
-
-function renderSbProjects(){
-  const rl=document.getElementById('sb-recent-list');
-  const sl=document.getElementById('sb-starred-list');
-  rl.innerHTML=projects.slice(0,5).map(p=>`
-    <div class="sb-proj ${currentProject?.id===p.id?'act':''}" onclick="selectProject(${p.id})">
-      <div class="sb-proj-icon" style="background:${p.color||'#0052cc'}">${p.icon||'📁'}</div>
+// ── SIDEBAR ──
+function toggleSb(){document.getElementById('lsb').classList.toggle('col');}
+function renderSb(){
+  document.getElementById('sb-recent').innerHTML=projects.slice(0,5).map(p=>`
+    <div class="sb-proj-row ${currentProject?.id===p.id?'act':''}" onclick="selectProject(${p.id})">
+      <div class="sb-proj-ic" style="background:${p.color||'#0052cc'}">${p.icon||'📁'}</div>
       <span style="overflow:hidden;text-overflow:ellipsis">${p.name}</span>
     </div>`).join('');
-  sl.innerHTML=projects.slice(0,4).map(p=>`
-    <div class="sb-starred-item" onclick="selectProject(${p.id})">
+  document.getElementById('sb-starred').innerHTML=projects.slice(0,3).map(p=>`
+    <div class="sb-filter-row" onclick="selectProject(${p.id})">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       <span style="overflow:hidden;text-overflow:ellipsis">${p.name}</span>
     </div>`).join('');
 }
 
-/* ── PROJECTS ── */
+// ── PROJECTS ──
 async function loadProjects(){
   try{
     projects=await api('GET','/api/v1/projects');
-    renderSbProjects();
-    if(projects.length>0 && !currentProject) selectProject(projects[0].id,false);
+    renderSb();
+    if(projects.length&&!currentProject) selectProject(projects[0].id,false);
   }catch(e){console.error(e);}
 }
-
 function selectProject(id,reload=true){
   currentProject=projects.find(p=>p.id===id);
   if(!currentProject) return;
   document.getElementById('ph-name').textContent=currentProject.name;
   document.getElementById('ph-icon').textContent=currentProject.icon||'📁';
   document.getElementById('ph-space').textContent=currentProject.name;
-  renderSbProjects();
+  renderSb();
   if(reload){
-    const active=document.querySelector('.page.on');
-    if(active?.id==='pg-backlog') loadBacklog();
-    else if(active?.id==='pg-board') loadBoard();
+    const active=document.querySelector('.pg.on')?.id?.replace('pg-','');
+    if(active==='backlog') loadBacklog();
+    else if(active==='board') loadBoard();
     else switchTab('backlog');
   }
-  toast(`Switched to "${currentProject.name}"`, 'info');
+  toast(`Switched to "${currentProject.name}"`,'info');
 }
 
-/* ── TABS & PAGES ── */
+// ── PAGES ──
 function switchTab(tab){
   document.querySelectorAll('.ph-tab').forEach(t=>t.classList.remove('act'));
   document.getElementById('tab-'+tab)?.classList.add('act');
-  showPage('pg-'+tab==='pg-backlog'?'backlog':'board', tab);
+  showPg(tab);
 }
-
-function showPage(name, tab){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  const pg=document.getElementById('pg-'+name);
-  if(pg) pg.classList.add('on');
-  closeDetail(); closeNotifs();
+function showPg(name){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+name)?.classList.add('on');
+  closeDP();closeNotifs();
   if(name==='backlog') loadBacklog();
   else if(name==='board') loadBoard();
   else if(name==='dashboard') loadDashboard();
-  else if(name==='projects') loadProjectsPage();
+  else if(name==='projects') loadProjectsPg();
 }
 
-/* ── BACKLOG ── */
-const STATUSES=[
-  {id:1,name:'To Do',cls:'todo'},
-  {id:2,name:'In Progress',cls:'prog'},
-  {id:3,name:'In Review',cls:'review'},
-  {id:4,name:'Done',cls:'done'},
-];
-
-function typeIcon(t){
-  const icons={Story:'<div class="ir-type" style="background:#0052cc;color:#fff;font-size:10px">S</div>',Bug:'<div class="ir-type" style="background:#de350b;color:#fff;font-size:10px">B</div>',Epic:'<div class="ir-type" style="background:#6554c0;color:#fff;font-size:10px">E</div>',Task:'<div class="ir-type" style="background:#00875a;color:#fff;font-size:10px">T</div>',Subtask:'<div class="ir-type" style="background:#0065ff;color:#fff;font-size:9px">↳</div>'};
-  return icons[t]||icons.Story;
-}
-function prioIcon(p){
-  const icons={Blocker:'<span style="color:#de350b;font-size:14px">⛔</span>',Critical:'<span style="color:#de350b;font-size:13px">▲</span>',Major:'<span style="color:#ff991f;font-size:13px">▲</span>',Minor:'<span style="color:#0065ff;font-size:13px">▼</span>',Trivial:'<span style="color:#97a0af;font-size:13px">▼</span>'};
-  return icons[p]||icons.Major;
-}
-function statusCls(s){
-  const l=(s||'').toLowerCase();
-  if(l.includes('done')||l.includes('closed')) return 'done';
-  if(l.includes('review')) return 'review';
-  if(l.includes('progress')) return 'prog';
-  return 'todo';
-}
-function statusLabel(s){ return s||'To Do'; }
-
-function issueRow(i){
-  const av=i.assigneeName?`<div class="ir-assignee" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>`:'<div class="ir-assignee" style="background:var(--border);"></div>';
-  return `<div class="issue-row" onclick="openDetail(${i.id})">
-    <div class="ir-cb"></div>
-    ${typeIcon(i.issueType)}
-    <span class="ir-key">${i.issueKey}</span>
-    <span class="ir-summary">${i.summary}</span>
-    <span class="ir-prio">${prioIcon(i.priority)}</span>
-    ${av}
-    <span class="ir-pts">${i.storyPoints??''}</span>
-    <span class="ir-status ${statusCls(i.statusName)}">${statusLabel(i.statusName)}</span>
-  </div>`;
+// ── TYPE / PRIO HELPERS ──
+const TYPE_COLORS={Story:'#0052cc',Bug:'#de350b',Epic:'#6554c0',Task:'#00875a',Subtask:'#0065ff'};
+const TYPE_LETTERS={Story:'S',Bug:'B',Epic:'E',Task:'T',Subtask:'↳'};
+function typeIc(t){const c=TYPE_COLORS[t]||'#0052cc';const l=TYPE_LETTERS[t]||'S';return `<div class="ir-type-ic" style="background:${c}">${l}</div>`;}
+const PRIO_ICONS={Blocker:'⛔',Critical:'<span style="color:#de350b">▲</span>',Major:'<span style="color:#ff991f">▲</span>',Minor:'<span style="color:#0065ff">▼</span>',Trivial:'<span style="color:#97a0af">▼</span>'};
+function prioIc(p){return PRIO_ICONS[p]||PRIO_ICONS.Major;}
+function statusPill(sName){
+  const s=statusByName(sName);
+  return `<span class="ir-status-pill" style="background:${s.bg};color:${s.color}">${sName||'To Do'}</span>`;
 }
 
+// ── BACKLOG ──
 async function loadBacklog(){
   const el=document.getElementById('bl-content');
-  if(!currentProject){el.innerHTML='<div class="loading">Select a project from the sidebar to view its backlog</div>';return;}
-  el.innerHTML='<div class="loading">Loading backlog…</div>';
+  if(!currentProject){el.innerHTML='<div class="loading">Select a project from the sidebar</div>';return;}
+  el.innerHTML='<div class="loading">Loading…</div>';
   try{
-    const [issues,sprintList]=await Promise.all([
+    const [issues,spList]=await Promise.all([
       api('GET',`/api/v1/issues/project/${currentProject.id}`),
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
-    sprints=sprintList;
-    allIssues=issues;
-    renderBacklog(issues,sprintList);
-    renderAvatarFilter(issues,'bl-avatars');
+    allIssues=issues; sprints=spList;
+    renderBacklog(issues,spList);
+    renderAvs(issues,'bl-avs');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
-
-function renderBacklog(issues,sprintList){
+function renderBacklog(issues,spList){
   const el=document.getElementById('bl-content');
   let html='';
-
-  // Sprint blocks
-  sprintList.forEach(s=>{
-    const sIssues=issues.filter(i=>i.sprintId===s.id);
-    const done=sIssues.filter(i=>statusCls(i.statusName)==='done').length;
-    const inprog=sIssues.filter(i=>statusCls(i.statusName)==='prog').length;
-    const todo=sIssues.filter(i=>statusCls(i.statusName)==='todo').length;
-    const isActive=s.state==='Active';
-    const isClosed=s.state==='Closed';
-    const dates=s.startDate&&s.endDate?`${new Date(s.startDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${new Date(s.endDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:s.startDate?'Add dates':'Add dates';
-
-    html+=`<div class="sprint-block">
-      <div class="sprint-row" onclick="toggleSprint('sp-${s.id}','spc-${s.id}')">
-        <div class="ir-cb"></div>
-        <div class="sprint-chevron open" id="spc-${s.id}"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
-        <span class="sprint-name">${s.name}</span>
-        <span class="sprint-dates">${isActive?`<span style="background:#e3fcef;color:#00875a;border-radius:2px;padding:1px 6px;font-size:11px;font-weight:700">ACTIVE</span> `:''} ${dates}</span>
-        <span class="sprint-count">(${sIssues.length} work item${sIssues.length!==1?'s':''})</span>
-        <div class="sprint-badges">
-          <span class="sp-badge done">${done}</span>
-          <span class="sp-badge inprog">${inprog}</span>
-          <span class="sp-badge todo">${todo}</span>
-        </div>
-        ${isClosed?`<button class="sprint-btn complete" onclick="event.stopPropagation()">Complete sprint</button>`:isActive?`<button class="sprint-btn complete" onclick="event.stopPropagation();doCloseSprint(${s.id})">Complete sprint</button>`:`<button class="sprint-btn primary" onclick="event.stopPropagation();doStartSprint(${s.id})">Start sprint</button>`}
-        <button class="sprint-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
+  spList.forEach(s=>{
+    const si=issues.filter(i=>i.sprintId===s.id);
+    const done=si.filter(i=>statusIdByName(i.statusName)===4).length;
+    const prog=si.filter(i=>{const id=statusIdByName(i.statusName);return id===2||id===3;}).length;
+    const todo=si.filter(i=>statusIdByName(i.statusName)===1).length;
+    const isActive=s.state==='Active',isClosed=s.state==='Closed';
+    const dateStr=s.startDate&&s.endDate
+      ?`${new Date(s.startDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})} – ${new Date(s.endDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}`:'Add dates';
+    html+=`<div class="sp-block">
+      <div class="sp-hdr" onclick="toggleSp('spb-${s.id}','spc-${s.id}')">
+        <div class="sp-cb"></div>
+        <div class="sp-chev open" id="spc-${s.id}"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+        <span class="sp-name">${s.name}</span>
+        ${isActive?'<span class="sp-act-badge">ACTIVE</span>':''}
+        <span class="sp-dates">${dateStr}</span>
+        <span class="sp-count">(${si.length} work item${si.length!==1?'s':''})</span>
+        <div class="sp-badges"><span class="spb done">${done}</span><span class="spb prog">${prog}</span><span class="spb todo">${todo}</span></div>
+        ${isClosed?`<button class="sp-btn">View sprint</button>`:isActive?`<button class="sp-btn" onclick="event.stopPropagation();doCloseSprint(${s.id})">Complete sprint</button>`:`<button class="sp-btn primary" onclick="event.stopPropagation();doStartSprint(${s.id})">Start sprint</button>`}
+        <button class="sp-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
       </div>
-      <div id="sp-${s.id}" class="sprint-issues">
-        ${sIssues.length?sIssues.map(i=>issueRow(i)).join(''):`<div style="padding:12px 16px;font-size:13px;color:var(--text3)">No issues in this sprint. Drag issues from the backlog below.</div>`}
-        <div class="bl-create-row" onclick="openCreateIssue()">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Create issue
-        </div>
+      <div id="spb-${s.id}" class="sp-issues">
+        ${si.length?si.map(i=>issueRow(i)).join(''):`<div style="padding:12px 16px;font-size:13px;color:var(--text3)">No issues. Drag from backlog below.</div>`}
+        <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
       </div>
     </div>`;
   });
-
-  // Backlog section
-  const backlogIssues=issues.filter(i=>!i.sprintId);
-  const bDone=backlogIssues.filter(i=>statusCls(i.statusName)==='done').length;
-  const bInprog=backlogIssues.filter(i=>statusCls(i.statusName)==='prog').length;
-  const bTodo=backlogIssues.filter(i=>statusCls(i.statusName)==='todo'||statusCls(i.statusName)==='review').length;
-
-  html+=`<div class="sprint-block">
-    <div class="backlog-header" onclick="toggleSprint('sp-backlog','spc-backlog')">
-      <div class="ir-cb"></div>
-      <div class="sprint-chevron open" id="spc-backlog"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
-      <span class="backlog-title">Backlog</span>
-      <span class="backlog-count">(${backlogIssues.length} work items)</span>
-      <div class="backlog-badges">
-        <span class="sp-badge done">${bDone}</span>
-        <span class="sp-badge inprog">${bInprog}</span>
-        <span class="sp-badge todo">${bTodo}</span>
-      </div>
-      <span class="backlog-create-sprint" onclick="event.stopPropagation();openCreateSprint()">Create sprint</span>
-      <button class="sprint-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
+  const backlog=issues.filter(i=>!i.sprintId);
+  const bd=backlog.filter(i=>statusIdByName(i.statusName)===4).length;
+  const bp=backlog.filter(i=>{const id=statusIdByName(i.statusName);return id===2||id===3;}).length;
+  const bt=backlog.filter(i=>statusIdByName(i.statusName)===1).length;
+  html+=`<div class="sp-block">
+    <div class="sp-hdr" onclick="toggleSp('spb-bl','spc-bl')">
+      <div class="sp-cb"></div>
+      <div class="sp-chev open" id="spc-bl"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+      <span class="sp-name">Backlog</span>
+      <span class="sp-count">(${backlog.length} work items)</span>
+      <div class="sp-badges"><span class="spb done">${bd}</span><span class="spb prog">${bp}</span><span class="spb todo">${bt}</span></div>
+      <span style="font-size:12px;color:var(--blue2);cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:background .1s" onclick="event.stopPropagation();openCreateSprint()" onmouseover="this.style.background='var(--blue-xlight)'" onmouseout="this.style.background=''">Create sprint</span>
+      <button class="sp-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
     </div>
-    <div id="sp-backlog" class="sprint-issues">
-      ${backlogIssues.length?backlogIssues.map(i=>issueRow(i)).join(''):`<div class="drag-hint">Plan a sprint by dragging work items into it, or by dragging the sprint footer.</div>`}
-      <div class="bl-create-row" onclick="openCreateIssue()">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Create issue
-      </div>
+    <div id="spb-bl" class="sp-issues">
+      ${backlog.length?backlog.map(i=>issueRow(i)).join(''):`<div class="drag-hint">Plan a sprint by dragging work items into it, or by dragging the sprint footer.</div>`}
+      <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
     </div>
   </div>`;
-
-  // Estimate footer
   const total=issues.reduce((s,i)=>s+(i.storyPoints||0),0);
-  const visible=issues.length;
-  html+=`<div style="padding:16px 0;font-size:12px;color:var(--text3);text-align:right">${visible} of ${visible} work items visible | Estimate: ${total} of ${total}</div>`;
-
+  html+=`<div class="bl-footer">${issues.length} of ${issues.length} work items visible | Estimate: <strong>${total}</strong> of ${total}</div>`;
   el.innerHTML=html;
 }
-
-function toggleSprint(bodyId, chevId){
-  const body=document.getElementById(bodyId);
-  const chev=document.getElementById(chevId);
-  if(!body) return;
-  body.style.display=body.style.display==='none'?'':'none';
-  chev?.classList.toggle('open');
+function issueRow(i){
+  const s=statusByName(i.statusName);
+  const av=i.assigneeName?`<div class="ir-av" style="background:${avc(i.assigneeName)}" title="${i.assigneeName}">${avi(i.assigneeName)}</div>`:`<div class="ir-av" style="background:var(--border)"></div>`;
+  return `<div class="ir" onclick="openDP(${i.id})">
+    <div class="ir-cb"></div>
+    ${typeIc(i.issueType)}
+    <span class="ir-key">${i.issueKey}</span>
+    <span class="ir-sum" title="${i.summary}">${i.summary}</span>
+    <span class="ir-status-pill" style="background:${s.bg};color:${s.color}">${i.statusName||'To Do'}</span>
+    <span class="ir-prio">${prioIc(i.priority)}</span>
+    ${av}
+    <span class="ir-pts">${i.storyPoints??''}</span>
+    <div class="ir-hov">
+      <button class="ir-hov-btn" title="Edit" onclick="event.stopPropagation();openDP(${i.id})">✏️</button>
+    </div>
+  </div>`;
 }
-
-function filterBacklog(q){
+function toggleSp(bodyId,chevId){
+  const b=document.getElementById(bodyId),c=document.getElementById(chevId);
+  if(!b) return;
+  b.style.display=b.style.display==='none'?'':'none';
+  c?.classList.toggle('open');
+}
+function filterBL(q){
   const filtered=q?allIssues.filter(i=>i.summary?.toLowerCase().includes(q.toLowerCase())||i.issueKey?.toLowerCase().includes(q.toLowerCase())):allIssues;
   renderBacklog(filtered,sprints);
 }
-
-function renderAvatarFilter(issues,elId){
+function renderAvs(issues,elId){
   const el=document.getElementById(elId);
+  if(!el) return;
   const names=[...new Set(issues.filter(i=>i.assigneeName).map(i=>i.assigneeName))].slice(0,5);
-  el.innerHTML=names.map(n=>`<div class="bl-avatar" style="background:${avatarColor(n)}" title="${n}">${avatarInitial(n)}</div>`).join('')+(names.length>=5?`<div class="bl-more">+${issues.filter(i=>i.assigneeName).length-5}</div>`:``);
+  const extra=issues.filter(i=>i.assigneeName).length-names.length;
+  el.innerHTML=names.map(n=>`<div class="bl-av" style="background:${avc(n)}" title="${n}">${avi(n)}</div>`).join('')+(extra>0?`<div class="bl-more">+${extra}</div>`:'');
 }
 
-/* ── BOARD ── */
+// ── BOARD ──
 async function loadBoard(){
   const el=document.getElementById('board-cols');
   if(!currentProject){el.innerHTML='<div class="loading">Select a project</div>';return;}
   el.innerHTML='';
   try{
-    const [issues,sprintList]=await Promise.all([
+    const [issues,spList]=await Promise.all([
       api('GET',`/api/v1/issues/project/${currentProject.id}`),
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
-    const active=sprintList.find(s=>s.state==='Active');
-    document.getElementById('board-sprint-title').textContent=active?`${currentProject.name} · ${active.name}`:`${currentProject.name} · Board`;
-    renderAvatarFilter(issues,'board-avatars');
-
+    const active=spList.find(s=>s.state==='Active');
+    document.getElementById('board-sprint-name').textContent=active?`${currentProject.name} · ${active.name}`:`${currentProject.name} · Board`;
+    renderAvs(issues,'board-avs');
     const COLS=[
-      {id:1,title:'TO DO',key:'todo'},
-      {id:2,title:'IN PROGRESS',key:'prog'},
-      {id:3,title:'IN REVIEW',key:'review'},
-      {id:4,title:'DONE',key:'done'},
+      {id:1,key:'todo',title:'TO DO'},
+      {id:2,key:'prog',title:'IN PROGRESS'},
+      {id:3,key:'review',title:'IN REVIEW'},
+      {id:4,key:'done',title:'DONE'},
     ];
     el.innerHTML=COLS.map(col=>{
-      const colIssues=issues.filter(i=>statusCls(i.statusName)===col.key);
-      const cards=colIssues.length?colIssues.map(i=>{
-        const av=i.assigneeName?`<div class="bcard-av" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>`:'';
-        return `<div class="bcard" onclick="openDetail(${i.id})">
-          <div class="bcard-summary">${i.summary}</div>
-          <div class="bcard-footer">
-            <div class="bcard-left">
-              ${col.key==='bug'?`<div class="bcard-type" style="background:#de350b;color:#fff">B</div>`:col.key==='epic'?`<div class="bcard-type" style="background:#6554c0;color:#fff">E</div>`:`<div class="bcard-type" style="background:#0052cc;color:#fff;font-size:10px">${(i.issueType||'S')[0]}</div>`}
-              <span class="bcard-key">${i.issueKey}</span>
-              <span class="bcard-prio">${prioIcon(i.priority)}</span>
+      const ci=issues.filter(i=>statusIdByName(i.statusName)===col.id);
+      return `<div class="bcol">
+        <div class="bcol-hdr"><span class="bcol-title">${col.title}</span><span class="bcol-cnt">${ci.length}</span></div>
+        <div class="bcol-body">${ci.length?ci.map(i=>{
+          const av=i.assigneeName?`<div class="bcard-av" style="background:${avc(i.assigneeName)}">${avi(i.assigneeName)}</div>`:'';
+          return `<div class="bcard" onclick="openDP(${i.id})">
+            <div class="bcard-sum">${i.summary}</div>
+            <div class="bcard-foot">
+              <div class="bcard-left">
+                <div class="ir-type-ic" style="background:${TYPE_COLORS[i.issueType]||'#0052cc'};width:16px;height:16px;font-size:10px">${TYPE_LETTERS[i.issueType]||'S'}</div>
+                <span style="font-size:11px;color:var(--text3);font-family:monospace">${i.issueKey}</span>
+                <span>${prioIc(i.priority)}</span>
+              </div>
+              <div class="bcard-right">
+                ${i.storyPoints!=null?`<span class="bcard-pts">${i.storyPoints}</span>`:''}
+                ${av}
+              </div>
             </div>
-            <div class="bcard-right">
-              ${i.storyPoints!=null?`<span class="bcard-pts">${i.storyPoints}</span>`:''}
-              ${av}
-            </div>
-          </div>
-        </div>`;
-      }).join(''):`<div style="padding:16px;font-size:12px;color:var(--text3);text-align:center">No issues</div>`;
-      return `<div class="bcol ${col.key==='done'?'done':''}">
-        <div class="bcol-header">
-          <span class="bcol-title">${col.title}</span>
-          <span class="bcol-count">${colIssues.length}</span>
-        </div>
-        <div class="bcol-body">${cards}</div>
+          </div>`;
+        }).join(''):`<div style="padding:16px;font-size:12px;color:var(--text3);text-align:center">No issues</div>`}</div>
       </div>`;
     }).join('');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
 
-/* ── DASHBOARD ── */
+// ── SPRINT ACTIONS ──
+async function doStartSprint(id){
+  try{
+    await api('POST',`/api/v1/sprints/${id}/start`,{startDate:new Date().toISOString(),endDate:new Date(Date.now()+14*86400000).toISOString()});
+    toast('Sprint started! 🚀','ok'); loadBacklog();
+  }catch(e){toast(e.message,'err');}
+}
+async function doCloseSprint(id){
+  if(!confirm('Complete this sprint? Incomplete issues stay in backlog.')) return;
+  try{
+    await api('POST',`/api/v1/sprints/${id}/close`);
+    toast('Sprint completed! ✅','ok'); loadBacklog();
+  }catch(e){toast(e.message,'err');}
+}
+
+// ── DASHBOARD ──
 async function loadDashboard(){
   try{
-    const [summary,mine]=await Promise.all([
+    const [sum,mine]=await Promise.all([
       api('GET','/api/v1/dashboard/summary'),
       api('GET','/api/v1/dashboard/assigned-to-me')
     ]);
-    const colors=[{num:'var(--blue)',bg:'#e9f2ff'},{num:'var(--yellow)',bg:'#fffae6'},{num:'var(--red)',bg:'#ffebe6'},{num:'var(--green)',bg:'#e3fcef'}];
-    const stats=[
-      {label:'Total Issues',num:summary.totalIssues,icon:'📋'},
-      {label:'Open',num:summary.openIssues,icon:'🔵'},
-      {label:'In Progress',num:summary.inProgressIssues,icon:'🟠'},
-      {label:'Done',num:summary.doneIssues,icon:'✅'},
-    ];
-    document.getElementById('dash-stats').innerHTML=stats.map((s,i)=>`
-      <div class="dash-card" style="border-top:3px solid ${colors[i].num}">
-        <div class="dash-card-num" style="color:${colors[i].num}">${s.num}</div>
-        <div class="dash-card-label">${s.icon} ${s.label}</div>
-      </div>`).join('');
-    const mi=document.getElementById('dash-my-issues');
-    mi.innerHTML=mine.length?mine.slice(0,8).map(i=>`
-      <div class="dash-table-row" onclick="openDetail(${i.id})">
-        ${typeIcon(i.issueType)}
+    const cols=[{c:'#0052cc',b:'#e9f2ff'},{c:'#ff991f',b:'#fffae6'},{c:'#de350b',b:'#ffebe6'},{c:'#00875a',b:'#e3fcef'}];
+    document.getElementById('dash-stats').innerHTML=[
+      {label:'Total Issues',num:sum.totalIssues},
+      {label:'Open',num:sum.openIssues},
+      {label:'In Progress',num:sum.inProgressIssues},
+      {label:'Done',num:sum.doneIssues},
+    ].map((s,i)=>`<div class="dash-stat" style="border-top-color:${cols[i].c}">
+      <div class="dash-stat-num" style="color:${cols[i].c}">${s.num}</div>
+      <div class="dash-stat-lbl">${s.label}</div>
+    </div>`).join('');
+    document.getElementById('dash-mine').innerHTML=mine.length?mine.slice(0,8).map(i=>`
+      <div class="dash-tbl-row" onclick="openDP(${i.id})">
+        ${typeIc(i.issueType)}
         <span style="font-family:monospace;font-size:12px;color:var(--blue2);width:80px;flex-shrink:0">${i.issueKey}</span>
         <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${i.summary}</span>
-        <span class="ir-status ${statusCls(i.statusName)}">${statusLabel(i.statusName)}</span>
-      </div>`).join(''):`<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">You're all caught up!</div></div>`;
-    renderBurndown();
+        ${statusPill(i.statusName)}
+      </div>`).join(''):`<div class="empty-state"><div class="empty-state-icon">🎉</div><div class="empty-state-title">You're all caught up!</div></div>`;
+    renderBd();
   }catch(e){console.error(e);}
 }
-
-function renderBurndown(){
+function renderBd(){
   const svg=document.getElementById('bd-svg');
-  const W=300,H=200,PAD=28,pts=50,days=14;
-  const iW=W-PAD*2,iH=H-PAD*2;
+  const W=300,H=200,P=28,pts=50,days=14,iW=W-P*2,iH=H-P*2;
   let ideal=[],actual=[];
   for(let d=0;d<=days;d++){
-    const x=PAD+(d/days)*iW;
-    const iY=PAD+((pts-pts*d/days)/pts)*iH;
-    const noise=Math.sin(d*1.5)*3+Math.cos(d*.8)*2;
-    const aY=PAD+Math.max(0,(pts-Math.max(0,pts*d/days*.88+noise))/pts)*iH;
+    const x=P+(d/days)*iW;
+    const iY=P+((pts-pts*d/days)/pts)*iH;
+    const n=Math.sin(d*1.5)*3+Math.cos(d*.8)*2;
+    const aY=P+Math.max(0,(pts-Math.max(0,pts*d/days*.88+n))/pts)*iH;
     ideal.push([x,iY]);actual.push([x,aY]);
   }
-  const p=pts=>`${pts.map((p,i)=>`${i?'L':'M'}${p[0]},${p[1]}`).join(' ')}`;
-  const gridPts=[0,25,50];
+  const pp=pts=>`${pts.map((p,i)=>`${i?'L':'M'}${p[0]},${p[1]}`).join(' ')}`;
   svg.innerHTML=`
-    ${gridPts.map(gp=>{const y=PAD+(1-gp/100)*iH;return `<line x1="${PAD}" y1="${y}" x2="${W-PAD}" y2="${y}" stroke="#ebecf0" stroke-width="1"/>
-    <text x="${PAD-4}" y="${y+4}" fill="#97a0af" font-size="9" text-anchor="end">${Math.round(pts*gp/100)}</text>`;}).join('')}
-    <path d="${p(ideal)}" stroke="#dfe1e6" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
-    <path d="${p(actual)} L${actual[actual.length-1][0]},${H-PAD} L${PAD},${H-PAD}" fill="#0052cc" opacity=".08"/>
-    <path d="${p(actual)}" stroke="#0052cc" stroke-width="2" fill="none"/>
-    <text x="${W/2}" y="${H-2}" fill="#97a0af" font-size="9" text-anchor="middle">Days remaining</text>`;
+    ${[0,25,50].map(g=>{const y=P+(1-g/100)*iH;return `<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="#ebecf0" stroke-width="1"/>
+    <text x="${P-4}" y="${y+4}" fill="#97a0af" font-size="9" text-anchor="end">${Math.round(pts*g/100)}</text>`;}).join('')}
+    <path d="${pp(ideal)}" stroke="#dfe1e6" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+    <path d="${pp(actual)} L${actual[actual.length-1][0]},${H-P} L${P},${H-P}" fill="#0052cc" opacity=".08"/>
+    <path d="${pp(actual)}" stroke="#0052cc" stroke-width="2" fill="none"/>`;
 }
 
-/* ── PROJECTS PAGE ── */
-async function loadProjectsPage(){
+// ── PROJECTS PAGE ──
+async function loadProjectsPg(){
   const grid=document.getElementById('pp-grid');
   grid.innerHTML='<div class="loading">Loading…</div>';
   try{
     projects=await api('GET','/api/v1/projects');
-    renderSbProjects();
+    renderSb();
     grid.innerHTML=projects.map(p=>`
       <div class="pp-card ${currentProject?.id===p.id?'act':''}" onclick="selectProject(${p.id});switchTab('backlog')">
         <div class="pp-card-top">
           <div class="pp-card-icon" style="background:${p.color||'#e9f2ff'}">${p.icon||'📁'}</div>
-          <div class="pp-card-meta">
-            <div class="pp-card-key">${p.key}</div>
-            <div class="pp-card-name">${p.name}</div>
-          </div>
+          <div><div class="pp-card-key">${p.key}</div><div class="pp-card-name">${p.name}</div></div>
         </div>
         <div class="pp-card-desc">${p.description||'Software project'}</div>
-        <div class="pp-card-footer">
-          <div class="pp-card-type"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>${p.boardType||'Scrum'}</div>
-          <span>by ${p.leadName||'Admin'}</span>
-        </div>
-      </div>`).join('')+`
-      <div class="pp-create" onclick="openCreateProject()">
-        <div class="pp-create-icon">＋</div>
-        <div class="pp-create-text">Create project</div>
-        <div style="font-size:12px">Scrum, Kanban, or custom</div>
-      </div>`;
+        <div class="pp-card-footer"><span>${p.boardType||'Scrum'}</span><span>Lead: ${p.leadName||'—'}</span></div>
+      </div>`).join('')+`<div class="pp-new" onclick="openCreateProject()"><div style="font-size:28px">＋</div><div style="font-weight:600">Create project</div><div style="font-size:12px">Scrum, Kanban, or custom</div></div>`;
   }catch(e){grid.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
 
-/* ── SPRINT ACTIONS ── */
-async function doStartSprint(id){
-  try{
-    await api('POST',`/api/v1/sprints/${id}/start`,{startDate:new Date().toISOString(),endDate:new Date(Date.now()+14*86400000).toISOString()});
-    toast('Sprint started!','ok'); loadBacklog();
-  }catch(e){toast(e.message,'err');}
-}
-async function doCloseSprint(id){
-  if(!confirm('Complete this sprint? Incomplete issues will move to the backlog.')) return;
-  try{
-    await api('POST',`/api/v1/sprints/${id}/close`);
-    toast('Sprint completed!','ok'); loadBacklog();
-  }catch(e){toast(e.message,'err');}
-}
-
-/* ── ISSUE DETAIL ── */
-async function openDetail(id){
-  currentIssueId=id;
-  const panel=document.getElementById('detail-panel');
-  panel.classList.add('on');
-  document.getElementById('dp-title').textContent='Loading…';
-  document.getElementById('dp-key').textContent='';
-  document.getElementById('dp-badges').innerHTML='';
-  document.getElementById('dp-fields').innerHTML='';
-  document.getElementById('dp-desc').textContent='';
-  document.getElementById('dp-transitions').innerHTML='';
+// ── ISSUE DETAIL PANEL ──
+async function openDP(id){
+  currentIssueId=id; issueLinks=[];
+  document.getElementById('dp').classList.add('on');
+  document.getElementById('dp-key').textContent='Loading…';
+  // Reset fields
+  ['dp-title','dp-desc','dp-labels-inp','dp-due-inp','dp-pts-inp'].forEach(el=>{const e=document.getElementById(el);if(e)e.value='';});
   document.getElementById('dp-comments').innerHTML='<div class="loading">Loading…</div>';
+  document.getElementById('dp-links').innerHTML='';
+  document.getElementById('link-form').style.display='none';
+
   try{
-    const i=await api('GET',`/api/v1/issues/${id}`);
-    document.getElementById('dp-key').textContent=i.issueKey;
-    document.getElementById('dp-title').textContent=i.summary;
+    const [issue,users,spList]=await Promise.all([
+      api('GET',`/api/v1/issues/${id}`),
+      api('GET','/api/v1/users').catch(()=>tenantUsers),
+      currentProject?api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[]):Promise.resolve([])
+    ]);
+    currentIssueData=issue; tenantUsers=users||[];
 
-    const typeBadge=`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;background:#e9f2ff;color:#0052cc">${typeIcon(i.issueType)} ${i.issueType}</span>`;
-    const prioBg={Blocker:'#ffebe6',Critical:'#ffebe6',Major:'#fffae6',Minor:'#e3fcef',Trivial:'#f4f5f7'};
-    const prioCol={Blocker:'#de350b',Critical:'#de350b',Major:'#ff991f',Minor:'#00875a',Trivial:'#97a0af'};
-    const prioBadge=`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:2px;font-size:11px;font-weight:600;background:${prioBg[i.priority]||'#fffae6'};color:${prioCol[i.priority]||'#ff991f'}">${prioIcon(i.priority)} ${i.priority}</span>`;
-    document.getElementById('dp-badges').innerHTML=typeBadge+' '+prioBadge;
+    // Header
+    document.getElementById('dp-key').textContent=issue.issueKey;
 
-    const statusColors={todo:{bg:'#f4f5f7',col:'#5e6c84'},prog:{bg:'#e9f2ff',col:'#0052cc'},review:{bg:'#fffae6',col:'#974f0c'},done:{bg:'#e3fcef',col:'#00875a'}};
-    const sc=statusCls(i.statusName);
-    const sc2=statusColors[sc]||statusColors.todo;
+    // Title (editable textarea)
+    document.getElementById('dp-title').value=issue.summary||'';
 
-    const fields=[
-      {l:'Status',v:`<span class="dp-status-btn" style="background:${sc2.bg};color:${sc2.col}">${i.statusName||'To Do'} ▾</span>`},
-      {l:'Assignee',v:i.assigneeName?`<div style="display:flex;align-items:center;gap:6px"><div class="dp-assignee-av" style="background:${avatarColor(i.assigneeName)}">${avatarInitial(i.assigneeName)}</div>${i.assigneeName}</div>`:'<span style="color:var(--text3)">Unassigned</span>'},
-      {l:'Reporter',v:i.reporterName||'—'},
-      {l:'Sprint',v:i.sprintName||'<span style="color:var(--text3)">None</span>'},
-      {l:'Story points',v:i.storyPoints!=null?i.storyPoints:'<span style="color:var(--text3)">None</span>'},
-      {l:'Priority',v:`<span style="display:inline-flex;align-items:center;gap:4px">${prioIcon(i.priority)} ${i.priority}</span>`},
-      {l:'Due date',v:i.dueDate?new Date(i.dueDate).toLocaleDateString():'<span style="color:var(--text3)">None</span>'},
-      {l:'Created',v:new Date(i.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})},
-    ];
-    document.getElementById('dp-fields').innerHTML=fields.map(f=>`
-      <div class="dp-field">
-        <div class="dp-field-label">${f.l}</div>
-        <div class="dp-field-val">${f.v}</div>
-      </div>`).join('');
-    document.getElementById('dp-desc').innerHTML=i.description||'<span style="color:var(--text3)">Add a description…</span>';
+    // Status button
+    updateStatusBtn(issue.statusId||statusIdByName(issue.statusName));
 
-    const transitions=[{id:1,name:'To Do'},{id:2,name:'In Progress'},{id:3,name:'In Review'},{id:4,name:'Done'}].filter(t=>t.id!==i.statusId);
-    document.getElementById('dp-transitions').innerHTML=transitions.map(t=>`<button class="dp-trans-btn" onclick="doTransition(${i.id},${t.id},'${t.name}')">→ ${t.name}</button>`).join('');
+    // Description
+    document.getElementById('dp-desc').value=(issue.description||'').replace(/<[^>]*>/g,'');
 
+    // Story points
+    document.getElementById('dp-pts-inp').value=issue.storyPoints!=null?issue.storyPoints:'';
+
+    // Due date
+    document.getElementById('dp-due-inp').value=issue.dueDate?new Date(issue.dueDate).toISOString().split('T')[0]:'';
+
+    // Labels
+    document.getElementById('dp-labels-inp').value=(issue.labels||[]).join(', ');
+
+    // Created / Updated
+    document.getElementById('dp-created').textContent=new Date(issue.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('dp-updated').textContent=new Date(issue.updatedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+    // Reporter
+    document.getElementById('dp-reporter-field').innerHTML=issue.reporterName?`<div style="display:flex;align-items:center;gap:6px"><div class="av-circle" style="background:${avc(issue.reporterName)};width:24px;height:24px;font-size:10px">${avi(issue.reporterName)}</div>${issue.reporterName}</div>`:'<span style="color:var(--text3)">Unknown</span>';
+
+    // Assignee dropdown
+    const asel=document.getElementById('dp-assignee-sel');
+    asel.innerHTML=`<option value="">Unassigned</option>${tenantUsers.map(u=>`<option value="${u.id}" ${issue.assigneeId===u.id?'selected':''}>${u.displayName}</option>`).join('')}`;
+
+    // Priority
+    document.getElementById('dp-prio-sel').value=issue.priority||'Major';
+
+    // Issue type
+    document.getElementById('dp-type-sel').value=issue.issueType||'Story';
+
+    // Sprint dropdown
+    const ssel=document.getElementById('dp-sprint-sel');
+    const spData=spList.length?spList:sprints;
+    ssel.innerHTML=`<option value="">None</option>${spData.map(s=>`<option value="${s.id}" ${issue.sprintId===s.id?'selected':''}>${s.name}</option>`).join('')}`;
+
+    // Fill link suggestions datalist
+    document.getElementById('link-suggestions').innerHTML=allIssues.map(i=>`<option value="${i.issueKey}">${i.issueKey} — ${i.summary}</option>`).join('');
+
+    // Comments
     const comments=await api('GET',`/api/v1/issues/${id}/comments`).catch(()=>[]);
     renderComments(comments);
-  }catch(e){document.getElementById('dp-title').textContent='Error: '+e.message;}
+
+    // Links (placeholder — would come from API)
+    renderLinks([]);
+
+    // Children section visibility
+    document.getElementById('dp-children-sec').style.display=issue.issueType==='Epic'||issue.issueType==='Story'?'block':'none';
+    document.getElementById('dp-children').innerHTML='<div style="color:var(--text3);font-size:13px">No child issues</div>';
+
+  }catch(e){
+    document.getElementById('dp-key').textContent='Error';
+    document.getElementById('dp-title').value=e.message;
+  }
+}
+function closeDP(){document.getElementById('dp').classList.remove('on');}
+
+function updateStatusBtn(statusId){
+  const s=statusById(statusId)||STATUS_MAP[1];
+  const btn=document.getElementById('status-btn');
+  btn.style.background=s.bg; btn.style.color=s.color;
+  btn.innerHTML=`${s.name} <span class="arr">▾</span>`;
+  btn.dataset.statusId=statusId;
+}
+
+function toggleStatusDrop(){
+  document.getElementById('status-drop').classList.toggle('on');
+}
+async function setStatus(id,name,color,bg){
+  document.getElementById('status-drop').classList.remove('on');
+  updateStatusBtn(id);
+  try{
+    await api('POST',`/api/v1/issues/${currentIssueId}/transitions`,{transitionId:id});
+    toast(`Status → ${name}`,'ok');
+    refreshBacklogAndBoard();
+  }catch(e){toast(e.message,'err');}
+}
+
+async function saveTitle(){
+  const val=document.getElementById('dp-title').value.trim();
+  if(!val||!currentIssueId) return;
+  if(currentIssueData&&val===currentIssueData.summary) return;
+  try{
+    await api('PUT',`/api/v1/issues/${currentIssueId}`,{summary:val});
+    if(currentIssueData) currentIssueData.summary=val;
+    toast('Title saved','ok'); refreshBacklogAndBoard();
+  }catch(e){toast(e.message,'err');}
+}
+async function saveDesc(){
+  const val=document.getElementById('dp-desc').value;
+  if(!currentIssueId) return;
+  try{
+    await api('PUT',`/api/v1/issues/${currentIssueId}`,{description:val});
+    toast('Description saved','ok');
+  }catch(e){toast(e.message,'err');}
+}
+async function saveField(field,value){
+  if(!currentIssueId) return;
+  const body={};
+  if(field==='assignee') body.assigneeId=value?parseInt(value):null;
+  else if(field==='priority') body.priority=value;
+  else if(field==='sprint') body.sprintId=value?parseInt(value):null;
+  else if(field==='points') body.storyPoints=value?parseInt(value):null;
+  else if(field==='type') body.issueType=value;
+  else if(field==='labels') body.labels=value?value.split(',').map(l=>l.trim()).filter(Boolean):null;
+  else if(field==='due') body.dueDate=value?new Date(value).toISOString():null;
+  try{
+    await api('PUT',`/api/v1/issues/${currentIssueId}`,body);
+    toast(`${field.charAt(0).toUpperCase()+field.slice(1)} updated`,'ok');
+    refreshBacklogAndBoard();
+  }catch(e){toast(e.message,'err');}
 }
 
 function renderComments(comments){
@@ -1114,215 +1255,200 @@ function renderComments(comments){
   el.innerHTML=comments.map(c=>`
     <div class="dp-comment">
       <div class="dp-comment-author">
-        <div class="dp-assignee-av" style="background:${avatarColor(c.authorName)};width:24px;height:24px;font-size:10px">${avatarInitial(c.authorName)}</div>
+        <div class="av-circle" style="background:${avc(c.authorName)};width:24px;height:24px;font-size:10px">${avi(c.authorName)}</div>
         ${c.authorName} <span class="dp-comment-time">${new Date(c.createdAt).toLocaleString()}</span>
       </div>
       <div class="dp-comment-body">${c.body}</div>
     </div>`).join('');
 }
-
 async function postComment(){
-  const body=document.getElementById('comment-input').value.trim();
+  const body=document.getElementById('comment-inp').value.trim();
   if(!body) return;
   try{
     await api('POST',`/api/v1/issues/${currentIssueId}/comments`,{body});
-    document.getElementById('comment-input').value='';
+    document.getElementById('comment-inp').value='';
     const comments=await api('GET',`/api/v1/issues/${currentIssueId}/comments`).catch(()=>[]);
     renderComments(comments);
     toast('Comment saved','ok');
   }catch(e){toast(e.message,'err');}
 }
 
-async function doTransition(id,statusId,name){
+// ── ISSUE LINKS ──
+function toggleLinkForm(){
+  const f=document.getElementById('link-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+  if(f.style.display==='block') document.getElementById('link-issue-input').focus();
+}
+async function submitLink(){
+  const linkType=document.getElementById('link-type').value;
+  const inputVal=document.getElementById('link-issue-input').value.trim();
+  if(!inputVal){toast('Enter an issue key','err');return;}
+  // Find issue by key
+  const target=allIssues.find(i=>i.issueKey.toLowerCase()===inputVal.toLowerCase());
+  if(!target){toast(`Issue "${inputVal}" not found in current project`,'err');return;}
+  if(target.id===currentIssueId){toast('Cannot link an issue to itself','err');return;}
   try{
-    await api('POST',`/api/v1/issues/${id}/transitions`,{transitionId:statusId});
-    toast(`Moved to "${name}"`, 'ok');
-    openDetail(id);
-    loadBacklog(); loadBoard();
+    const result=await api('POST','/api/v1/issuelinks',{sourceIssueId:currentIssueId,targetIssueId:target.id,linkType});
+    issueLinks.push({...result,id:Date.now()});
+    renderLinks(issueLinks);
+    document.getElementById('link-issue-input').value='';
+    document.getElementById('link-form').style.display='none';
+    toast(`Linked: ${currentIssueData?.issueKey} ${linkType.toLowerCase().replace(/([A-Z])/g,' $1').trim()} ${target.issueKey}`,'ok');
   }catch(e){toast(e.message,'err');}
 }
-
-function closeDetail(){document.getElementById('detail-panel').classList.remove('on');}
-
-/* ── CREATE ISSUE MODAL ── */
-function openCreateIssue(){
-  document.getElementById('modal-title').textContent='Create issue';
-  const projOpts=projects.map(p=>`<option value="${p.key}" ${p.id===currentProject?.id?'selected':''}>${p.name} (${p.key})</option>`).join('');
-  document.getElementById('modal-body').innerHTML=`
-    <div class="mf">
-      <label class="ml">Project <span style="color:var(--red)">*</span></label>
-      <select class="mi" id="ci-proj">${projOpts||'<option>No projects yet</option>'}</select>
-    </div>
-    <div class="mi-grid">
-      <div class="mf">
-        <label class="ml">Issue type</label>
-        <select class="mi" id="ci-type">
-          <option value="Story">Story</option>
-          <option value="Bug">Bug</option>
-          <option value="Epic">Epic</option>
-          <option value="Task">Task</option>
-          <option value="Subtask">Subtask</option>
-        </select>
-      </div>
-      <div class="mf">
-        <label class="ml">Priority</label>
-        <select class="mi" id="ci-prio">
-          <option value="Blocker">Blocker</option>
-          <option value="Critical">Critical</option>
-          <option value="Major" selected>Major</option>
-          <option value="Minor">Minor</option>
-          <option value="Trivial">Trivial</option>
-        </select>
-      </div>
-    </div>
-    <div class="mf">
-      <label class="ml">Summary <span style="color:var(--red)">*</span></label>
-      <input class="mi" id="ci-summary" placeholder="What needs to be done?" maxlength="255"/>
-    </div>
-    <div class="mf">
-      <label class="ml">Description</label>
-      <textarea class="mi" id="ci-desc" placeholder="Add details, steps to reproduce, acceptance criteria…" rows="4"></textarea>
-    </div>
-    <div class="mi-grid">
-      <div class="mf">
-        <label class="ml">Story points</label>
-        <input class="mi" type="number" id="ci-pts" placeholder="e.g. 3, 5, 8" min="0" max="999"/>
-      </div>
-      <div class="mf">
-        <label class="ml">Due date</label>
-        <input class="mi" type="date" id="ci-due"/>
-      </div>
-    </div>
-    <div class="mf">
-      <label class="ml">Labels</label>
-      <input class="mi" id="ci-labels" placeholder="e.g. frontend, regression, urgent"/>
-      <div class="mf-hint">Comma-separated</div>
-    </div>`;
-  document.getElementById('modal-footer').innerHTML=`
-    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
-    <button class="btn-jira btn-primary" onclick="submitCreateIssue()">Create</button>`;
-  document.getElementById('modal-bg').classList.add('on');
-  setTimeout(()=>document.getElementById('ci-summary')?.focus(),50);
+function renderLinks(links){
+  const el=document.getElementById('dp-links');
+  if(!links.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:4px 0">No linked issues</div>';return;}
+  const grouped={};
+  links.forEach(l=>{
+    const lt=l.linkType||'RelatesTo';
+    if(!grouped[lt]) grouped[lt]=[];
+    grouped[lt].push(l);
+  });
+  el.innerHTML=Object.entries(grouped).map(([lt,items])=>`
+    <div style="margin-bottom:8px">
+      <div class="link-type-label">${lt.replace(/([A-Z])/g,' $1').trim()}</div>
+      ${items.map(l=>`
+        <div class="link-item">
+          ${typeIc('Story')}
+          <span class="link-key" onclick="openDP(${l.targetIssueId})">${l.targetKey||l.targetIssueId}</span>
+          <span style="flex:1;font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.targetSummary||''}</span>
+          <button class="link-rm" onclick="removeLink(${l.id})" title="Remove link">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function removeLink(linkId){
+  issueLinks=issueLinks.filter(l=>l.id!==linkId);
+  renderLinks(issueLinks);
+  toast('Link removed','ok');
+}
+function openCreateChildIssue(){
+  openCreateIssue(currentIssueId);
 }
 
+// ── CREATE MODALS ──
+function openCreateIssue(parentId=null){
+  document.getElementById('modal-title').textContent='Create issue';
+  const projOpts=projects.map(p=>`<option value="${p.key}" ${p.id===currentProject?.id?'selected':''}>${p.name} (${p.key})</option>`).join('');
+  const userOpts=tenantUsers.map(u=>`<option value="${u.id}">${u.displayName}</option>`).join('');
+  const spOpts=sprints.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="mf"><label class="ml">Project *</label><select class="mi" id="ci-proj">${projOpts||'<option>No projects</option>'}</select></div>
+    <div class="mi-grid">
+      <div class="mf"><label class="ml">Issue type</label>
+        <select class="mi" id="ci-type">
+          <option>Story</option><option>Bug</option><option>Epic</option><option>Task</option><option>Subtask</option>
+        </select>
+      </div>
+      <div class="mf"><label class="ml">Priority</label>
+        <select class="mi" id="ci-prio">
+          <option>Blocker</option><option>Critical</option><option selected>Major</option><option>Minor</option><option>Trivial</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf"><label class="ml">Summary *</label><input class="mi" id="ci-sum" placeholder="What needs to be done?" maxlength="255"/></div>
+    <div class="mf"><label class="ml">Description</label><textarea class="mi" id="ci-desc" placeholder="Details, acceptance criteria, steps to reproduce…" rows="4"></textarea></div>
+    <div class="mi-grid">
+      <div class="mf"><label class="ml">Assignee</label><select class="mi" id="ci-assignee"><option value="">Unassigned</option>${userOpts}</select></div>
+      <div class="mf"><label class="ml">Sprint</label><select class="mi" id="ci-sprint"><option value="">Backlog</option>${spOpts}</select></div>
+    </div>
+    <div class="mi-grid">
+      <div class="mf"><label class="ml">Story points</label><input class="mi" type="number" id="ci-pts" placeholder="e.g. 3, 5, 8" min="0" max="999"/></div>
+      <div class="mf"><label class="ml">Due date</label><input class="mi" type="date" id="ci-due"/></div>
+    </div>
+    <div class="mf"><label class="ml">Labels</label><input class="mi" id="ci-labels" placeholder="e.g. frontend, regression, urgent"/><div class="mf-hint">Comma-separated</div></div>
+    ${parentId?`<input type="hidden" id="ci-parent" value="${parentId}"/>`:''}`;
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn-s" onclick="closeModal()">Cancel</button>
+    <button class="btn-p" onclick="submitCreateIssue()">Create</button>`;
+  document.getElementById('modal-bg').classList.add('on');
+  setTimeout(()=>document.getElementById('ci-sum')?.focus(),50);
+}
 async function submitCreateIssue(){
-  const projKey=document.getElementById('ci-proj').value;
-  const summary=document.getElementById('ci-summary').value.trim();
-  if(!summary){toast('Summary is required','err');return;}
+  const sum=document.getElementById('ci-sum').value.trim();
+  if(!sum){toast('Summary is required','err');return;}
   const pts=document.getElementById('ci-pts').value;
   const due=document.getElementById('ci-due').value;
   const labels=document.getElementById('ci-labels').value.split(',').map(l=>l.trim()).filter(Boolean);
+  const sprintId=document.getElementById('ci-sprint').value;
+  const assigneeId=document.getElementById('ci-assignee').value;
+  const parent=document.getElementById('ci-parent');
   try{
     const issue=await api('POST','/api/v1/issues',{
-      projectKey:projKey,
+      projectKey:document.getElementById('ci-proj').value,
       issueType:document.getElementById('ci-type').value,
       priority:document.getElementById('ci-prio').value,
-      summary,
+      summary:sum,
       description:document.getElementById('ci-desc').value.trim()||null,
       storyPoints:pts?parseInt(pts):null,
       dueDate:due?new Date(due).toISOString():null,
       labels:labels.length?labels:null,
+      sprintId:sprintId?parseInt(sprintId):null,
+      assigneeId:assigneeId?parseInt(assigneeId):null,
+      parentIssueId:parent?parseInt(parent.value):null,
     });
     toast(`${issue.issueKey} created`,'ok');
-    closeModal(); loadBacklog(); loadBoard();
+    closeModal();
+    refreshBacklogAndBoard();
   }catch(e){toast(e.message,'err');}
 }
-
-/* ── CREATE PROJECT ── */
 function openCreateProject(){
   document.getElementById('modal-title').textContent='Create project';
   document.getElementById('modal-body').innerHTML=`
-    <div class="mf">
-      <label class="ml">Project name <span style="color:var(--red)">*</span></label>
-      <input class="mi" id="cp-name" placeholder="e.g. Customer Portal, Mobile App"/>
-    </div>
+    <div class="mf"><label class="ml">Project name *</label><input class="mi" id="cp-name" placeholder="e.g. Customer Portal, Mobile App"/></div>
     <div class="mi-grid">
-      <div class="mf">
-        <label class="ml">Key <span style="color:var(--red)">*</span></label>
-        <input class="mi" id="cp-key" placeholder="e.g. CP, APP" maxlength="10" oninput="this.value=this.value.toUpperCase()"/>
-        <div class="mf-hint">Used in issue identifiers like CP-1</div>
-      </div>
-      <div class="mf">
-        <label class="ml">Board type</label>
-        <select class="mi" id="cp-board">
-          <option value="Scrum">Scrum</option>
-          <option value="Kanban">Kanban</option>
-        </select>
-      </div>
+      <div class="mf"><label class="ml">Key *</label><input class="mi" id="cp-key" placeholder="e.g. CP, APP" maxlength="10" oninput="this.value=this.value.toUpperCase()"/><div class="mf-hint">Used in issue keys like CP-1</div></div>
+      <div class="mf"><label class="ml">Board type</label><select class="mi" id="cp-board"><option>Scrum</option><option>Kanban</option></select></div>
     </div>
-    <div class="mf">
-      <label class="ml">Description</label>
-      <textarea class="mi" id="cp-desc" placeholder="What is this project about?" rows="3"></textarea>
-    </div>
+    <div class="mf"><label class="ml">Description</label><textarea class="mi" id="cp-desc" placeholder="What is this project about?" rows="3"></textarea></div>
     <div class="mi-grid">
-      <div class="mf">
-        <label class="ml">Icon (emoji)</label>
-        <input class="mi" id="cp-icon" placeholder="🚀" maxlength="4"/>
-      </div>
-      <div class="mf">
-        <label class="ml">Color</label>
-        <input class="mi" type="color" id="cp-color" value="#0052cc" style="height:40px;padding:4px"/>
-      </div>
+      <div class="mf"><label class="ml">Icon (emoji)</label><input class="mi" id="cp-icon" placeholder="🚀" maxlength="4"/></div>
+      <div class="mf"><label class="ml">Color</label><input class="mi" type="color" id="cp-color" value="#0052cc" style="height:40px;padding:4px"/></div>
     </div>`;
-  document.getElementById('modal-footer').innerHTML=`
-    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
-    <button class="btn-jira btn-primary" onclick="submitCreateProject()">Create project</button>`;
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn-s" onclick="closeModal()">Cancel</button>
+    <button class="btn-p" onclick="submitCreateProject()">Create project</button>`;
   document.getElementById('modal-bg').classList.add('on');
   setTimeout(()=>document.getElementById('cp-name')?.focus(),50);
 }
-
 async function submitCreateProject(){
   const key=document.getElementById('cp-key').value.trim().toUpperCase();
   const name=document.getElementById('cp-name').value.trim();
-  if(!key||key.length<2){toast('Project key must be 2–10 chars','err');return;}
-  if(!name){toast('Project name is required','err');return;}
+  if(!key||key.length<2){toast('Key must be 2–10 chars','err');return;}
+  if(!name){toast('Name is required','err');return;}
   try{
-    const p=await api('POST','/api/v1/projects',{
-      key,name,
+    const p=await api('POST','/api/v1/projects',{key,name,
       description:document.getElementById('cp-desc').value.trim()||null,
       boardType:document.getElementById('cp-board').value,
       color:document.getElementById('cp-color').value,
       icon:document.getElementById('cp-icon').value.trim()||'📁',
     });
     toast(`Project "${p.name}" created`,'ok');
-    closeModal();
-    await loadProjects();
-    selectProject(p.id);
-    showPage('projects');
+    closeModal(); await loadProjects(); selectProject(p.id); showPg('projects');
   }catch(e){toast(e.message,'err');}
 }
-
-/* ── CREATE SPRINT ── */
 function openCreateSprint(){
   if(!currentProject){toast('Select a project first','err');return;}
   const today=new Date().toISOString().split('T')[0];
   const twoW=new Date(Date.now()+14*86400000).toISOString().split('T')[0];
   document.getElementById('modal-title').textContent='Create sprint';
   document.getElementById('modal-body').innerHTML=`
-    <div class="mf">
-      <label class="ml">Sprint name <span style="color:var(--red)">*</span></label>
-      <input class="mi" id="cs-name" value="${currentProject.key} Sprint ${(sprints.length||0)+1}"/>
-    </div>
-    <div class="mf">
-      <label class="ml">Sprint goal</label>
-      <input class="mi" id="cs-goal" placeholder="What will this sprint achieve?"/>
-    </div>
+    <div class="mf"><label class="ml">Sprint name *</label><input class="mi" id="cs-name" value="${currentProject.key} Sprint ${(sprints.length||0)+1}"/></div>
+    <div class="mf"><label class="ml">Sprint goal</label><input class="mi" id="cs-goal" placeholder="What will this sprint achieve?"/></div>
     <div class="mi-grid">
       <div class="mf"><label class="ml">Start date</label><input class="mi" type="date" id="cs-start" value="${today}"/></div>
       <div class="mf"><label class="ml">End date</label><input class="mi" type="date" id="cs-end" value="${twoW}"/></div>
     </div>`;
-  document.getElementById('modal-footer').innerHTML=`
-    <button class="btn-jira btn-secondary" onclick="closeModal()">Cancel</button>
-    <button class="btn-jira btn-primary" onclick="submitCreateSprint()">Create sprint</button>`;
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn-s" onclick="closeModal()">Cancel</button>
+    <button class="btn-p" onclick="submitCreateSprint()">Create sprint</button>`;
   document.getElementById('modal-bg').classList.add('on');
 }
-
 async function submitCreateSprint(){
   const name=document.getElementById('cs-name').value.trim();
   if(!name){toast('Sprint name required','err');return;}
   try{
-    await api('POST',`/api/v1/projects/${currentProject.id}/sprints`,{
-      name,
+    await api('POST',`/api/v1/projects/${currentProject.id}/sprints`,{name,
       goal:document.getElementById('cs-goal').value.trim()||null,
       startDate:new Date(document.getElementById('cs-start').value).toISOString(),
       endDate:new Date(document.getElementById('cs-end').value).toISOString(),
@@ -1330,66 +1456,64 @@ async function submitCreateSprint(){
     toast('Sprint created','ok'); closeModal(); loadBacklog();
   }catch(e){toast(e.message,'err');}
 }
-
 function closeModal(){document.getElementById('modal-bg').classList.remove('on');}
 
-/* ── SEARCH ── */
-function doSearch(q){if(q.trim()) searchIssues(q);}
-async function searchIssues(iql){
-  showPage('backlog');
+// ── REFRESH HELPERS ──
+function refreshBacklogAndBoard(){
+  const active=document.querySelector('.pg.on')?.id?.replace('pg-','');
+  if(active==='backlog') loadBacklog();
+  else if(active==='board') loadBoard();
+}
+
+// ── SEARCH ──
+function doSearchNav(q){
+  if(!q.trim()) return;
+  showPg('backlog');
   const el=document.getElementById('bl-content');
   el.innerHTML='<div class="loading">Searching…</div>';
-  try{
-    const r=await api('POST','/api/v1/issues/search',{iql,maxResults:50,startAt:0});
-    const issues=r.issues||r;
-    allIssues=issues;
-    renderBacklog(issues,[]);
-    toast(`${issues.length} result${issues.length!==1?'s':''} found`,'info');
-  }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
+  api('POST','/api/v1/issues/search',{iql:q,maxResults:50,startAt:0})
+    .then(r=>{const issues=r.issues||r;allIssues=issues;renderBacklog(issues,[]);toast(`${issues.length} result${issues.length!==1?'s':''}`,'info');})
+    .catch(e=>{el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;});
 }
 
-/* ── NOTIFICATIONS ── */
+// ── NOTIFICATIONS ──
 async function loadNotifications(){
   try{
-    const notes=await api('GET','/api/v1/notifications/unread');
-    document.getElementById('ndot').classList.toggle('on',notes.length>0);
-    const el=document.getElementById('notif-list');
-    el.innerHTML=notes.length?notes.map(n=>`
-      <div class="np-item unread" onclick="markRead(${n.id})">
+    const n=await api('GET','/api/v1/notifications/unread');
+    document.getElementById('ndot').classList.toggle('on',n.length>0);
+    document.getElementById('np-list').innerHTML=n.length?n.map(x=>`
+      <div class="np-item unread" onclick="markRead(${x.id})">
         <div class="np-dot"></div>
-        <div class="np-content">
-          <div class="np-title2">${n.title}</div>
-          <div class="np-body">${n.body}</div>
-          <div class="np-time">${new Date(n.createdAt).toLocaleString()}</div>
-        </div>
-      </div>`).join(''):`<div class="np-empty">🔔 You're all caught up!</div>`;
+        <div><div class="np-title">${x.title}</div><div class="np-body2">${x.body}</div><div class="np-time">${new Date(x.createdAt).toLocaleString()}</div></div>
+      </div>`).join(''):`<div class="np-empty">🔔 All caught up!</div>`;
   }catch(e){}
 }
-function toggleNotifs(){
-  document.getElementById('notif-panel').classList.toggle('on');
-  if(document.getElementById('notif-panel').classList.contains('on')) loadNotifications();
-}
-function closeNotifs(){document.getElementById('notif-panel').classList.remove('on');}
+function toggleNotifs(){document.getElementById('np').classList.toggle('on');if(document.getElementById('np').classList.contains('on'))loadNotifications();}
+function closeNotifs(){document.getElementById('np').classList.remove('on');}
 async function markRead(id){try{await api('POST',`/api/v1/notifications/${id}/read`);loadNotifications();}catch(e){}}
-async function markAllRead(){try{await api('POST','/api/v1/notifications/read-all');loadNotifications();toast('All marked read','ok');}catch(e){}}
+async function markAllRead(){try{await api('POST','/api/v1/notifications/read-all');toast('All marked read','ok');loadNotifications();}catch(e){}}
 
-/* ── TOAST ── */
+// ── TOAST ──
 function toast(msg,type='info'){
   const box=document.getElementById('toast-box');
   const d=document.createElement('div');
   d.className=`toast ${type}`;
-  const icon=type==='err'?'✕':type==='ok'?'✓':'ℹ';
-  d.innerHTML=`<span>${icon}</span> ${msg}`;
+  const icons={ok:'✓',err:'✕',info:'ℹ'};
+  d.innerHTML=`<span>${icons[type]||'ℹ'}</span> ${msg}`;
   box.appendChild(d);
   setTimeout(()=>d.remove(),3500);
 }
 
-/* ── KEYBOARD ── */
+// ── KEYBOARD ──
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeDetail();closeModal();closeNotifs();}
+  if(e.key==='Escape'){closeDP();closeModal();closeNotifs();document.getElementById('status-drop').classList.remove('on');}
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.querySelector('#tnav .tn-search input')?.focus();}
 });
-document.getElementById('login-screen').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// Close status dropdown when clicking outside
+document.addEventListener('click',e=>{
+  if(!document.getElementById('status-wrap')?.contains(e.target))
+    document.getElementById('status-drop').classList.remove('on');
+});
 </script>
 </body>
 </html>
