@@ -58,9 +58,11 @@ builder.Services.AddCors(opts =>
 {
     opts.AddPolicy("PmsCors", p =>
     {
-        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:3000", "http://localhost:5173" };
-        p.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (origins != null && origins.Length > 0)
+            p.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+        else
+            p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
 

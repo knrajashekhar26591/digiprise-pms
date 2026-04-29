@@ -15,17 +15,19 @@ public class IssueService : IIssueService
     private readonly IIssueRepository _issues;
     private readonly IProjectRepository _projects;
     private readonly IUserRepository _users;
+    private readonly ISprintRepository _sprints;
     private readonly IEventBus _eventBus;
     private readonly INotificationService _notifications;
     private readonly ILogger<IssueService> _logger;
 
     public IssueService(IIssueRepository issues, IProjectRepository projects,
-        IUserRepository users, IEventBus eventBus,
+        IUserRepository users, ISprintRepository sprints, IEventBus eventBus,
         INotificationService notifications, ILogger<IssueService> logger)
     {
         _issues = issues;
         _projects = projects;
         _users = users;
+        _sprints = sprints;
         _eventBus = eventBus;
         _notifications = notifications;
         _logger = logger;
@@ -197,19 +199,27 @@ public class IssueService : IIssueService
     public Task<IEnumerable<CommentDto>> GetCommentsAsync(int issueId, int tenantId, CancellationToken ct = default)
         => Task.FromResult<IEnumerable<CommentDto>>(Array.Empty<CommentDto>());
 
+    private static readonly Dictionary<int, string> StatusNames = new()
+    {
+        { 1, "To Do" }, { 2, "In Progress" }, { 3, "In Review" }, { 4, "Done" }
+    };
+    private static string GetStatusName(int id) => StatusNames.TryGetValue(id, out var n) ? n : "To Do";
+
     private async Task<IssueDto?> MapFullAsync(Issue i, CancellationToken ct)
     {
         var assignee = i.AssigneeId.HasValue ? await _users.GetByIdAsync(i.AssigneeId.Value, ct) : null;
         var reporter = await _users.GetByIdAsync(i.ReporterId, ct);
         var project = await _projects.GetByIdAsync(i.ProjectId, ct);
+        Sprint? sprint = null;
+        if (i.SprintId.HasValue) sprint = await _sprints.GetByIdAsync(i.SprintId.Value, ct);
 
         return new IssueDto(
             i.Id, i.IssueKey, i.IssueType.ToString(), i.Summary, i.Description,
             i.ProjectId, project?.Key ?? "",
-            i.StatusId, $"Status_{i.StatusId}", "InProgress",
+            i.StatusId, GetStatusName(i.StatusId), i.StatusId >= 4 ? "Done" : i.StatusId >= 2 ? "InProgress" : "ToDo",
             i.Priority.ToString(), i.AssigneeId, assignee?.DisplayName,
             i.ReporterId, reporter?.DisplayName ?? "Unknown",
-            i.ParentIssueId, i.SprintId, null, i.StoryPoints, i.DueDate,
+            i.ParentIssueId, i.SprintId, sprint?.Name, i.StoryPoints, i.DueDate,
             i.Labels != null ? JsonSerializer.Deserialize<string[]>(i.Labels) : null,
             i.CreatedAt, i.UpdatedAt);
     }
@@ -219,7 +229,7 @@ public class IssueService : IIssueService
         var assignee = i.AssigneeId.HasValue ? await _users.GetByIdAsync(i.AssigneeId.Value, ct) : null;
         return new IssueListItemDto(
             i.Id, i.IssueKey, i.IssueType.ToString(), i.Summary,
-            i.Priority.ToString(), $"Status_{i.StatusId}", "InProgress",
+            i.Priority.ToString(), GetStatusName(i.StatusId), i.StatusId >= 4 ? "Done" : i.StatusId >= 2 ? "InProgress" : "ToDo",
             i.AssigneeId, assignee?.DisplayName, i.StoryPoints, i.UpdatedAt);
     }
 }

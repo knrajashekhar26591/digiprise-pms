@@ -783,10 +783,23 @@ async function doLogin(){
   const email=document.getElementById('le').value.trim();
   const pass=document.getElementById('lp').value;
   const btn=document.getElementById('lbtn');
-  document.getElementById('lerr').style.display='none';
+  const errEl=document.getElementById('lerr');
+  errEl.style.display='none';
   btn.textContent='Logging in…';btn.disabled=true;
   try{
-    const d=await api('POST','/api/v1/auth/login?tenantId=1',{email,password:pass});
+    // Try tenantId=1 first, which is what gets seeded
+    const resp=await fetch('/api/v1/auth/login?tenantId=1',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({email,password:pass})
+    });
+    if(!resp.ok){
+      let msg='Invalid email or password';
+      try{const e=await resp.json();msg=e.detail||e.title||msg;}catch(ex){}
+      throw new Error(msg);
+    }
+    const d=await resp.json();
+    if(!d.accessToken) throw new Error('No token received — check server logs');
     token=d.accessToken;currentUser=d.user;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').classList.add('on');
@@ -796,8 +809,8 @@ async function doLogin(){
     av.title=d.user.displayName;
     onLoggedIn();
   }catch(e){
-    document.getElementById('lerr').textContent=e.message;
-    document.getElementById('lerr').style.display='block';
+    errEl.textContent=e.message;
+    errEl.style.display='block';
   }finally{btn.textContent='Log in';btn.disabled=false;}
 }
 function doLogout(){
