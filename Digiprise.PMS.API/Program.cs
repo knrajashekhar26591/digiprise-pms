@@ -81,17 +81,18 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    // Inline API documentation page at /docs
     app.MapGet("/docs", () => Results.Content(BuildApiDocsHtml(), "text/html"));
-    app.MapGet("/", () => Results.Redirect("/docs"));
 }
 
-app.UseHttpsRedirection();
+// Always serve the SPA UI
+
+// Static files served first - before auth (public assets don't need auth)
+app.UseDefaultFiles();  // serves index.html at /
+app.UseStaticFiles();   // serves wwwroot (full SPA UI)
+
 app.UseCors("PmsCors");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseDefaultFiles();  // serves index.html at /
-app.UseStaticFiles();   // serves wwwroot (full SPA UI)
 
 // Security headers
 app.Use(async (ctx, next) =>
