@@ -1,8 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 8080
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS builder
 WORKDIR /src
 
 COPY ["Digiprise.PMS.API/Digiprise.PMS.API.csproj", "Digiprise.PMS.API/"]
@@ -15,14 +11,12 @@ RUN dotnet restore "Digiprise.PMS.API/Digiprise.PMS.API.csproj"
 
 COPY . .
 WORKDIR "/src/Digiprise.PMS.API"
-RUN dotnet publish "Digiprise.PMS.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Digiprise.PMS.API.csproj" -c Release -o /app/out /p:UseAppHost=false
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=builder /app/out .
 
-# Railway uses $PORT — must listen on 0.0.0.0
-ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-ENTRYPOINT ["dotnet", "Digiprise.PMS.API.dll"]
+CMD ASPNETCORE_URLS=http://+:${PORT:-8080} dotnet Digiprise.PMS.API.dll
