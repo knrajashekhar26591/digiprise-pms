@@ -905,9 +905,20 @@ async function loadBacklog(){
       api('GET',`/api/v1/issues/project/${currentProject.id}`),
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
-    allIssues=issues; sprints=spList;
-    renderBacklog(allIssues, spList);
-    renderAvs(issues,'bl-avs');
+    const saved = localStorage.getItem("issues");
+
+if (saved) {
+    allIssues = JSON.parse(saved);
+    console.log("📦 Loaded from localStorage");
+} else {
+    allIssues = issues;
+    console.log("🌐 Loaded from API");
+}
+
+sprints = spList;
+
+renderBacklog(allIssues, spList);
+    renderAvs(allIssues,'bl-avs');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
 function renderBacklog(issues,spList){
@@ -1576,6 +1587,9 @@ function dropIssue(event, sprintId) {
         issue.sprintId = sprintId;
         console.log("✅ Updated:", issue);
     }
+
+    // 🔥 SAVE TO LOCAL STORAGE
+    localStorage.setItem("issues", JSON.stringify(allIssues));
 
     renderBacklog(allIssues, sprints);
     enableDrag();
