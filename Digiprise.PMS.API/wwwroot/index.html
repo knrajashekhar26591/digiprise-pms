@@ -1564,7 +1564,7 @@ function dropIssue(event, sprintId) {
 
     console.log("Moving issue:", draggedIssueId, "to sprint:", sprintId);
 
-    const issue = allIssues.find(i => i.id == draggedIssueId);
+    const issue = allIssues.find(i => String(i.id) === String(draggedIssueId));
 
     if (issue) {
         issue.sprintId = sprintId;
