@@ -973,7 +973,6 @@ function issueRow(i){
     draggable="true"
     data-id="${i.id}"
     ondragstart="dragStart(event)"
-    onmousedown="event.stopPropagation(); event.preventDefault();"
     onclick="openDP(${i.id})">
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
@@ -1555,24 +1554,23 @@ function allowDrop(event) {
 function dropIssue(event, sprintId) {
     event.preventDefault();
 
-    console.log("Drop triggered");
+    const droppedId = event.dataTransfer.getData("text/plain");
 
-    if (!draggedIssueId) {
-        console.log("No dragged issue");
+    console.log("Drop triggered:", droppedId);
+
+    if (!droppedId) {
+        console.log("❌ No dragged ID");
         return;
     }
 
-    console.log("Moving issue:", draggedIssueId, "to sprint:", sprintId);
-
-    const issue = allIssues.find(i => String(i.id) === String(draggedIssueId));
+    const issue = allIssues.find(i => String(i.id) === String(droppedId));
 
     if (issue) {
         issue.sprintId = sprintId;
+        console.log("✅ Updated:", issue);
     }
 
-    loadBacklog(); // re-render UI
-
-    draggedIssueId = null;
+    loadBacklog();
 }
 </script>
 </body>
