@@ -910,7 +910,7 @@ async function loadBacklog(){
     renderAvs(issues,'bl-avs');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
-function renderBacklog(issues,spList){
+function renderBacklog(allissues,spList){
   const el=document.getElementById('bl-content');
   let html='';
   spList.forEach(s=>{
@@ -1579,7 +1579,8 @@ function dropIssue(event, sprintId) {
         console.log("❌ Issue not found");
     }
 
-    loadBacklog();
+    renderBacklog(allIssues, sprints);
+    enableDrag();
 }
 </script>
 </body>
