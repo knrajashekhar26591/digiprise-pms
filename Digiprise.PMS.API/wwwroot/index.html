@@ -972,7 +972,6 @@ function issueRow(i){
   return `<div class="ir"
         draggable="true"
         data-id="${i.id}"
-        onmousedown="event.stopPropagation()"
         ondragstart="dragStart(event)"
         onclick="openDP(${i.id})">
     <div class="ir-cb"></div>
