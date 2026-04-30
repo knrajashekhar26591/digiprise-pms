@@ -933,7 +933,9 @@ function renderBacklog(issues,spList){
         ${isClosed?`<button class="sp-btn">View sprint</button>`:isActive?`<button class="sp-btn" onclick="event.stopPropagation();doCloseSprint(${s.id})">Complete sprint</button>`:`<button class="sp-btn primary" onclick="event.stopPropagation();doStartSprint(${s.id})">Start sprint</button>`}
         <button class="sp-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
       </div>
-      <div id="spb-${s.id}" class="sp-issues">
+      <div id="spb-${s.id}" class="sp-issues"
+     ondragover="allowDrop(event)"
+     ondrop="dropIssue(event, ${s.id})">
         ${si.length?si.map(i=>issueRow(i)).join(''):`<div style="padding:12px 16px;font-size:13px;color:var(--text3)">No issues. Drag from backlog below.</div>`}
         <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
       </div>
@@ -953,7 +955,9 @@ function renderBacklog(issues,spList){
       <span style="font-size:12px;color:var(--blue2);cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:background .1s" onclick="event.stopPropagation();openCreateSprint()" onmouseover="this.style.background='var(--blue-xlight)'" onmouseout="this.style.background=''">Create sprint</span>
       <button class="sp-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
     </div>
-    <div id="spb-bl" class="sp-issues">
+    <<div id="spb-bl" class="sp-issues"
+     ondragover="allowDrop(event)"
+     ondrop="dropIssue(event, null)">
       ${backlog.length?backlog.map(i=>issueRow(i)).join(''):`<div class="drag-hint">Plan a sprint by dragging work items into it, or by dragging the sprint footer.</div>`}
       <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
     </div>
@@ -965,7 +969,11 @@ function renderBacklog(issues,spList){
 function issueRow(i){
   const s=statusByName(i.statusName);
   const av=i.assigneeName?`<div class="ir-av" style="background:${avc(i.assigneeName)}" title="${i.assigneeName}">${avi(i.assigneeName)}</div>`:`<div class="ir-av" style="background:var(--border)"></div>`;
-  return `<div class="ir" onclick="openDP(${i.id})">
+  return `<div class="ir"
+             draggable="true"
+             data-id="${i.id}"
+             ondragstart="dragStart(event)"
+             onclick="openDP(${i.id})">
     <div class="ir-cb"></div>
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
@@ -1527,6 +1535,44 @@ document.addEventListener('click',e=>{
   if(!document.getElementById('status-wrap')?.contains(e.target))
     document.getElementById('status-drop').classList.remove('on');
 });
+</script>
+<script>
+let draggedIssueId = null;
+
+// 🔥 DRAG FUNCTION (THIS IS WHAT YOU ASKED)
+function dragStart(event) {
+    const row = event.target.closest('.ir');
+    draggedIssueId = row.getAttribute('data-id');
+    console.log("Dragging:", draggedIssueId);
+}
+
+// Allow drop
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+// Drop into sprint
+function dropIssue(event, sprintId) {
+    event.preventDefault();
+
+    console.log("Drop triggered");
+
+    if (!draggedIssueId) {
+        console.log("No dragged issue");
+        return;
+    }
+
+    console.log("Moving issue:", draggedIssueId, "to sprint:", sprintId);
+
+    const issue = issues.find(i => i.id == draggedIssueId);
+    if (issue) {
+        issue.sprintId = sprintId;
+    }
+
+    loadBacklog();
+
+    draggedIssueId = null;
+}
 </script>
 </body>
 </html>
