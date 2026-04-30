@@ -906,7 +906,7 @@ async function loadBacklog(){
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
     allIssues=issues; sprints=spList;
-    renderBacklog(issues,spList);
+    renderBacklog(allIssues, spList);
     renderAvs(issues,'bl-avs');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
