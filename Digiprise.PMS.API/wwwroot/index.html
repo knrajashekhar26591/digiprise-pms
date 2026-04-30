@@ -910,7 +910,7 @@ async function loadBacklog(){
     renderAvs(issues,'bl-avs');
   }catch(e){el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;}
 }
-function renderBacklog(allissues,spList){
+function renderBacklog(issues,spList){
   const el=document.getElementById('bl-content');
   let html='';
   spList.forEach(s=>{
