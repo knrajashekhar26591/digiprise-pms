@@ -970,8 +970,10 @@ function issueRow(i){
   const s=statusByName(i.statusName);
   const av=i.assigneeName?`<div class="ir-av" style="background:${avc(i.assigneeName)}" title="${i.assigneeName}">${avi(i.assigneeName)}</div>`:`<div class="ir-av" style="background:var(--border)"></div>`;
   return `<div class="ir"
-        data-id="${i.id}"
-        onclick="openDP(${i.id})">
+    draggable="true"
+    data-id="${i.id}"
+    ondragstart="dragStart(event)"
+    onclick="openDP(${i.id})">
     <div class="ir-cb"></div>
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
@@ -1537,18 +1539,11 @@ document.addEventListener('click',e=>{
 <script>
 let draggedIssueId = null;
 
-// 🚀 ENABLE DRAG AFTER RENDER
-function enableDrag() {
-    const issues = document.querySelectorAll('.ir');
+function dragStart(event) {
+    const row = event.currentTarget;
+    draggedIssueId = row.getAttribute("data-id");
 
-    issues.forEach(el => {
-        el.draggable = true;
-
-        el.addEventListener("dragstart", function () {
-            draggedIssueId = el.getAttribute("data-id");
-            console.log("🔥 Drag started:", draggedIssueId);
-        });
-    });
+    console.log("🔥 DRAG START:", draggedIssueId);
 }
 
 // Allow drop
