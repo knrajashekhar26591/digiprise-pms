@@ -973,8 +973,8 @@ function issueRow(i){
     draggable="true"
     data-id="${i.id}"
     ondragstart="dragStart(event)"
+    onmousedown="event.stopPropagation(); event.preventDefault();"
     onclick="openDP(${i.id})">
-    <div class="ir-cb"></div>
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
     <span class="ir-sum" title="${i.summary}">${i.summary}</span>
