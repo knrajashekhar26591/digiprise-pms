@@ -1564,13 +1564,13 @@ function dropIssue(event, sprintId) {
 
     console.log("Moving issue:", draggedIssueId, "to sprint:", sprintId);
 
-    const issue = issues.find(i => i.id == draggedIssueId);
+    const issue = allIssues.find(i => i.id == draggedIssueId);
+
     if (issue) {
         issue.sprintId = sprintId;
     }
 
-    loadBacklog();
-    enableDrag(); // 🔥 MUST RE-ENABLE
+    loadBacklog(); // re-render UI
 
     draggedIssueId = null;
 }
