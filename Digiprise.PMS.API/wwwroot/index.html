@@ -970,9 +970,7 @@ function issueRow(i){
   const s=statusByName(i.statusName);
   const av=i.assigneeName?`<div class="ir-av" style="background:${avc(i.assigneeName)}" title="${i.assigneeName}">${avi(i.assigneeName)}</div>`:`<div class="ir-av" style="background:var(--border)"></div>`;
   return `<div class="ir"
-        draggable="true"
         data-id="${i.id}"
-        ondragstart="dragStart(event)"
         onclick="openDP(${i.id})">
     <div class="ir-cb"></div>
     ${typeIc(i.issueType)}
@@ -1539,14 +1537,18 @@ document.addEventListener('click',e=>{
 <script>
 let draggedIssueId = null;
 
-// 🔥 DRAG FUNCTION (THIS IS WHAT YOU ASKED)
-function dragStart(event) {
-    console.log("DRAG START TRIGGERED"); // 👈 ADD THIS
+// 🚀 ENABLE DRAG AFTER RENDER
+function enableDrag() {
+    const issues = document.querySelectorAll('.ir');
 
-    const row = event.target.closest('.ir');
-    draggedIssueId = row.getAttribute('data-id');
+    issues.forEach(el => {
+        el.draggable = true;
 
-    console.log("Dragging:", draggedIssueId);
+        el.addEventListener("dragstart", function () {
+            draggedIssueId = el.getAttribute("data-id");
+            console.log("🔥 Drag started:", draggedIssueId);
+        });
+    });
 }
 
 // Allow drop
@@ -1573,6 +1575,7 @@ function dropIssue(event, sprintId) {
     }
 
     loadBacklog();
+    enableDrag(); // 🔥 MUST RE-ENABLE
 
     draggedIssueId = null;
 }
