@@ -914,7 +914,7 @@ function renderBacklog(issues,spList){
   const el=document.getElementById('bl-content');
   let html='';
   spList.forEach(s=>{
-    const si=issues.filter(i=>i.sprintId===s.id);
+    const si = allIssues.filter(i => i.sprintId == s.id);
     const done=si.filter(i=>statusIdByName(i.statusName)===4).length;
     const prog=si.filter(i=>{const id=statusIdByName(i.statusName);return id===2||id===3;}).length;
     const todo=si.filter(i=>statusIdByName(i.statusName)===1).length;
