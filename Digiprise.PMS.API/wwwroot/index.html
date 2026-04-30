@@ -1561,7 +1561,7 @@ function allowDrop(event) {
 function dropIssue(event, sprintId) {
     event.preventDefault();
 
-    const droppedId = event.dataTransfer.getData("text/plain") || draggedIssueId;
+    const droppedId = event.dataTransfer.getData("text/plain");
 
     console.log("Drop triggered:", droppedId);
 
@@ -1575,8 +1575,6 @@ function dropIssue(event, sprintId) {
     if (issue) {
         issue.sprintId = sprintId;
         console.log("✅ Updated:", issue);
-    } else {
-        console.log("❌ Issue not found");
     }
 
     renderBacklog(allIssues, sprints);
