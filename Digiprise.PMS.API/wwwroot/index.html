@@ -970,10 +970,11 @@ function issueRow(i){
   const s=statusByName(i.statusName);
   const av=i.assigneeName?`<div class="ir-av" style="background:${avc(i.assigneeName)}" title="${i.assigneeName}">${avi(i.assigneeName)}</div>`:`<div class="ir-av" style="background:var(--border)"></div>`;
   return `<div class="ir"
-             draggable="true"
-             data-id="${i.id}"
-             ondragstart="dragStart(event)"
-             onclick="openDP(${i.id})">
+        draggable="true"
+        data-id="${i.id}"
+        onmousedown="event.stopPropagation()"
+        ondragstart="dragStart(event)"
+        onclick="openDP(${i.id})">
     <div class="ir-cb"></div>
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
@@ -1541,8 +1542,11 @@ let draggedIssueId = null;
 
 // 🔥 DRAG FUNCTION (THIS IS WHAT YOU ASKED)
 function dragStart(event) {
+    console.log("DRAG START TRIGGERED"); // 👈 ADD THIS
+
     const row = event.target.closest('.ir');
     draggedIssueId = row.getAttribute('data-id');
+
     console.log("Dragging:", draggedIssueId);
 }
 
