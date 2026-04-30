@@ -1540,9 +1540,16 @@ let draggedIssueId = null;
 
 function dragStart(event) {
     const row = event.currentTarget;
+
     draggedIssueId = row.getAttribute("data-id");
 
     console.log("🔥 DRAG START:", draggedIssueId);
+
+    // 🔥 THIS LINE IS THE FIX
+    event.dataTransfer.setData("text/plain", draggedIssueId);
+
+    // 👇 ADD THIS (IMPORTANT FOR SOME BROWSERS)
+    event.dataTransfer.effectAllowed = "move";
 }
 
 // Allow drop
@@ -1568,6 +1575,8 @@ function dropIssue(event, sprintId) {
     if (issue) {
         issue.sprintId = sprintId;
         console.log("✅ Updated:", issue);
+    } else {
+        console.log("❌ Issue not found");
     }
 
     loadBacklog();
