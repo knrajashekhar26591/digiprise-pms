@@ -905,7 +905,8 @@ async function loadBacklog(){
       api('GET',`/api/v1/issues/project/${currentProject.id}`),
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
-    const saved = localStorage.getItem("issues");
+    const key = `issues_${currentProject.id}`;
+    const saved = localStorage.getItem(key);
 
 if (saved) {
     allIssues = JSON.parse(saved);
@@ -1589,7 +1590,8 @@ function dropIssue(event, sprintId) {
     }
 
     // 🔥 SAVE TO LOCAL STORAGE
-    localStorage.setItem("issues", JSON.stringify(allIssues));
+    const key = `issues_${currentProject.id}`;
+    localStorage.setItem(key, JSON.stringify(allIssues));
 
     renderBacklog(allIssues, sprints);
     enableDrag();
