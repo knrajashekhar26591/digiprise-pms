@@ -1561,7 +1561,7 @@ function allowDrop(event) {
 function dropIssue(event, sprintId) {
     event.preventDefault();
 
-    const droppedId = event.dataTransfer.getData("text/plain");
+    const droppedId = event.dataTransfer.getData("text/plain") || draggedIssueId;
 
     console.log("Drop triggered:", droppedId);
 
