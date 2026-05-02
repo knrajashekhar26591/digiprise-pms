@@ -502,7 +502,7 @@ textarea.mi{resize:vertical;min-height:80px}
             <input type="text" placeholder="Search backlog" id="bl-q" oninput="filterBL(this.value)"/>
           </div>
           <div class="bl-avs" id="bl-avs"></div>
-          <button class="bl-btn"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+          <button class="bl-btn" onclick="applyIqlFilter('bl-q')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
           <div style="margin-left:auto;display:flex;gap:8px">
             <button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button>
             <button class="bl-btn" onclick="openCreateSprint()">+ Create sprint</button>
@@ -517,7 +517,7 @@ textarea.mi{resize:vertical;min-height:80px}
           <div class="board-bar">
             <span class="board-sprint-name" id="board-sprint-name">Board</span>
             <div class="bl-avs" style="margin-left:8px" id="board-avs"></div>
-            <button class="bl-btn" style="margin-left:8px"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+            <button class="bl-btn" style="margin-left:8px" onclick="applyIqlFilter('board-q')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
             <div style="margin-left:auto"><button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button></div>
           </div>
           <div class="board-scroll"><div class="board-cols" id="board-cols"></div></div>
@@ -1538,8 +1538,27 @@ function doSearchNav(q){
   const el=document.getElementById('bl-content');
   el.innerHTML='<div class="loading">Searching…</div>';
   api('POST','/api/v1/issues/search',{iql:q,maxResults:50,startAt:0})
-    .then(r=>{const issues=r.issues||r;allIssues=issues;renderBacklog(issues,[]);toast(`${issues.length} result${issues.length!==1?'s':''}`,'info');})
+    .then(r=>{const issues=r.issues||r;allIssues=issues;renderBacklog(issues,sprints||[]);toast(`${issues.length} result${issues.length!==1?'s':''}`,'info');})
     .catch(e=>{el.innerHTML=`<div class="loading">Error: ${e.message}</div>`;});
+}
+function applyIqlFilter(inputId) {
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  const q = el.value.trim();
+  if(!q) {
+    if(inputId === 'bl-q') loadBacklog();
+    if(inputId === 'board-q') loadBoard();
+    return;
+  }
+  api('POST','/api/v1/issues/search',{iql:q,maxResults:50,startAt:0})
+    .then(r=>{
+      const issues = r.issues || r;
+      allIssues = issues;
+      if(inputId === 'bl-q') renderBacklog(issues, sprints || []);
+      if(inputId === 'board-q') renderBoard(issues);
+      toast(`${issues.length} result(s)`,'info');
+    })
+    .catch(e=>toast(`Filter Error: ${e.message}`, 'err'));
 }
 
 // ── NOTIFICATIONS ──
