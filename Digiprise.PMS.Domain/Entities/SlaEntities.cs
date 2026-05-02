@@ -11,12 +11,14 @@ public class SlaPolicy : BaseEntity, ITenantScoped
     public Priority? TargetPriority { get; private set; } // Null means applies to all priorities
     public int ResponseSecs { get; private set; }
     public int ResolutionSecs { get; private set; }
+    public string? PauseStatuses { get; private set; } // JSON array of StatusIds where clock stops
+
 
     public Project? Project { get; private set; }
 
     protected SlaPolicy() { }
 
-    public static SlaPolicy Create(int tenantId, int projectId, string name, Priority? targetPriority, int responseSecs, int resolutionSecs)
+    public static SlaPolicy Create(int tenantId, int projectId, string name, Priority? targetPriority, int responseSecs, int resolutionSecs, string? pauseStatuses = null)
     {
         return new SlaPolicy
         {
@@ -25,9 +27,13 @@ public class SlaPolicy : BaseEntity, ITenantScoped
             Name = name,
             TargetPriority = targetPriority,
             ResponseSecs = responseSecs,
-            ResolutionSecs = resolutionSecs
+            ResolutionSecs = resolutionSecs,
+            PauseStatuses = pauseStatuses
         };
     }
+
+    public void UpdatePauseStatuses(string? json) { PauseStatuses = json; Touch(); }
+
 }
 
 public class SlaBreach : BaseEntity
@@ -60,10 +66,20 @@ public class SlaBreach : BaseEntity
         };
     }
 
+    public void AddPauseTime(int seconds)
+    {
+        if (State == "Breached") return;
+        PausedSeconds += seconds;
+        BreachAt = BreachAt.AddSeconds(seconds);
+        Touch();
+    }
+
     public void MarkBreached()
     {
+        if (State == "Breached") return;
         State = "Breached";
         BreachedAt = DateTimeOffset.UtcNow;
         Touch();
     }
+
 }

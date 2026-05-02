@@ -7,6 +7,8 @@ using Digiprise.PMS.Domain.Entities;
 using Digiprise.PMS.Domain.Events;
 using Digiprise.PMS.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Digiprise.PMS.Application.Services;
 
@@ -282,11 +284,24 @@ public class PasswordHasher : IPasswordHasher
 public class InMemoryEventBus : IEventBus
 {
     private readonly ILogger<InMemoryEventBus> _logger;
-    public InMemoryEventBus(ILogger<InMemoryEventBus> logger) => _logger = logger;
-
-    public Task PublishAsync<T>(T domainEvent, CancellationToken ct = default) where T : class
+    private readonly IServiceProvider _serviceProvider;
+    public InMemoryEventBus(ILogger<InMemoryEventBus> logger, IServiceProvider serviceProvider)
+    {
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+    }
+    public async Task PublishAsync<T>(T domainEvent, CancellationToken ct = default) where T : class
     {
         _logger.LogDebug("Domain event published: {EventType}", typeof(T).Name);
-        return Task.CompletedTask;
+        
+        using var scope = _serviceProvider.CreateScope();
+        var handlers = scope.ServiceProvider.GetServices<INotificationHandler<T>>();
+        foreach (var handler in handlers)
+        {
+            try { await handler.Handle(domainEvent, ct); }
+            catch (Exception ex) { _logger.LogError(ex, "Error handling event {EventType}", typeof(T).Name); }
+        }
     }
 }
+
+

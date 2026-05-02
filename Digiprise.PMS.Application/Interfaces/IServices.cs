@@ -110,6 +110,19 @@ public interface ISlaService
 {
     Task<IEnumerable<SlaPolicyDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<SlaBreachDto>> GetBreachesByIssueAsync(int issueId, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<SlaBreachDto>> GetActiveBreachesByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<SlaPolicyDto> CreatePolicyAsync(CreateSlaPolicyRequest request, int tenantId, CancellationToken ct = default);
+
+}
+
+public interface ISlaMonitorService
+{
+    Task ProcessBreachesAsync(CancellationToken ct = default);
+    Task EvaluateIssueSlaAsync(int issueId, int tenantId, CancellationToken ct = default);
+}
+
+public interface INotificationHandler<T> where T : class
+{
+    Task Handle(T domainEvent, CancellationToken ct);
 }
 

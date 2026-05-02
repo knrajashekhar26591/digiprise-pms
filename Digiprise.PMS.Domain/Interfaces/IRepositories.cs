@@ -76,5 +76,9 @@ public interface ISlaRepository : IRepository<SlaPolicy>
 {
     Task<IEnumerable<SlaPolicy>> GetByProjectAsync(int projectId, CancellationToken ct = default);
     Task<IEnumerable<SlaBreach>> GetBreachesByIssueAsync(int issueId, CancellationToken ct = default);
+    Task<IEnumerable<SlaBreach>> GetActiveBreachesAsync(CancellationToken ct = default);
+    Task AddBreachAsync(SlaBreach breach, CancellationToken ct = default);
+    Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default);
 }
+
 

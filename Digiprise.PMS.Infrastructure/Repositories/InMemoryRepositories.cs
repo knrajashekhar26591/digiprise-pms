@@ -213,5 +213,21 @@ public class SlaRepository : InMemoryRepository<SlaPolicy>, ISlaRepository
 
     public Task<IEnumerable<SlaBreach>> GetBreachesByIssueAsync(int issueId, CancellationToken ct = default)
         => Task.FromResult<IEnumerable<SlaBreach>>(_db.SlaBreaches.Values.Where(s => s.IssueId == issueId).ToList());
+
+    public Task<IEnumerable<SlaBreach>> GetActiveBreachesAsync(CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<SlaBreach>>(_db.SlaBreaches.Values.Where(s => s.State != "Breached").ToList());
+
+    public Task AddBreachAsync(SlaBreach breach, CancellationToken ct = default)
+    {
+        _db.SlaBreaches.TryAdd(breach.Id, breach);
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default)
+    {
+        _db.SlaBreaches[breach.Id] = breach;
+        return Task.CompletedTask;
+    }
 }
+
 

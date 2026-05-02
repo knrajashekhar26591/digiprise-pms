@@ -92,8 +92,13 @@ public class SlaService : ISlaService
     public async Task<IEnumerable<SlaBreachDto>> GetBreachesByIssueAsync(int issueId, int tenantId, CancellationToken ct = default)
     {
         var breaches = await _sla.GetBreachesByIssueAsync(issueId, ct);
-        // SlaBreach doesn't have TenantId directly, but linked via Issue/Policy
         return breaches.Select(b => MapBreach(b));
+    }
+
+    public async Task<IEnumerable<SlaBreachDto>> GetActiveBreachesByProjectAsync(int projectId, int tenantId, CancellationToken ct = default)
+    {
+        var active = await _sla.GetActiveBreachesAsync(ct);
+        return active.Where(b => b.Issue?.ProjectId == projectId && b.Issue?.TenantId == tenantId).Select(b => MapBreach(b));
     }
 
     public async Task<SlaPolicyDto> CreatePolicyAsync(CreateSlaPolicyRequest request, int tenantId, CancellationToken ct = default)

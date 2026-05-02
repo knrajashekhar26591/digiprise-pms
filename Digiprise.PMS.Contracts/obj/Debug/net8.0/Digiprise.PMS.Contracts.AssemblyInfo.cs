@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Digiprise.PMS.Contracts")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f16902c0e81744d182a6aa456697015fc5a6de7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77b30c78ad1b1d7261cf75dbee080820f5627703")]
 [assembly: System.Reflection.AssemblyProductAttribute("Digiprise.PMS.Contracts")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Digiprise.PMS.Contracts")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

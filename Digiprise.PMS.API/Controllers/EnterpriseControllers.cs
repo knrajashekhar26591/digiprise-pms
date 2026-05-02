@@ -62,6 +62,12 @@ public class SlaController : BaseController
     public async Task<IActionResult> GetBreaches(int issueId, CancellationToken ct)
         => Ok(await _sla.GetBreachesByIssueAsync(issueId, CurrentTenantId, ct));
 
+
+    [HttpGet("project/{projectId:int}/active-breaches")]
+    public async Task<IActionResult> GetActiveBreaches(int projectId, CancellationToken ct)
+        => Ok(await _sla.GetActiveBreachesByProjectAsync(projectId, CurrentTenantId, ct));
+
+
     [HttpPost("policies")]
     public async Task<IActionResult> CreatePolicy([FromBody] CreateSlaPolicyRequest request, CancellationToken ct)
     {

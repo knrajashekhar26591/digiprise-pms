@@ -253,5 +253,23 @@ public class EfSlaRepository : EfRepository<SlaPolicy>, ISlaRepository
     {
         return await _context.SlaBreaches.Where(s => s.IssueId == issueId).ToListAsync(ct);
     }
+
+    public async Task<IEnumerable<SlaBreach>> GetActiveBreachesAsync(CancellationToken ct = default)
+    {
+        return await _context.SlaBreaches.Include(s => s.Issue).Include(s => s.Policy).Where(s => s.State != "Breached").ToListAsync(ct);
+    }
+
+    public async Task AddBreachAsync(SlaBreach breach, CancellationToken ct = default)
+    {
+        _context.SlaBreaches.Add(breach);
+        await Task.CompletedTask;
+    }
+
+    public async Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default)
+    {
+        _context.SlaBreaches.Update(breach);
+        await Task.CompletedTask;
+    }
 }
+
 

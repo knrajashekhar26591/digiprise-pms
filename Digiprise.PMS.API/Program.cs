@@ -58,12 +58,19 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ICostService, CostService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
+builder.Services.AddScoped<ISlaMonitorService, SlaMonitorService>();
+builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueCreatedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();
+builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueStatusChangedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();
+
+
 
 
 // ── Infrastructure Services ────────────────────────────────────────────
 builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<IEventBus, InMemoryEventBus>();
+builder.Services.AddHostedService<SlaBackgroundWorker>();
+
 
 // ── Authentication (custom JWT handler, no external packages) ─────────
 builder.Services.AddAuthentication("PmsJwt")
