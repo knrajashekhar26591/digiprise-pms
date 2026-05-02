@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digiprise.PMS.API", "Digipr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digiprise.PMS.Tests", "Digiprise.PMS.Tests\Digiprise.PMS.Tests.csproj", "{95BDABFB-F1BD-448B-BBC2-875FA7EF8304}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digiprise.PMS.UI", "Digiprise.PMS.UI\Digiprise.PMS.UI.csproj", "{9706A6B1-715D-44EF-91FC-160A9E0D650C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{95BDABFB-F1BD-448B-BBC2-875FA7EF8304}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95BDABFB-F1BD-448B-BBC2-875FA7EF8304}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95BDABFB-F1BD-448B-BBC2-875FA7EF8304}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9706A6B1-715D-44EF-91FC-160A9E0D650C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9706A6B1-715D-44EF-91FC-160A9E0D650C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9706A6B1-715D-44EF-91FC-160A9E0D650C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9706A6B1-715D-44EF-91FC-160A9E0D650C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

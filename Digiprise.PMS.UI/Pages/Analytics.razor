@@ -1,0 +1,193 @@
+@page "/analytics"
+@using Digiprise.PMS.Contracts.DTOs
+@inject HttpClient Http
+
+<PageTitle>Advanced Analytics - Digiprise PMS</PageTitle>
+
+<div class="analytics-container">
+    <header class="dashboard-header">
+        <h1>Advanced Analytics</h1>
+        <p class="subtitle">Real-time performance metrics for your project</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Velocity</h3>
+            <div class="chart-placeholder velocity-chart">
+                @if (velocityData != null)
+                {
+                    @foreach (var item in velocityData)
+                    {
+                        <div class="bar-group">
+                            <div class="bar committed" style="height: @(item.Committed * 2)px"></div>
+                            <div class="bar completed" style="height: @(item.Completed * 2)px"></div>
+                            <span class="label">@item.SprintName</span>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="legend">
+                <span class="dot committed"></span> Committed
+                <span class="dot completed"></span> Completed
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <h3>SLA Performance</h3>
+            <div class="sla-list">
+                @if (slaData != null)
+                {
+                    @foreach (var item in slaData)
+                    {
+                        <div class="sla-item">
+                            <div class="sla-info">
+                                <span>@item.PolicyName</span>
+                                <span>@item.MetPercentage% Met</span>
+                            </div>
+                            <div class="progress-bg">
+                                <div class="progress-fill" style="width: @item.MetPercentage%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card full-width">
+        <h3>Cycle Time (Avg Days)</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Issue Key</th>
+                    <th>Cycle Time</th>
+                    <th>Trend</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (cycleTimeData != null)
+                {
+                    @foreach (var item in cycleTimeData)
+                    {
+                        <tr>
+                            <td>@item.IssueKey</td>
+                            <td>@item.Days Days</td>
+                            <td><span class="trend-up">↑</span></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .analytics-container {
+        padding: 2rem;
+        background: #f8fafc;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        font-weight: 800;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .full-width {
+        grid-column: span 2;
+        margin-top: 2rem;
+    }
+
+    .chart-placeholder {
+        height: 250px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        padding: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .bar-group {
+        display: flex;
+        gap: 4px;
+        align-items: flex-end;
+        position: relative;
+    }
+
+    .bar {
+        width: 20px;
+        border-radius: 4px 4px 0 0;
+        transition: height 0.3s ease;
+    }
+
+    .committed { background: #cbd5e1; }
+    .completed { background: #3b82f6; }
+
+    .legend {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    .progress-bg { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+    .progress-fill { height: 100%; background: #10b981; }
+
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .data-table th { text-align: left; padding: 1rem; border-bottom: 1px solid #e2e8f0; color: #64748b; }
+    .data-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
+</style>
+
+@code {
+    private List<VelocityReportDto>? velocityData;
+    private List<SlaPerformanceDto>? slaData;
+    private List<CycleTimeReportDto>? cycleTimeData;
+
+    protected override void OnInitialized()
+    {
+        // Mock data for demo
+        velocityData = new List<VelocityReportDto>
+        {
+            new("Sprint 1", 40, 35),
+            new("Sprint 2", 45, 42),
+            new("Sprint 3", 50, 48),
+            new("Sprint 4", 42, 45)
+        };
+
+        slaData = new List<SlaPerformanceDto>
+        {
+            new("Response SLA", 92, 8, 92),
+            new("Resolution SLA", 85, 15, 85),
+            new("High Priority SLA", 100, 0, 100)
+        };
+
+        cycleTimeData = new List<CycleTimeReportDto>
+        {
+            new("PMS-101", 3.2),
+            new("PMS-102", 1.5),
+            new("PMS-103", 5.8),
+            new("PMS-104", 2.1)
+        };
+    }
+}
