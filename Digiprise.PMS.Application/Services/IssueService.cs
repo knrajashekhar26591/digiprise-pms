@@ -142,11 +142,20 @@ public class IssueService : IIssueService
 
         if (request.Summary != null) issue.UpdateSummary(request.Summary, currentUserId);
         if (request.Description != null) issue.UpdateDescription(request.Description, currentUserId);
-        if (request.AssigneeId != issue.AssigneeId) issue.Assign(request.AssigneeId, currentUserId);
+        
+        // Only update if not null. Treat 0 as "clear" (null).
+        if (request.AssigneeId.HasValue) 
+            issue.Assign(request.AssigneeId.Value == 0 ? null : request.AssigneeId.Value, currentUserId);
+            
         if (request.Priority != null && Enum.TryParse<Priority>(request.Priority, true, out var p))
             issue.ChangePriority(p, currentUserId);
-        if (request.StoryPoints != null) issue.SetStoryPoints(request.StoryPoints, currentUserId);
-        if (request.SprintId != null) issue.AssignToSprint(request.SprintId, currentUserId);
+            
+        if (request.StoryPoints.HasValue) 
+            issue.SetStoryPoints(request.StoryPoints.Value, currentUserId);
+            
+        if (request.SprintId.HasValue) 
+            issue.AssignToSprint(request.SprintId.Value == 0 ? null : request.SprintId.Value, currentUserId);
+            
         if (request.Labels != null) issue.SetLabels(JsonSerializer.Serialize(request.Labels));
         if (request.StartDate != null) issue.SetStartDate(request.StartDate, currentUserId);
         if (request.DueDate != null) issue.SetDueDate(request.DueDate, currentUserId);
@@ -198,11 +207,11 @@ public class IssueService : IIssueService
             switch (request.Action?.ToLower())
             {
                 case "assign" when int.TryParse(request.Value, out var uid):
-                    issue.Assign(uid, currentUserId); break;
+                    issue.Assign(uid == 0 ? null : uid, currentUserId); break;
                 case "setpriority" when Enum.TryParse<Priority>(request.Value, true, out var pri):
                     issue.ChangePriority(pri, currentUserId); break;
                 case "movetosprint" when int.TryParse(request.Value, out var sid):
-                    issue.AssignToSprint(sid, currentUserId); break;
+                    issue.AssignToSprint(sid == 0 ? null : sid, currentUserId); break;
             }
             await _issues.UpdateAsync(issue, ct);
         }

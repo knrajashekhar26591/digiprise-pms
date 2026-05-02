@@ -13,15 +13,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+                   ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Railway provides the database URL in 'postgresql://user:pass@host:port/db' format
 // EF Core / Npgsql requires the 'Host=...;Port=...;' format
-if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres"))
+if (!string.IsNullOrEmpty(connectionString) && (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
 {
     var uri = new Uri(connectionString);
     var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Disable;";
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};SslMode=Prefer;Trust Server Certificate=true;";
 }
 
 // ── Entity Framework Core Database ──────────────────────────────────────
