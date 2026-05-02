@@ -4,6 +4,7 @@ using Digiprise.PMS.API.Middleware;
 using Digiprise.PMS.Application.Interfaces;
 using Digiprise.PMS.Application.Services;
 using Digiprise.PMS.Domain.Interfaces;
+using Digiprise.PMS.Domain.Entities;
 using Digiprise.PMS.Infrastructure.Data;
 using Digiprise.PMS.Infrastructure.Repositories;
 using Digiprise.PMS.Infrastructure.Services;
@@ -44,6 +45,12 @@ builder.Services.AddScoped<ICostRepository, EfCostRepository>();
 builder.Services.AddScoped<IBudgetRepository, EfBudgetRepository>();
 builder.Services.AddScoped<ISlaRepository, EfSlaRepository>();
 builder.Services.AddScoped<IAutomationRepository, EfAutomationRepository>();
+builder.Services.AddScoped<IReportingRepository, EfReportingRepository>();
+builder.Services.AddScoped<IRepository<SystemSetting>, EfRepository<SystemSetting>>();
+builder.Services.AddScoped<IRepository<TenantSetting>, EfRepository<TenantSetting>>();
+builder.Services.AddScoped<IRepository<UserInvite>, EfRepository<UserInvite>>();
+
+
 
 
 
@@ -62,6 +69,10 @@ builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
 builder.Services.AddScoped<ISlaMonitorService, SlaMonitorService>();
 builder.Services.AddScoped<IAutomationService, AutomationService>();
+builder.Services.AddScoped<IReportingService, ReportingService>();
+builder.Services.AddScoped<ISystemAdminService, SystemAdminService>();
+
+
 
 builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueCreatedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();
 builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueStatusChangedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();

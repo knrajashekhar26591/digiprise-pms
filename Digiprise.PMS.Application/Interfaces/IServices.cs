@@ -1,5 +1,6 @@
 using Digiprise.PMS.Contracts.DTOs;
 using Digiprise.PMS.Contracts.Requests;
+using Digiprise.PMS.Domain.Entities;
 
 namespace Digiprise.PMS.Application.Interfaces;
 
@@ -112,7 +113,6 @@ public interface ISlaService
     Task<IEnumerable<SlaBreachDto>> GetBreachesByIssueAsync(int issueId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<SlaBreachDto>> GetActiveBreachesByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<SlaPolicyDto> CreatePolicyAsync(CreateSlaPolicyRequest request, int tenantId, CancellationToken ct = default);
-
 }
 
 public interface ISlaMonitorService
@@ -128,10 +128,23 @@ public interface IAutomationService
     Task ExecuteAsync(string triggerType, object context, int tenantId, CancellationToken ct = default);
 }
 
+public interface IReportingService
+{
+    Task<IEnumerable<VelocityReportDto>> GetVelocityAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<CycleTimeReportDto>> GetCycleTimeAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<SlaPerformanceDto>> GetSlaPerformanceAsync(int projectId, int tenantId, CancellationToken ct = default);
+}
+
+public interface ISystemAdminService
+{
+    Task<IEnumerable<Tenant>> GetTenantsAsync(CancellationToken ct = default);
+    Task<Tenant> CreateTenantAsync(string name, string subdomain, CancellationToken ct = default);
+    Task<string> InviteUserAsync(int tenantId, string email, string role, CancellationToken ct = default);
+    Task<IEnumerable<SystemSetting>> GetSystemSettingsAsync(CancellationToken ct = default);
+    Task UpdateSystemSettingAsync(string key, string value, CancellationToken ct = default);
+}
 
 public interface INotificationHandler<T> where T : class
 {
     Task Handle(T domainEvent, CancellationToken ct);
 }
-
-

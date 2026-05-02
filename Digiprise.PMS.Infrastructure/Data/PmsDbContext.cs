@@ -38,6 +38,13 @@ public class PmsDbContext : DbContext
     public DbSet<CostEntry> CostEntries { get; set; } = null!;
     public DbSet<SlaPolicy> SlaPolicies { get; set; } = null!;
     public DbSet<SlaBreach> SlaBreaches { get; set; } = null!;
+    public DbSet<ReportDefinition> ReportDefinitions { get; set; } = null!;
+    public DbSet<SystemSetting> SystemSettings { get; set; } = null!;
+    public DbSet<TenantSetting> TenantSettings { get; set; } = null!;
+    public DbSet<UserInvite> UserInvites { get; set; } = null!;
+
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,6 +86,9 @@ public class PmsDbContext : DbContext
         modelBuilder.Entity<SlaPolicy>().HasOne(s => s.Project).WithMany().HasForeignKey(s => s.ProjectId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<SlaBreach>().HasOne(s => s.Issue).WithMany().HasForeignKey(s => s.IssueId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<SlaBreach>().HasOne(s => s.Policy).WithMany().HasForeignKey(s => s.PolicyId).OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ReportDefinition>().HasOne(r => r.Project).WithMany().HasForeignKey(r => r.ProjectId).OnDelete(DeleteBehavior.Cascade);
+
 
         // Global Query Filters for Tenant Isolation
         foreach (var entity in modelBuilder.Model.GetEntityTypes()

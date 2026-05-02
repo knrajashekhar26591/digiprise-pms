@@ -290,3 +290,83 @@ public class AutomationRule : BaseEntity
     public void Toggle() { IsActive = !IsActive; Touch(); }
     public void RecordRun() { LastRunAt = DateTime.UtcNow; Touch(); }
 }
+
+// ── Report Definition ────────────────────────────────────────────────
+public class ReportDefinition : BaseEntity
+{
+    public int ProjectId { get; private set; }
+    public string Name { get; private set; } = string.Empty;
+    public string Type { get; private set; } = "Velocity"; // Velocity, CycleTime, LeadTime, SlaPerformance
+    public string Config { get; private set; } = "{}"; // JSON
+    public bool IsPublic { get; private set; }
+    public int CreatedByUserId { get; private set; }
+
+    public Project? Project { get; private set; }
+
+    protected ReportDefinition() { }
+
+    public static ReportDefinition Create(int projectId, string name, string type, string config, int createdBy)
+    {
+        return new ReportDefinition
+        {
+            ProjectId = projectId,
+            Name = name,
+            Type = type,
+            Config = config,
+            CreatedByUserId = createdBy,
+            IsPublic = true
+        };
+    }
+}
+
+// ── Settings ─────────────────────────────────────────────────────────
+public class SystemSetting : BaseEntity
+{
+    public string Key { get; private set; } = string.Empty;
+    public string Value { get; private set; } = string.Empty;
+    public string Group { get; private set; } = "General";
+    
+    public static SystemSetting Create(string key, string value, string group = "General")
+        => new() { Key = key, Value = value, Group = group };
+
+    public void UpdateValue(string value) { Value = value; Touch(); }
+}
+
+public class TenantSetting : BaseEntity, ITenantScoped
+{
+    public int TenantId { get; private set; }
+    public string Key { get; private set; } = string.Empty;
+    public string Value { get; private set; } = string.Empty;
+
+    public static TenantSetting Create(int tenantId, string key, string value)
+        => new() { TenantId = tenantId, Key = key, Value = value };
+
+    public void UpdateValue(string value) { Value = value; Touch(); }
+}
+
+public class UserInvite : BaseEntity, ITenantScoped
+{
+    public int TenantId { get; private set; }
+    public string Email { get; private set; } = string.Empty;
+    public string Token { get; private set; } = string.Empty;
+    public string Role { get; private set; } = "User";
+    public DateTime ExpiryAt { get; private set; }
+    public bool IsUsed { get; private set; }
+
+    public static UserInvite Create(int tenantId, string email, string role, int expiryDays = 7)
+    {
+        return new UserInvite
+        {
+            TenantId = tenantId,
+            Email = email.ToLowerInvariant(),
+            Token = Guid.NewGuid().ToString("N"),
+            Role = role,
+            ExpiryAt = DateTime.UtcNow.AddDays(expiryDays)
+        };
+    }
+
+    public void MarkUsed() { IsUsed = true; Touch(); }
+}
+
+
+

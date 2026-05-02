@@ -51,3 +51,8 @@ public record CostEntryDto(int Id, int IssueId, string IssueKey, int UserId, str
 public record SlaPolicyDto(int Id, int ProjectId, string Name, string? TargetPriority, int ResponseSecs, int ResolutionSecs);
 public record SlaBreachDto(long Id, int IssueId, int PolicyId, string Type, string State, DateTimeOffset StartedAt, DateTimeOffset BreachAt, DateTimeOffset? BreachedAt);
 public record AutomationRuleDto(int Id, int ProjectId, string Name, bool IsActive, string TriggerConfig, string ConditionConfig, string ActionConfig, DateTime? LastRunAt);
+public record ChartDataDto(string Label, double Value);
+public record VelocityReportDto(string SprintName, int Committed, int Completed);
+public record CycleTimeReportDto(string IssueKey, double Days);
+public record SlaPerformanceDto(string PolicyName, int Met, int Breached, double MetPercentage);
+

@@ -292,5 +292,16 @@ public class EfAutomationRepository : EfRepository<AutomationRule>, IAutomationR
     }
 }
 
+public class EfReportingRepository : EfRepository<ReportDefinition>, IReportingRepository
+{
+    public EfReportingRepository(PmsDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<ReportDefinition>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await _context.ReportDefinitions.Where(r => r.ProjectId == projectId).ToListAsync(ct);
+    }
+}
+
+
 
 

@@ -86,4 +86,7 @@ public interface IAutomationRepository : IRepository<AutomationRule>
     Task<IEnumerable<AutomationRule>> GetByProjectAsync(int projectId, CancellationToken ct = default);
     Task<IEnumerable<AutomationRule>> GetActiveRulesAsync(int tenantId, CancellationToken ct = default);
 }
-
+public interface IReportingRepository : IRepository<ReportDefinition>
+{
+    Task<IEnumerable<ReportDefinition>> GetByProjectAsync(int projectId, CancellationToken ct = default);
+}
