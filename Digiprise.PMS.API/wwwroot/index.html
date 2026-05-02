@@ -920,8 +920,54 @@ textarea.mi{resize:vertical;min-height:80px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 <script>
 const API='';
-let token=null,currentUser=null,projects=[],currentProject=null,sprints=[],allIssues=[],tenantUsers=[];
+let token = localStorage.getItem('token');
+let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+let currentProject = JSON.parse(localStorage.getItem('currentProject') || 'null');
+let lastActivity = parseInt(localStorage.getItem('lastActivity') || '0', 10);
+let projects=[], sprints=[], allIssues=[], tenantUsers=[];
 let connection=null;
+
+// 1 Hour Inactivity check (3600000 ms)
+function checkAuthActivity() {
+  if (token) {
+    if (Date.now() - lastActivity > 3600000) {
+      doLogout(true); // auto logoff
+    } else {
+      localStorage.setItem('lastActivity', Date.now().toString());
+    }
+  }
+}
+
+// Track activity globally
+['click', 'keydown', 'scroll'].forEach(evt => 
+  document.addEventListener(evt, () => {
+    if(token) {
+      lastActivity = Date.now();
+      localStorage.setItem('lastActivity', lastActivity.toString());
+    }
+  })
+);
+
+// Auto init if logged in
+window.addEventListener('DOMContentLoaded', () => {
+  if (token) {
+    if (Date.now() - lastActivity > 3600000) {
+      doLogout(true);
+    } else {
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('app').classList.add('on');
+      const av=document.getElementById('user-av');
+      if(currentUser) {
+        av.textContent=avi(currentUser.displayName);
+        av.style.background=avc(currentUser.displayName);
+        av.title=currentUser.displayName;
+      }
+      onLoggedIn();
+      setInterval(checkAuthActivity, 60000); // Check every minute
+    }
+  }
+});
+
 function initSignalR() {
   if (connection) return;
   connection = new signalR.HubConnectionBuilder()
@@ -1001,6 +1047,12 @@ async function doLogin(){
     const d=await resp.json();
     if(!d.accessToken) throw new Error('No token received — check server logs');
     token=d.accessToken;currentUser=d.user;
+    
+    // Save state
+    localStorage.setItem('token', token);
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    localStorage.setItem('lastActivity', Date.now().toString());
+    
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').classList.add('on');
     const av=document.getElementById('user-av');
@@ -1008,16 +1060,22 @@ async function doLogin(){
     av.style.background=avc(d.user.displayName);
     av.title=d.user.displayName;
     onLoggedIn();
+    setInterval(checkAuthActivity, 60000); // Start 1-min check loop
   }catch(e){
     errEl.textContent=e.message;
     errEl.style.display='block';
   }finally{btn.textContent='Log in';btn.disabled=false;}
 }
-function doLogout(){
+function doLogout(auto = false){
   token=null;currentUser=null;currentProject=null;
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
+  localStorage.removeItem('currentProject');
+  localStorage.removeItem('lastActivity');
+  
   document.getElementById('app').classList.remove('on');
   document.getElementById('login-screen').style.display='';
-  toast('Signed out','info');
+  toast(auto ? 'Session expired due to inactivity' : 'Signed out', 'info');
 }
 async function onLoggedIn(){
   await loadProjects();
@@ -1075,6 +1133,7 @@ function selectProject(id,reload=true){
     else switchTab('backlog');
   }
   toast(`Switched to "${currentProject.name}"`,'info');
+  localStorage.setItem('currentProject', JSON.stringify(currentProject));
 }
 
 // ── PAGES ──
