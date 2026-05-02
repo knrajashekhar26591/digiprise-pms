@@ -27,15 +27,17 @@ public class JwtAuthenticationHandler : AuthenticationHandler<AuthenticationSche
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        string token = string.Empty;
+
         // Check Authorization header
-        if (!Request.Headers.TryGetValue("Authorization", out var authHeader))
-            return Task.FromResult(AuthenticateResult.NoResult());
-
-        var headerValue = authHeader.ToString();
-        if (!headerValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            return Task.FromResult(AuthenticateResult.NoResult());
-
-        var token = headerValue["Bearer ".Length..].Trim();
+        if (Request.Headers.TryGetValue("Authorization", out var authHeader))
+        {
+            var headerValue = authHeader.ToString();
+            if (headerValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                token = headerValue["Bearer ".Length..].Trim();
+            }
+        }
 
         // Also support SignalR query string token
         if (string.IsNullOrEmpty(token))
