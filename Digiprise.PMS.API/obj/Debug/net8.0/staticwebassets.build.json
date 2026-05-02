@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "yS6ClxAyt6JRvCuPZvv7lwefW4yYMwx79CK6LIS/CXA=",
+  "Source": "Digiprise.PMS.API",
+  "BasePath": "_content/Digiprise.PMS.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Digiprise.PMS.API\\wwwroot",
+      "Source": "Digiprise.PMS.API",
+      "ContentRoot": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.API\\wwwroot\\",
+      "BasePath": "_content/Digiprise.PMS.API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.API\\wwwroot\\index.html",
+      "SourceId": "Digiprise.PMS.API",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.API\\wwwroot\\",
+      "BasePath": "_content/Digiprise.PMS.API",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    }
+  ]
+}

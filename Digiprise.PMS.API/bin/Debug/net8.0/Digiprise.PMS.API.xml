@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Digiprise.PMS.API</name>
+    </assembly>
+    <members>
+        <member name="T:Digiprise.PMS.API.Controllers.AuthController">
+            <summary>Authentication and user registration endpoints</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.AuthController.Login(Digiprise.PMS.Contracts.Requests.LoginRequest,System.Int32,System.Threading.CancellationToken)">
+            <summary>Authenticate and receive JWT tokens</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.AuthController.Register(Digiprise.PMS.Contracts.Requests.RegisterRequest,System.Threading.CancellationToken)">
+            <summary>Register a new user (and tenant if new subdomain)</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.AuthController.Refresh(Digiprise.PMS.Contracts.Requests.RefreshTokenRequest,System.Threading.CancellationToken)">
+            <summary>Refresh access token using refresh token</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.AuthController.Logout(Digiprise.PMS.Contracts.Requests.RefreshTokenRequest,System.Threading.CancellationToken)">
+            <summary>Revoke refresh token (logout)</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.IssuesController">
+            <summary>Issue management — full CRUD, transitions, comments, bulk ops, and IQL search</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetById(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get a single issue with all details</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetByProject(System.Int32,System.Threading.CancellationToken)">
+            <summary>List issues for a project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetBacklog(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get backlog for a project (issues not in any sprint)</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Search(Digiprise.PMS.Contracts.Requests.IssueSearchRequest,System.Threading.CancellationToken)">
+            <summary>Search issues using IQL (Internal Query Language)</summary>
+            <remarks>
+            IQL Examples:
+            - `project = DIG AND status IN ("In Progress", "In Review")`
+            - `assignee = currentUser() AND updated >= -7d`
+            - `issuetype = Bug AND priority IN (Critical, Blocker)`
+            </remarks>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Create(Digiprise.PMS.Contracts.Requests.CreateIssueRequest,System.Threading.CancellationToken)">
+            <summary>Create a new issue</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Update(System.Int32,Digiprise.PMS.Contracts.Requests.UpdateIssueRequest,System.Threading.CancellationToken)">
+            <summary>Full update of an issue (use PATCH for partial)</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Patch(System.Int32,Digiprise.PMS.Contracts.Requests.UpdateIssueRequest,System.Threading.CancellationToken)">
+            <summary>Partial update (same as PUT in this implementation)</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Transition(System.Int32,Digiprise.PMS.Contracts.Requests.TransitionIssueRequest,System.Threading.CancellationToken)">
+            <summary>Execute a workflow transition on an issue</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Delete(System.Int32,System.Threading.CancellationToken)">
+            <summary>Delete an issue</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.Bulk(Digiprise.PMS.Contracts.Requests.BulkIssueRequest,System.Threading.CancellationToken)">
+            <summary>Bulk update up to 50 issues at once</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.AddComment(System.Int32,Digiprise.PMS.Contracts.Requests.CreateCommentRequest,System.Threading.CancellationToken)">
+            <summary>Add a comment to an issue</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetComments(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get all comments for an issue</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.SprintsController">
+            <summary>Sprint lifecycle management — start, close, burndown</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.SprintsController.GetById(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get sprint by ID</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.SprintsController.GetActive(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get active sprint for a board</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.SprintsController.Start(System.Int32,Digiprise.PMS.Contracts.Requests.StartSprintRequest,System.Threading.CancellationToken)">
+            <summary>Start a sprint</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.SprintsController.Close(System.Int32,System.Threading.CancellationToken)">
+            <summary>Close a sprint and record velocity</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.SprintsController.Burndown(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get burndown chart data for a sprint</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.DashboardController">
+            <summary>Dashboard widgets and summary data</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.DashboardController.Summary(System.Threading.CancellationToken)">
+            <summary>Get high-level dashboard summary for the current user</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.DashboardController.AssignedToMe(System.Threading.CancellationToken)">
+            <summary>Get issues assigned to the current user</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.NotificationsController">
+            <summary>In-app notifications for the current user</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.NotificationsController.GetUnread(System.Threading.CancellationToken)">
+            <summary>Get all unread notifications</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.NotificationsController.MarkRead(System.Int32,System.Threading.CancellationToken)">
+            <summary>Mark a single notification as read</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.NotificationsController.MarkAllRead(System.Threading.CancellationToken)">
+            <summary>Mark all notifications as read</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.HealthController">
+            <summary>Health check endpoints for load balancers and orchestrators</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.HealthController.Live">
+            <summary>Liveness probe — is the process alive?</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.HealthController.Ready">
+            <summary>Readiness probe — is the app ready to serve traffic?</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Controllers.ProjectsController">
+            <summary>Project management — CRUD, membership, and archival</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.GetAll(System.Threading.CancellationToken)">
+            <summary>List all projects for the current tenant</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.GetById(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get project by ID</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.GetByKey(System.String,System.Threading.CancellationToken)">
+            <summary>Get project by key (e.g., DIG)</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.Create(Digiprise.PMS.Contracts.Requests.CreateProjectRequest,System.Threading.CancellationToken)">
+            <summary>Create a new project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.Update(System.Int32,Digiprise.PMS.Contracts.Requests.UpdateProjectRequest,System.Threading.CancellationToken)">
+            <summary>Update project details</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.Archive(System.Int32,System.Threading.CancellationToken)">
+            <summary>Archive a project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.Delete(System.Int32,System.Threading.CancellationToken)">
+            <summary>Soft-delete a project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.AddMember(System.Int32,Digiprise.PMS.Contracts.Requests.AddMemberRequest,System.Threading.CancellationToken)">
+            <summary>Add a member to project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.RemoveMember(System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>Remove a member from project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.GetSprints(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get all sprints for a project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.ProjectsController.CreateSprint(System.Int32,Digiprise.PMS.Contracts.Requests.CreateSprintRequest,System.Threading.CancellationToken)">
+            <summary>Create a sprint for a project</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.UsersController.GetAll(System.Threading.CancellationToken)">
+            <summary>Get all users in current tenant</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.UsersController.GetById(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get user by id</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssueLinksController.CreateLink(Digiprise.PMS.API.Controllers.CreateLinkRequest,System.Threading.CancellationToken)">
+            <summary>Link two issues together</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssueLinksController.GetLinks(System.Int32,System.Threading.CancellationToken)">
+            <summary>Get all links for an issue</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.WorkflowController.GetStatuses">
+            <summary>Get all available statuses and transitions</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.WorkflowController.GetTransitions(System.Int32)">
+            <summary>Get available transitions from a given status</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Hubs.PmsHub">
+            <summary>
+            PmsHub — tenant-scoped real-time hub for board updates, notifications, and live collaboration.
+            Groups: board:{boardId}, project:{projectId}, user:{userId}
+            </summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Hubs.PmsHub.JoinBoard(System.Int32)">
+            <summary>Join a board room to receive live card updates</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Hubs.PmsHub.LeaveBoard(System.Int32)">
+            <summary>Leave a board room</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Hubs.PmsHub.JoinProject(System.Int32)">
+            <summary>Join a project room</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Hubs.PmsHub.Events">
+            <summary>Broadcast issue status change (called server-side via IHubContext)</summary>
+        </member>
+        <member name="T:Digiprise.PMS.API.Middleware.JwtAuthenticationHandler">
+            <summary>
+            Custom JWT authentication handler — uses only built-in ASP.NET 8 types.
+            No Microsoft.AspNetCore.Authentication.JwtBearer NuGet package needed.
+            </summary>
+        </member>
+    </members>
+</doc>

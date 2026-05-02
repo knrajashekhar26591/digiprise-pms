@@ -1,0 +1,12 @@
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\bin\Debug\net8.0\Digiprise.PMS.Contracts.deps.json
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\bin\Debug\net8.0\Digiprise.PMS.Contracts.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\bin\Debug\net8.0\Digiprise.PMS.Contracts.pdb
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.AssemblyInfoInputs.cache
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.AssemblyInfo.cs
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.csproj.CoreCompileInputs.cache
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.sourcelink.json
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\refint\Digiprise.PMS.Contracts.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\Digiprise.PMS.Contracts.pdb
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Contracts\obj\Debug\net8.0\ref\Digiprise.PMS.Contracts.dll

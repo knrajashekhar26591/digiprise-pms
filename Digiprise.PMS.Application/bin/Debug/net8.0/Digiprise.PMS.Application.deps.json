@@ -1,0 +1,53 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Digiprise.PMS.Application/1.0.0": {
+        "dependencies": {
+          "Digiprise.PMS.Contracts": "1.0.0",
+          "Digiprise.PMS.Domain": "1.0.0"
+        },
+        "runtime": {
+          "Digiprise.PMS.Application.dll": {}
+        }
+      },
+      "Digiprise.PMS.Contracts/1.0.0": {
+        "runtime": {
+          "Digiprise.PMS.Contracts.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Digiprise.PMS.Domain/1.0.0": {
+        "runtime": {
+          "Digiprise.PMS.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Digiprise.PMS.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Digiprise.PMS.Contracts/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Digiprise.PMS.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

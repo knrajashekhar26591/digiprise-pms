@@ -1,0 +1,138 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "Digiprise.PMS.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "Digiprise.PMS.Contracts": "1.0.0",
+          "Digiprise.PMS.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Digiprise.PMS.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Digiprise.PMS.Application.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
+      "Digiprise.PMS.Contracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Digiprise.PMS.Contracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Digiprise.PMS.Contracts.dll": {}
+        }
+      },
+      "Digiprise.PMS.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Digiprise.PMS.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Digiprise.PMS.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Digiprise.PMS.Application/1.0.0": {
+      "type": "project",
+      "path": "../Digiprise.PMS.Application/Digiprise.PMS.Application.csproj",
+      "msbuildProject": "../Digiprise.PMS.Application/Digiprise.PMS.Application.csproj"
+    },
+    "Digiprise.PMS.Contracts/1.0.0": {
+      "type": "project",
+      "path": "../Digiprise.PMS.Contracts/Digiprise.PMS.Contracts.csproj",
+      "msbuildProject": "../Digiprise.PMS.Contracts/Digiprise.PMS.Contracts.csproj"
+    },
+    "Digiprise.PMS.Domain/1.0.0": {
+      "type": "project",
+      "path": "../Digiprise.PMS.Domain/Digiprise.PMS.Domain.csproj",
+      "msbuildProject": "../Digiprise.PMS.Domain/Digiprise.PMS.Domain.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "Digiprise.PMS.Application >= 1.0.0",
+      "Digiprise.PMS.Domain >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\knraj\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Infrastructure\\Digiprise.PMS.Infrastructure.csproj",
+      "projectName": "Digiprise.PMS.Infrastructure",
+      "projectPath": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Infrastructure\\Digiprise.PMS.Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\knraj\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Infrastructure\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\knraj\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Application\\Digiprise.PMS.Application.csproj": {
+              "projectPath": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Application\\Digiprise.PMS.Application.csproj"
+            },
+            "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Domain\\Digiprise.PMS.Domain.csproj": {
+              "projectPath": "C:\\Users\\knraj\\OneDrive\\Documents\\GitHub\\digiprise-pms\\Digiprise.PMS.Domain\\Digiprise.PMS.Domain.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.420/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

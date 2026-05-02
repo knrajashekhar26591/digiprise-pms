@@ -1,0 +1,12 @@
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\bin\Debug\net8.0\Digiprise.PMS.Domain.deps.json
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\bin\Debug\net8.0\Digiprise.PMS.Domain.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\bin\Debug\net8.0\Digiprise.PMS.Domain.pdb
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.AssemblyInfoInputs.cache
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.AssemblyInfo.cs
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.csproj.CoreCompileInputs.cache
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.sourcelink.json
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\refint\Digiprise.PMS.Domain.dll
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\Digiprise.PMS.Domain.pdb
+C:\Users\knraj\OneDrive\Documents\GitHub\digiprise-pms\Digiprise.PMS.Domain\obj\Debug\net8.0\ref\Digiprise.PMS.Domain.dll
