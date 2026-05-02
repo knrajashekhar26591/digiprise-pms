@@ -196,6 +196,7 @@ public class IssueService : IIssueService
         issue.AddComment(comment);
         
         await _issues.UpdateAsync(issue, ct);
+        await _issues.SaveChangesAsync(ct);
         
         return new CommentDto(comment.Id, issueId, currentUserId, user?.DisplayName ?? "Unknown", user?.AvatarUrl, comment.Body, comment.CreatedAt, comment.UpdatedAt);
     }
