@@ -42,6 +42,7 @@ public class UsersController : BaseController
         // Create with a dummy password hash since there's no email flow
         var user = Digiprise.PMS.Domain.Entities.User.Create(CurrentTenantId, req.Email, req.DisplayName, "DUMMY_HASH", req.Role);
         await _users.AddAsync(user, ct);
+        await _users.SaveChangesAsync(ct);
         return Ok(new { user.Id, user.Email, user.DisplayName, user.AvatarUrl, user.IsActive, user.SystemRole });
     }
 
@@ -54,6 +55,7 @@ public class UsersController : BaseController
 
         user.UpdateProfile(req.DisplayName, user.AvatarUrl);
         await _users.UpdateAsync(user, ct);
+        await _users.SaveChangesAsync(ct);
         return Ok();
     }
 
@@ -67,6 +69,7 @@ public class UsersController : BaseController
 
         user.UpdateRole(req.Role);
         await _users.UpdateAsync(user, ct);
+        await _users.SaveChangesAsync(ct);
         return Ok();
     }
 }
