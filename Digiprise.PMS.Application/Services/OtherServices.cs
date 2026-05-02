@@ -235,23 +235,45 @@ public class DashboardService : IDashboardService
 
     public DashboardService(IIssueRepository issues, IUserRepository users) { _issues = issues; _users = users; }
 
-    public async Task<DashboardSummaryDto> GetSummaryAsync(int tenantId, int userId, CancellationToken ct = default)
+    public async Task<DashboardSummaryDto> GetSummaryAsync(int tenantId, int userId, int? projectId = null, CancellationToken ct = default)
     {
-        var assigned = await _issues.GetByAssigneeAsync(userId, tenantId, ct);
-        var issueList = assigned?.ToList() ?? new List<Issue>();
+        IEnumerable<Issue> issueList;
+        if (projectId.HasValue)
+        {
+            issueList = await _issues.GetByProjectAsync(projectId.Value, ct);
+        }
+        else
+        {
+            issueList = await _issues.SearchByIqlAsync("", tenantId, userId, 1, 5000, ct);
+        }
         
-        var total = issueList.Count;
-        var open = issueList.Count(i => i.StatusId == 1);
-        var inProgress = issueList.Count(i => i.StatusId == 2);
-        var done = issueList.Count(i => i.StatusId == 3);
+        var total = issueList.Count();
         
+        var byStatus = issueList
+            .GroupBy(i => i.StatusId)
+            .Select(g => new IssueStatDto(GetStatusName(g.Key), g.Count()))
+            .ToList();
+
+        var byType = issueList
+            .GroupBy(i => i.IssueType.ToString())
+            .Select(g => new IssueStatDto(g.Key, g.Count()))
+            .ToList();
+
         var byPriority = issueList
             .GroupBy(i => i.Priority.ToString())
             .Select(g => new IssueStatDto(g.Key, g.Count()))
             .ToList();
 
-        return new DashboardSummaryDto(total, open, inProgress, done, byPriority);
+        return new DashboardSummaryDto(total, byStatus, byType, byPriority);
     }
+
+    private string GetStatusName(int statusId) => statusId switch {
+        1 => "To Do",
+        2 => "In Progress",
+        3 => "In Review",
+        4 => "Done",
+        _ => "Open"
+    };
 
     public async Task<IEnumerable<IssueListItemDto>> GetAssignedToMeAsync(int userId, int tenantId, CancellationToken ct = default)
     {

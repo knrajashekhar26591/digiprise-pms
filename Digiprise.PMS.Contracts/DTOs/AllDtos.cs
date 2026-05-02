@@ -42,7 +42,7 @@ public record AuthTokenDto(string AccessToken, string RefreshToken, DateTime Exp
 // ── Dashboard DTOs ────────────────────────────────────────────────────
 public record IssueStatDto(string Label, int Count);
 public record BurndownPointDto(DateTime Date, int Remaining, int Ideal);
-public record DashboardSummaryDto(int TotalIssues, int OpenIssues, int InProgressIssues, int DoneIssues, IEnumerable<IssueStatDto> ByPriority);
+public record DashboardSummaryDto(int TotalIssues, IEnumerable<IssueStatDto> ByStatus, IEnumerable<IssueStatDto> ByType, IEnumerable<IssueStatDto> ByPriority);
 
 // ── Phase 3: Enterprise Module DTOs ───────────────────────────────────
 public record BudgetDto(int Id, int ProjectId, string Name, decimal MaterialBudgetCents, decimal LaborBudgetCents, string? Description);

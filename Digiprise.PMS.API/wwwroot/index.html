@@ -564,7 +564,10 @@ textarea.mi{resize:vertical;min-height:80px}
               <div class="dash-tbl-hdr"><span>Assigned to me</span><span style="font-size:12px;color:var(--blue2);font-weight:400;cursor:pointer" onclick="showPg('backlog')">View all →</span></div>
               <div id="dash-mine"></div>
             </div>
-            <div class="dash-burn"><div class="dash-burn-title">Sprint Burndown</div><svg viewBox="0 0 300 200" style="width:100%;height:180px;display:block" id="bd-svg"></svg></div>
+            <div class="dash-burn" id="dash-graphs">
+              <div class="dash-burn-title">Issues by Type</div>
+              <svg viewBox="0 0 300 200" style="width:100%;height:180px;display:block" id="type-svg"></svg>
+            </div>
           </div>
         </div>
       </div>
@@ -1133,20 +1136,20 @@ async function doCloseSprint(id){
 // ── DASHBOARD ──
 async function loadDashboard(){
   try{
+    const pid = currentProject ? `?projectId=${currentProject.id}` : '';
     const [sum,mine]=await Promise.all([
-      api('GET','/api/v1/dashboard/summary'),
+      api('GET',`/api/v1/dashboard/summary${pid}`),
       api('GET','/api/v1/dashboard/assigned-to-me')
     ]);
-    const cols=[{c:'#0052cc',b:'#e9f2ff'},{c:'#ff991f',b:'#fffae6'},{c:'#de350b',b:'#ffebe6'},{c:'#00875a',b:'#e3fcef'}];
-    document.getElementById('dash-stats').innerHTML=[
-      {label:'Total Issues',num:sum.totalIssues},
-      {label:'Open',num:sum.openIssues},
-      {label:'In Progress',num:sum.inProgressIssues},
-      {label:'Done',num:sum.doneIssues},
-    ].map((s,i)=>`<div class="dash-stat" style="border-top-color:${cols[i].c}">
-      <div class="dash-stat-num" style="color:${cols[i].c}">${s.num}</div>
-      <div class="dash-stat-lbl">${s.label}</div>
-    </div>`).join('');
+    const cols=[{c:'#0052cc',b:'#e9f2ff'},{c:'#ff991f',b:'#fffae6'},{c:'#de350b',b:'#ffebe6'},{c:'#00875a',b:'#e3fcef'},{c:'#6554c0',b:'#e9e3ff'}];
+    
+    if (sum.byStatus) {
+      document.getElementById('dash-stats').innerHTML=sum.byStatus.map((s,i)=>`<div class="dash-stat" style="border-top-color:${cols[i%cols.length].c}">
+        <div class="dash-stat-num" style="color:${cols[i%cols.length].c}">${s.count} / ${sum.totalIssues}</div>
+        <div class="dash-stat-lbl">issues in ${s.label}</div>
+      </div>`).join('');
+    }
+
     document.getElementById('dash-mine').innerHTML=mine.length?mine.slice(0,8).map(i=>`
       <div class="dash-tbl-row" onclick="openDP(${i.id})">
         ${typeIc(i.issueType)}
@@ -1154,28 +1157,57 @@ async function loadDashboard(){
         <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${i.summary}</span>
         ${statusPill(i.statusName)}
       </div>`).join(''):`<div class="empty-state"><div class="empty-state-icon">🎉</div><div class="empty-state-title">You're all caught up!</div></div>`;
-    renderBd();
+    
+    renderTypeChart(sum.byType, sum.totalIssues);
   }catch(e){console.error(e);}
 }
-function renderBd(){
-  const svg=document.getElementById('bd-svg');
-  const W=300,H=200,P=28,pts=50,days=14,iW=W-P*2,iH=H-P*2;
-  let ideal=[],actual=[];
-  for(let d=0;d<=days;d++){
-    const x=P+(d/days)*iW;
-    const iY=P+((pts-pts*d/days)/pts)*iH;
-    const n=Math.sin(d*1.5)*3+Math.cos(d*.8)*2;
-    const aY=P+Math.max(0,(pts-Math.max(0,pts*d/days*.88+n))/pts)*iH;
-    ideal.push([x,iY]);actual.push([x,aY]);
+
+function renderTypeChart(byType, total){
+  const svg = document.getElementById('type-svg');
+  if(!svg || !byType || total === 0) {
+    if(svg) svg.innerHTML = '<text x="150" y="100" text-anchor="middle" fill="#97a0af" font-size="14">No issues to display</text>';
+    return;
   }
-  const pp=pts=>`${pts.map((p,i)=>`${i?'L':'M'}${p[0]},${p[1]}`).join(' ')}`;
-  svg.innerHTML=`
-    ${[0,25,50].map(g=>{const y=P+(1-g/100)*iH;return `<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="#ebecf0" stroke-width="1"/>
-    <text x="${P-4}" y="${y+4}" fill="#97a0af" font-size="9" text-anchor="end">${Math.round(pts*g/100)}</text>`;}).join('')}
-    <path d="${pp(ideal)}" stroke="#dfe1e6" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
-    <path d="${pp(actual)} L${actual[actual.length-1][0]},${H-P} L${P},${H-P}" fill="#0052cc" opacity=".08"/>
-    <path d="${pp(actual)}" stroke="#0052cc" stroke-width="2" fill="none"/>`;
+  
+  let html = '';
+  let cx = 150, cy = 100, r = 60;
+  let startAngle = 0;
+  
+  byType.forEach(t => {
+    if(t.count === 0) return;
+    const sliceAngle = (t.count / total) * 360;
+    const endAngle = startAngle + sliceAngle;
+    const startRad = (startAngle - 90) * Math.PI / 180;
+    const endRad = (endAngle - 90) * Math.PI / 180;
+    
+    const x1 = cx + r * Math.cos(startRad);
+    const y1 = cy + r * Math.sin(startRad);
+    const x2 = cx + r * Math.cos(endRad);
+    const y2 = cy + r * Math.sin(endRad);
+    
+    const largeArc = sliceAngle > 180 ? 1 : 0;
+    const color = TYPE_COLORS[t.label] || '#0052cc';
+    
+    if(sliceAngle === 360) {
+      html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/>`;
+    } else {
+      html += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" stroke="#fff" stroke-width="2"/>`;
+    }
+    
+    // Label
+    const midAngle = startAngle + sliceAngle/2;
+    const midRad = (midAngle - 90) * Math.PI / 180;
+    const lx = cx + (r + 25) * Math.cos(midRad);
+    const ly = cy + (r + 25) * Math.sin(midRad);
+    
+    html += `<text x="${lx}" y="${ly}" text-anchor="middle" alignment-baseline="middle" font-size="12" font-weight="600" fill="${color}">${t.label} (${t.count})</text>`;
+    
+    startAngle = endAngle;
+  });
+  
+  svg.innerHTML = html;
 }
+
 
 // ── PROJECTS PAGE ──
 async function loadProjectsPg(){

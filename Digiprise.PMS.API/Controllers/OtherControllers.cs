@@ -72,11 +72,11 @@ public class DashboardController : BaseController
 
     public DashboardController(IDashboardService dashboard) => _dashboard = dashboard;
 
-    /// <summary>Get high-level dashboard summary for the current user</summary>
+    /// <summary>Get high-level dashboard summary for the current user or specific project</summary>
     [HttpGet("summary")]
-    public async Task<IActionResult> Summary(CancellationToken ct)
+    public async Task<IActionResult> Summary([FromQuery] int? projectId, CancellationToken ct)
     {
-        var summary = await _dashboard.GetSummaryAsync(CurrentTenantId, CurrentUserId, ct);
+        var summary = await _dashboard.GetSummaryAsync(CurrentTenantId, CurrentUserId, projectId, ct);
         return Ok(summary);
     }
 

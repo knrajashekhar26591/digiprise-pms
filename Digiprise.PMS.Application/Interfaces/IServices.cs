@@ -54,7 +54,7 @@ public interface ISprintService
 
 public interface IDashboardService
 {
-    Task<DashboardSummaryDto> GetSummaryAsync(int tenantId, int userId, CancellationToken ct = default);
+    Task<DashboardSummaryDto> GetSummaryAsync(int tenantId, int userId, int? projectId = null, CancellationToken ct = default);
     Task<IEnumerable<IssueListItemDto>> GetAssignedToMeAsync(int userId, int tenantId, CancellationToken ct = default);
 }
 

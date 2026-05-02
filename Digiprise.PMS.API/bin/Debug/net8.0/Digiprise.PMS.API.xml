@@ -88,8 +88,8 @@
         <member name="T:Digiprise.PMS.API.Controllers.DashboardController">
             <summary>Dashboard widgets and summary data</summary>
         </member>
-        <member name="M:Digiprise.PMS.API.Controllers.DashboardController.Summary(System.Threading.CancellationToken)">
-            <summary>Get high-level dashboard summary for the current user</summary>
+        <member name="M:Digiprise.PMS.API.Controllers.DashboardController.Summary(System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>Get high-level dashboard summary for the current user or specific project</summary>
         </member>
         <member name="M:Digiprise.PMS.API.Controllers.DashboardController.AssignedToMe(System.Threading.CancellationToken)">
             <summary>Get issues assigned to the current user</summary>
