@@ -79,6 +79,8 @@ public class EfIssueRepository : EfRepository<Issue>, IIssueRepository
             .Include(i => i.Assignee)
             .Include(i => i.Reporter)
             .Include(i => i.Sprint)
+            .Include(i => i.Comments)
+                .ThenInclude(c => c.Author)
             .FirstOrDefaultAsync(i => i.Id == id, ct);
     }
 

@@ -187,17 +187,28 @@ public class IssueService : IIssueService
 
     public async Task<CommentDto> AddCommentAsync(int issueId, CreateCommentRequest request, int tenantId, int currentUserId, CancellationToken ct = default)
     {
-        var issue = await _issues.GetByIdAsync(issueId, ct) ?? throw new KeyNotFoundException();
+        var issue = await _issues.GetWithDetailsAsync(issueId, ct) ?? throw new KeyNotFoundException();
         if (issue.TenantId != tenantId) throw new UnauthorizedAccessException();
 
         var user = await _users.GetByIdAsync(currentUserId, ct);
-        var now = DateTime.UtcNow;
-        // In full implementation, comment would be persisted via repository
-        return new CommentDto(0, issueId, currentUserId, user?.DisplayName ?? "Unknown", user?.AvatarUrl, request.Body, now, now);
+        
+        var comment = Comment.Create(issueId, currentUserId, request.Body);
+        issue.AddComment(comment);
+        
+        await _issues.UpdateAsync(issue, ct);
+        
+        return new CommentDto(comment.Id, issueId, currentUserId, user?.DisplayName ?? "Unknown", user?.AvatarUrl, comment.Body, comment.CreatedAt, comment.UpdatedAt);
     }
 
-    public Task<IEnumerable<CommentDto>> GetCommentsAsync(int issueId, int tenantId, CancellationToken ct = default)
-        => Task.FromResult<IEnumerable<CommentDto>>(Array.Empty<CommentDto>());
+    public async Task<IEnumerable<CommentDto>> GetCommentsAsync(int issueId, int tenantId, CancellationToken ct = default)
+    {
+        var issue = await _issues.GetWithDetailsAsync(issueId, ct) ?? throw new KeyNotFoundException();
+        if (issue.TenantId != tenantId) throw new UnauthorizedAccessException();
+        
+        return issue.Comments.OrderBy(c => c.CreatedAt).Select(c => new CommentDto(
+            c.Id, c.IssueId, c.UserId, c.Author?.DisplayName ?? "Unknown", c.Author?.AvatarUrl, c.Body, c.CreatedAt, c.UpdatedAt
+        ));
+    }
 
     private static readonly Dictionary<int, string> StatusNames = new()
     {

@@ -33,6 +33,11 @@ public class Issue : BaseEntity
 
     public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
     public IReadOnlyCollection<Attachment> Attachments => _attachments.AsReadOnly();
+
+    public void AddComment(Comment comment)
+    {
+        _comments.Add(comment);
+    }
     public IReadOnlyCollection<IssueLink> IssueLinks => _issueLinks.AsReadOnly();
     public IReadOnlyCollection<IssueHistory> History => _history.AsReadOnly();
     public IReadOnlyCollection<IssueCustomField> CustomFields => _customFields.AsReadOnly();
