@@ -12,9 +12,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Railway provides the database URL in 'postgresql://user:pass@host:port/db' format
+// EF Core / Npgsql requires the 'Host=...;Port=...;' format
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={userInfo[0]};Password={userInfo[1]};Ssl Mode=Disable;";
+}
+
 // ── Entity Framework Core Database ──────────────────────────────────────
 builder.Services.AddDbContext<PmsDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // ── Domain Repositories ────────────────────────────────────────────────
 builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();
