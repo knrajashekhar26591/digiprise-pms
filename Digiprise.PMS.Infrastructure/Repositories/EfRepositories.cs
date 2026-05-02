@@ -32,7 +32,10 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
 
     public virtual Task UpdateAsync(T entity, CancellationToken ct = default)
     {
-        _context.Set<T>().Update(entity);
+        if (_context.Entry(entity).State == EntityState.Detached)
+        {
+            _context.Set<T>().Update(entity);
+        }
         return Task.CompletedTask;
     }
 
