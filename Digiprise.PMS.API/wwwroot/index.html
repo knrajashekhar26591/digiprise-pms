@@ -25,6 +25,22 @@ input,textarea,select{font-family:inherit;font-size:14px}
 
 /* ── LOGIN ── */
 #login-screen{display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}
+
+/* ── WELCOME PAGE ── */
+#pg-welcome { min-height: calc(100vh - 56px); background: var(--bg); display: none; flex-direction: column; }
+#pg-welcome.on { display: flex; }
+.wp-hero { background: linear-gradient(135deg, #0052cc 0%, #0065ff 100%); color: #fff; padding: 48px 32px; border-radius: 0 0 16px 16px; margin-bottom: 32px; box-shadow: 0 4px 12px rgba(0,82,204,0.15); }
+.wp-h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+.wp-sub { font-size: 16px; opacity: 0.9; }
+.wp-content { max-width: 1000px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 32px; width: 100%; }
+.wp-sec-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+.wp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.wp-card { background: #fff; border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 16px; box-shadow: var(--sh); }
+.wp-card:hover { border-color: var(--blue2); box-shadow: var(--sh2); transform: translateY(-2px); }
+.wp-card-ic { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; color: #fff; }
+.wp-card-title { font-weight: 600; font-size: 15px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
+.wp-card-sub { font-size: 12px; color: var(--text2); }
+
 .lw{width:400px}
 .ll{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:8px}
 .ll-icon{width:44px;height:44px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center}
@@ -421,7 +437,7 @@ textarea.mi{resize:vertical;min-height:80px}
     </div>
     <div class="tn-sep"></div>
     <div class="tn-btn" onclick="toggleSb()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
-    <div class="tn-btn" onclick="showPg('dashboard')">Your work</div>
+    <div class="tn-btn" onclick="showPg('welcome')">Your work</div>
     
     <div class="tn-drop-wrap" id="tn-proj-wrap">
       <div class="tn-btn" onclick="toggleNavDrop(event, 'tn-proj-wrap')">Projects <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
@@ -620,6 +636,27 @@ textarea.mi{resize:vertical;min-height:80px}
             <div style="margin-left:auto"><button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button></div>
           </div>
           <div class="board-scroll"><div class="board-cols" id="board-cols"></div></div>
+        </div>
+      </div>
+
+      <div class="pg on" id="pg-welcome">
+        <div class="wp-hero">
+          <div class="wp-content" style="padding:0">
+            <div class="wp-h1" id="wp-greet">Welcome to Digiprise Jira!</div>
+            <div class="wp-sub">Here's what's happening today.</div>
+          </div>
+        </div>
+        <div class="wp-content">
+          <div>
+            <div class="wp-sec-title">Pick up where you left off</div>
+            <div class="wp-grid" id="wp-projects"></div>
+          </div>
+          <div class="dash-2col" style="margin-top:0">
+            <div class="dash-tbl" style="background:#fff;border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--sh)">
+              <div class="dash-tbl-hdr" style="padding:16px;border-bottom:1px solid var(--border)"><span>Assigned to me (Across all projects)</span></div>
+              <div id="wp-mine" style="padding:0 8px 8px"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -948,10 +985,8 @@ function doLogout(){
   toast('Signed out','info');
 }
 async function onLoggedIn(){
-  const h=new Date().getHours();
-  document.getElementById('dash-greet').textContent=`${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
   await loadProjects();
-  loadDashboard();
+  showPg('welcome');
   loadNotifications();
   // Pre-load tenant users for assignee dropdowns
   api('GET','/api/v1/users').then(u=>{tenantUsers=u||[];}).catch(()=>{});
@@ -1021,6 +1056,7 @@ function showPg(name){
   else if(name==='board') loadBoard();
   else if(name==='dashboard') loadDashboard();
   else if(name==='projects') loadProjectsPg();
+  else if(name==='welcome') loadWelcomePg();
 }
 
 // ── TYPE / PRIO HELPERS ──
@@ -1211,6 +1247,39 @@ async function doCloseSprint(id){
     await api('POST',`/api/v1/sprints/${id}/close`);
     toast('Sprint completed! ✅','ok'); loadBacklog();
   }catch(e){toast(e.message,'err');}
+}
+
+// ── WELCOME PAGE ──
+async function loadWelcomePg(){
+  try{
+    const h=new Date().getHours();
+    const g=`${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}`;
+    document.getElementById('wp-greet').textContent=`${g}, ${(currentUser?.displayName||'').split(' ')[0]} 👋`;
+    
+    const rec = document.getElementById('wp-projects');
+    if(projects && projects.length) {
+      rec.innerHTML = projects.slice(0, 4).map(p => `
+        <div class="wp-card" onclick="selectProject(${p.id})">
+          <div class="wp-card-ic" style="background:${p.color||'#0052cc'}">${p.icon||'📁'}</div>
+          <div style="overflow:hidden">
+            <div class="wp-card-title">${p.name}</div>
+            <div class="wp-card-sub">${p.key} Project</div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      rec.innerHTML = `<div class="empty-state" style="grid-column:1/-1;border:1px dashed var(--border);border-radius:8px;padding:32px"><div class="empty-state-title">No projects yet</div><button class="btn-p" style="margin-top:12px" onclick="openCreateProject()">Create Project</button></div>`;
+    }
+    
+    const mine=await api('GET','/api/v1/dashboard/assigned-to-me');
+    document.getElementById('wp-mine').innerHTML=mine.length?mine.slice(0,8).map(i=>`
+      <div class="dash-tbl-row" onclick="openDP(${i.id})">
+        ${typeIc(i.issueType)}
+        <span style="font-family:monospace;font-size:12px;color:var(--blue2);width:80px;flex-shrink:0">${i.issueKey}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">${i.summary}</span>
+        ${statusPill(i.statusName)}
+      </div>`).join(''):`<div class="empty-state"><div class="empty-state-icon">🎉</div><div class="empty-state-title">You're all caught up!</div></div>`;
+  }catch(e){console.error(e);}
 }
 
 // ── DASHBOARD ──
