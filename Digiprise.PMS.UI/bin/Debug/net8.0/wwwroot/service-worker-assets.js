@@ -845,25 +845,25 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-fm3LCMMT0xsnr0A\/TwXBD2tP8WHzQUjBJv+XgMO6fHM=",
+      "hash": "sha256-y1ul6x+1zFrwUjqUKNlDPl3fjUfATwVte3Jm9E0BQ7I=",
       "url": "_framework\/Digiprise.PMS.Contracts.wasm"
     },
     {
-      "hash": "sha256-\/dvasW64GQ4PIeA0uJZ+kOMiaMzEdbz2daZk0BQrnI0=",
+      "hash": "sha256-A4Se6mfgOXr3lEpcQtXiv3qcF7SYzdLAvBO\/1qcrTNI=",
       "url": "_framework\/Digiprise.PMS.Contracts.pdb"
     },
     {
-      "hash": "sha256-X+8fEc+O08QqB0Nboe7VI76xRl2GycWkFS5PtG3r+W4=",
+      "hash": "sha256-p1+dM7A2l8CD75LZaLSOK1aMYrX3reYBjbovJY\/\/uSc=",
       "url": "_framework\/Digiprise.PMS.UI.wasm"
     },
     {
-      "hash": "sha256-K\/GA5RNVOiEQq6KcrahKdzvVHT2wgOUijJfPydnELhE=",
+      "hash": "sha256-hXQIdHLyztLVYYzL4AMY\/guJrBGZYFbVn8MMsRJ4s1g=",
       "url": "_framework\/Digiprise.PMS.UI.pdb"
     },
     {
-      "hash": "sha256-WO\/dCBetTYFAA+dIiYZpRo0UR5wNk92nED394df+7NQ=",
+      "hash": "sha256-FBbFarIUBw4lUYK5sWsAEl8gbU9YNmKOacrjPgTGskw=",
       "url": "_framework\/blazor.boot.json"
     }
   ],
-  "version": "b55Vw+m8"
+  "version": "6\/L3Qc47"
 };

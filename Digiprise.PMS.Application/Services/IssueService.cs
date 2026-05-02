@@ -58,9 +58,9 @@ public class IssueService : IIssueService
         return result;
     }
 
-    public async Task<IEnumerable<IssueListItemDto>> SearchAsync(IssueSearchRequest request, int tenantId, CancellationToken ct = default)
+    public async Task<IEnumerable<IssueListItemDto>> SearchAsync(IssueSearchRequest request, int tenantId, int currentUserId, CancellationToken ct = default)
     {
-        var issues = await _issues.SearchByIqlAsync(request.Iql ?? "", tenantId, request.StartAt / request.MaxResults, request.MaxResults, ct);
+        var issues = await _issues.SearchByIqlAsync(request.Iql ?? "", tenantId, currentUserId, request.StartAt / request.MaxResults + 1, request.MaxResults, ct);
         var result = new List<IssueListItemDto>();
         foreach (var i in issues)
             result.Add(await MapListAsync(i, ct));

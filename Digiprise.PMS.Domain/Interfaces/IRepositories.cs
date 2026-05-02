@@ -27,7 +27,7 @@ public interface IIssueRepository : IRepository<Issue>
     Task<IEnumerable<Issue>> GetBacklogAsync(int projectId, CancellationToken ct = default);
     Task<IEnumerable<Issue>> GetByAssigneeAsync(int userId, int tenantId, CancellationToken ct = default);
     Task<string> GenerateIssueKeyAsync(int projectId, string projectKey, CancellationToken ct = default);
-    Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int page, int pageSize, CancellationToken ct = default);
+    Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int currentUserId, int page, int pageSize, CancellationToken ct = default);
     Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default);
 }
 

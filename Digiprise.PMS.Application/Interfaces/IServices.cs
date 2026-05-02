@@ -30,7 +30,7 @@ public interface IIssueService
     Task<IssueDto?> GetByIdAsync(int issueId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<IssueListItemDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<IssueListItemDto>> GetBacklogAsync(int projectId, int tenantId, CancellationToken ct = default);
-    Task<IEnumerable<IssueListItemDto>> SearchAsync(IssueSearchRequest request, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<IssueListItemDto>> SearchAsync(IssueSearchRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
     Task<BaselineResponse> GetWithBaselineAsync(int projectId, DateTimeOffset baseline, int tenantId, int page = 1, int pageSize = 50, CancellationToken ct = default);
     Task<IssueDto> CreateAsync(CreateIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
     Task<IssueDto> UpdateAsync(int issueId, UpdateIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default);

@@ -47,7 +47,7 @@ public class IssuesController : BaseController
     [HttpPost("search")]
     public async Task<IActionResult> Search([FromBody] IssueSearchRequest request, CancellationToken ct)
     {
-        var issues = await _issues.SearchAsync(request, CurrentTenantId, ct);
+        var issues = await _issues.SearchAsync(request, CurrentTenantId, CurrentUserId, ct);
         return Ok(new { issues, total = issues.Count() });
     }
 

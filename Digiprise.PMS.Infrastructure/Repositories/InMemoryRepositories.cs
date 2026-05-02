@@ -90,7 +90,7 @@ public class IssueRepository : InMemoryRepository<Issue>, IIssueRepository
         return Task.FromResult($"{projectKey}-{existing + 1}");
     }
 
-    public Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int page, int pageSize, CancellationToken ct = default)
+    public Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int currentUserId, int page, int pageSize, CancellationToken ct = default)
     {
         var query = _store.Values.Where(i => i.TenantId == tenantId).AsEnumerable();
         if (!string.IsNullOrWhiteSpace(iql))
@@ -103,7 +103,7 @@ public class IssueRepository : InMemoryRepository<Issue>, IIssueRepository
             if (lower.Contains("priority = critical"))   query = query.Where(i => i.Priority == Priority.Critical);
             if (lower.Contains("sprint = opensprints()")) query = query.Where(i => i.SprintId != null);
         }
-        return Task.FromResult<IEnumerable<Issue>>(query.OrderByDescending(i => i.UpdatedAt).Skip(page * pageSize).Take(pageSize).ToList());
+        return Task.FromResult<IEnumerable<Issue>>(query.OrderByDescending(i => i.UpdatedAt).Skip((page - 1) * pageSize).Take(pageSize).ToList());
     }
 
     public Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default)
