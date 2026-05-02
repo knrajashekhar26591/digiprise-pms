@@ -1,0 +1,1752 @@
+﻿DIGIPRISE CRM
+JIRA-Like Project Management System
+DETAILED IMPLEMENTATION DOCUMENT
+Full Code · UI Mockups · Wireframes · Architecture
+Version 1.0  |  ASP.NET Core 8 + React.js 18  |  Enterprise Edition
+Attribute
+Details
+Document Type
+Detailed Implementation Guide
+Platform
+ASP.NET Core 8 / React.js 18 / SQL Server 2022
+Architecture
+CQRS + Clean Architecture + DDD
+Database
+SQL Server with EF Core 8 + Redis + Elasticsearch
+Frontend
+React 18, Redux Toolkit, TanStack Query, TipTap
+Auth
+JWT Bearer + OAuth 2.0 / OIDC + MFA
+Deployment
+Docker + Kubernetes + GitHub Actions CI/CD
+Classification
+Confidential – Internal Engineering Use
+01
+Solution &amp; Project Setup
+1.1 Visual Studio Solution Structure
+Create a new blank solution named Digiprise.PMS and add the following projects:
+ 
+Digiprise.PMS/
+├── Digiprise.PMS.API/              # ASP.NET Core 8 Web API
+│   ├── Controllers/
+│   │   ├── IssuesController.cs
+│   │   ├── ProjectsController.cs
+│   │   ├── BoardsController.cs
+│   │   ├── SprintsController.cs
+│   │   ├── DashboardsController.cs
+│   │   └── AuthController.cs
+│   ├── Middleware/
+│   │   ├── TenantMiddleware.cs
+│   │   ├── ExceptionHandlingMiddleware.cs
+│   │   └── RequestLoggingMiddleware.cs
+│   ├── Extensions/
+│   │   ├── ServiceCollectionExtensions.cs
+│   │   └── ApplicationBuilderExtensions.cs
+│   └── Program.cs
+├── Digiprise.PMS.Application/      # Use Cases (CQRS via MediatR)
+│   ├── Issues/
+│   │   ├── Commands/
+│   │   │   ├── CreateIssueCommand.cs
+│   │   │   ├── UpdateIssueCommand.cs
+│   │   │   └── TransitionIssueCommand.cs
+│   │   └── Queries/
+│   │       ├── GetIssueByIdQuery.cs
+│   │       └── SearchIssuesQuery.cs
+│   ├── Projects/
+│   ├── Sprints/
+│   ├── Boards/
+│   └── Common/
+│       ├── Behaviors/
+│       │   ├── ValidationBehavior.cs
+│       │   ├── LoggingBehavior.cs
+│       │   └── CachingBehavior.cs
+│       └── Interfaces/
+├── Digiprise.PMS.Domain/           # Domain Entities &amp; Events
+│   ├── Entities/
+│   ├── ValueObjects/
+│   ├── Events/
+│   ├── Enums/
+│   └── Exceptions/
+├── Digiprise.PMS.Infrastructure/   # EF Core, Redis, Elasticsearch
+│   ├── Persistence/
+│   │   ├── PmsDbContext.cs
+│   │   ├── Configurations/
+│   │   └── Migrations/
+│   ├── Repositories/
+│   ├── Caching/
+│   ├── Search/
+│   └── Messaging/
+├── Digiprise.PMS.Contracts/        # DTOs, Request/Response Models
+└── Digiprise.PMS.Tests/            # xUnit + Integration Tests
+ 
+1.2 NuGet Package References
+Add the following packages to each project via the .csproj files or Package Manager Console:
+ 
+# Digiprise.PMS.API
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 8.*
+dotnet add package MediatR.Extensions.Microsoft.DependencyInjection
+dotnet add package FluentValidation.AspNetCore
+dotnet add package Serilog.AspNetCore
+dotnet add package Microsoft.AspNetCore.SignalR
+dotnet add package Swashbuckle.AspNetCore
+ 
+# Digiprise.PMS.Application
+dotnet add package MediatR
+dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+dotnet add package FluentValidation
+ 
+# Digiprise.PMS.Infrastructure
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package StackExchange.Redis
+dotnet add package NEST  # Elasticsearch.Net
+dotnet add package RabbitMQ.Client
+dotnet add package HtmlSanitizer
+ 
+1.3 Program.cs – Application Bootstrap
+ 
+// Program.cs
+var builder = WebApplication.CreateBuilder(args);
+ 
+// ── Logging ──────────────────────────────────────────────
+builder.Host.UseSerilog((ctx, lc) =&gt; lc
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Seq(ctx.Configuration[&quot;Seq:Url&quot;]!));
+ 
+// ── Services ─────────────────────────────────────────────
+builder.Services
+    .AddPmsAuthentication(builder.Configuration)
+    .AddPmsDatabase(builder.Configuration)
+    .AddPmsRedis(builder.Configuration)
+    .AddPmsElasticsearch(builder.Configuration)
+    .AddPmsMediator()
+    .AddPmsSignalR()
+    .AddPmsRateLimit()
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen();
+ 
+var app = builder.Build();
+ 
+// ── Middleware pipeline ───────────────────────────────────
+app.UseExceptionHandlingMiddleware();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseTenantMiddleware();   // Resolves TenantId from JWT
+app.UseAuthorization();
+app.UseRateLimiter();
+app.MapControllers();
+app.MapHub&lt;PmsHub&gt;(&quot;/hubs/pms&quot;);
+ 
+app.Run();
+ 
+02
+Database Design &amp; EF Core
+2.1 Domain Entities
+Issue.cs – Core Aggregate Root
+ 
+// Domain/Entities/Issue.cs
+public class Issue : BaseEntity
+{
+    public int Id             { get; private set; }
+    public int TenantId       { get; private set; }
+    public int ProjectId      { get; private set; }
+    public string IssueKey    { get; private set; } = default!; // e.g. DIG-42
+    public IssueType IssueType { get; private set; }
+    public string Summary     { get; private set; } = default!;
+    public string? Description { get; private set; }
+    public int StatusId       { get; private set; }
+    public Priority Priority  { get; private set; }
+    public int? AssigneeId    { get; private set; }
+    public int ReporterId     { get; private set; }
+    public int? ParentIssueId { get; private set; }
+    public int? SprintId      { get; private set; }
+    public int? StoryPoints   { get; private set; }
+    public int? EpicId        { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime? DueDate  { get; private set; }
+ 
+    // Navigation
+    public Project Project          { get; private set; } = default!;
+    public WorkflowStatus Status    { get; private set; } = default!;
+    public User? Assignee           { get; private set; }
+    public IReadOnlyList&lt;Comment&gt; Comments    =&gt; _comments.AsReadOnly();
+    public IReadOnlyList&lt;IssueLink&gt; Links     =&gt; _links.AsReadOnly();
+    public IReadOnlyList&lt;Attachment&gt; Attachments =&gt; _attachments.AsReadOnly();
+ 
+    private readonly List&lt;Comment&gt;    _comments    = [];
+    private readonly List&lt;IssueLink&gt;  _links       = [];
+    private readonly List&lt;Attachment&gt; _attachments = [];
+ 
+    // Domain events collection
+    private readonly List&lt;IDomainEvent&gt; _domainEvents = [];
+    public IReadOnlyList&lt;IDomainEvent&gt; DomainEvents =&gt; _domainEvents.AsReadOnly();
+ 
+    // Factory
+    public static Issue Create(int tenantId, int projectId, string key,
+        IssueType type, string summary, Priority priority, int reporterId)
+    {
+        var issue = new Issue
+        {
+            TenantId   = tenantId,
+            ProjectId  = projectId,
+            IssueKey   = key,
+            IssueType  = type,
+            Summary    = summary,
+            Priority   = priority,
+            ReporterId = reporterId,
+            CreatedAt  = DateTime.UtcNow,
+            UpdatedAt  = DateTime.UtcNow
+        };
+        issue._domainEvents.Add(new IssueCreatedEvent(issue));
+        return issue;
+    }
+ 
+    public void Transition(WorkflowStatus newStatus, int actorId)
+    {
+        var old = StatusId;
+        StatusId  = newStatus.Id;
+        UpdatedAt = DateTime.UtcNow;
+        _domainEvents.Add(new IssueStatusChangedEvent(Id, old, newStatus.Id, actorId));
+    }
+}
+ 
+PmsDbContext.cs
+ 
+// Infrastructure/Persistence/PmsDbContext.cs
+public class PmsDbContext : DbContext
+{
+    private readonly ITenantContext _tenant;
+ 
+    public PmsDbContext(DbContextOptions&lt;PmsDbContext&gt; opts, ITenantContext tenant)
+        : base(opts) =&gt; _tenant = tenant;
+ 
+    public DbSet&lt;Project&gt;          Projects          =&gt; Set&lt;Project&gt;();
+    public DbSet&lt;Issue&gt;            Issues            =&gt; Set&lt;Issue&gt;();
+    public DbSet&lt;Sprint&gt;           Sprints           =&gt; Set&lt;Sprint&gt;();
+    public DbSet&lt;Comment&gt;          Comments          =&gt; Set&lt;Comment&gt;();
+    public DbSet&lt;Attachment&gt;       Attachments       =&gt; Set&lt;Attachment&gt;();
+    public DbSet&lt;WorkflowStatus&gt;   WorkflowStatuses  =&gt; Set&lt;WorkflowStatus&gt;();
+    public DbSet&lt;IssueHistory&gt;     IssueHistories    =&gt; Set&lt;IssueHistory&gt;();
+    public DbSet&lt;Notification&gt;     Notifications     =&gt; Set&lt;Notification&gt;();
+    public DbSet&lt;AutomationRule&gt;   AutomationRules   =&gt; Set&lt;AutomationRule&gt;();
+    public DbSet&lt;SprintSnapshot&gt;   SprintSnapshots   =&gt; Set&lt;SprintSnapshot&gt;();
+    public DbSet&lt;AuditLog&gt;         AuditLogs         =&gt; Set&lt;AuditLog&gt;();
+ 
+    protected override void OnModelCreating(ModelBuilder mb)
+    {
+        mb.ApplyConfigurationsFromAssembly(typeof(PmsDbContext).Assembly);
+ 
+        // ── Global tenant filter (Row-Level Security) ──
+        mb.Entity&lt;Issue&gt;().HasQueryFilter(i =&gt; i.TenantId == _tenant.Id);
+        mb.Entity&lt;Project&gt;().HasQueryFilter(p =&gt; p.TenantId == _tenant.Id);
+        mb.Entity&lt;Sprint&gt;().HasQueryFilter(s =&gt; s.TenantId == _tenant.Id);
+        // ... apply to all tenant-scoped tables
+    }
+}
+ 
+2.2 EF Core Fluent Configuration – Issue
+ 
+// Infrastructure/Persistence/Configurations/IssueConfiguration.cs
+public class IssueConfiguration : IEntityTypeConfiguration&lt;Issue&gt;
+{
+    public void Configure(EntityTypeBuilder&lt;Issue&gt; b)
+    {
+        b.ToTable(&quot;Issues&quot;);
+        b.HasKey(i =&gt; i.Id);
+ 
+        b.Property(i =&gt; i.IssueKey).HasMaxLength(20).IsRequired();
+        b.Property(i =&gt; i.Summary).HasMaxLength(255).IsRequired();
+        b.Property(i =&gt; i.Description).HasColumnType(&quot;nvarchar(max)&quot;);
+        b.Property(i =&gt; i.IssueType).HasConversion&lt;string&gt;().HasMaxLength(30);
+        b.Property(i =&gt; i.Priority).HasConversion&lt;string&gt;().HasMaxLength(20);
+ 
+        // ── Indexes ──
+        b.HasIndex(i =&gt; new { i.TenantId, i.ProjectId, i.StatusId })  // board queries
+            .HasDatabaseName(&quot;IX_Issues_Tenant_Project_Status&quot;);
+        b.HasIndex(i =&gt; new { i.TenantId, i.AssigneeId, i.UpdatedAt })  // assigned-to-me
+            .HasDatabaseName(&quot;IX_Issues_Tenant_Assignee_Updated&quot;);
+        b.HasIndex(i =&gt; i.IssueKey).IsUnique()
+            .HasDatabaseName(&quot;UQ_Issues_IssueKey&quot;);
+ 
+        // ── Relationships ──
+        b.HasMany(i =&gt; i.Comments).WithOne().HasForeignKey(c =&gt; c.IssueId);
+        b.HasMany(i =&gt; i.Attachments).WithOne().HasForeignKey(a =&gt; a.IssueId);
+    }
+}
+ 
+2.3 Database Migration Commands
+ 
+# Add initial migration
+dotnet ef migrations add InitialCreate --project Digiprise.PMS.Infrastructure \
+    --startup-project Digiprise.PMS.API
+ 
+# Apply to database
+dotnet ef database update --project Digiprise.PMS.Infrastructure \
+    --startup-project Digiprise.PMS.API
+ 
+# Generate SQL script for production deployment
+dotnet ef migrations script --idempotent -o migrations.sql \
+    --project Digiprise.PMS.Infrastructure \
+    --startup-project Digiprise.PMS.API
+ 
+03
+Backend API – Controllers &amp; CQRS
+3.1 IssuesController.cs
+ 
+[ApiController]
+[Route(&quot;api/v1/[controller]&quot;)]
+[Authorize]
+public class IssuesController : ControllerBase
+{
+    private readonly IMediator _mediator;
+    public IssuesController(IMediator mediator) =&gt; _mediator = mediator;
+ 
+    // GET /api/v1/issues/{id}
+    [HttpGet(&quot;{id:int}&quot;)]
+    [ProducesResponseType&lt;IssueDetailDto&gt;(200)]
+    [ProducesResponseType(404)]
+    public async Task&lt;IActionResult&gt; GetById(int id, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetIssueByIdQuery(id), ct);
+        return result is null ? NotFound() : Ok(result);
+    }
+ 
+    // POST /api/v1/issues
+    [HttpPost]
+    [ProducesResponseType&lt;IssueDto&gt;(201)]
+    public async Task&lt;IActionResult&gt; Create([FromBody] CreateIssueRequest req, CancellationToken ct)
+    {
+        var cmd = new CreateIssueCommand(
+            req.ProjectKey, req.IssueType, req.Summary,
+            req.Description, req.Priority, req.AssigneeId,
+            req.StoryPoints, req.SprintId, req.Labels, req.CustomFields);
+ 
+        var result = await _mediator.Send(cmd, ct);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+ 
+    // PATCH /api/v1/issues/{id}
+    [HttpPatch(&quot;{id:int}&quot;)]
+    public async Task&lt;IActionResult&gt; Update(int id,
+        [FromBody] UpdateIssueRequest req, CancellationToken ct)
+    {
+        var cmd = new UpdateIssueCommand(id, req);
+        await _mediator.Send(cmd, ct);
+        return NoContent();
+    }
+ 
+    // POST /api/v1/issues/search  (IQL)
+    [HttpPost(&quot;search&quot;)]
+    [ProducesResponseType&lt;PagedResult&lt;IssueDto&gt;&gt;(200)]
+    public async Task&lt;IActionResult&gt; Search([FromBody] IssueSearchRequest req, CancellationToken ct)
+    {
+        var result = await _mediator.Send(
+            new SearchIssuesQuery(req.Iql, req.MaxResults, req.StartAt), ct);
+        return Ok(result);
+    }
+ 
+    // POST /api/v1/issues/{id}/transitions
+    [HttpPost(&quot;{id:int}/transitions&quot;)]
+    public async Task&lt;IActionResult&gt; Transition(int id,
+        [FromBody] TransitionRequest req, CancellationToken ct)
+    {
+        await _mediator.Send(new TransitionIssueCommand(id, req.TransitionId), ct);
+        return NoContent();
+    }
+ 
+    // DELETE /api/v1/issues/{id}
+    [HttpDelete(&quot;{id:int}&quot;)]
+    [Authorize(Policy = Policies.DeleteIssue)]
+    public async Task&lt;IActionResult&gt; Delete(int id, CancellationToken ct)
+    {
+        await _mediator.Send(new DeleteIssueCommand(id), ct);
+        return NoContent();
+    }
+}
+ 
+3.2 CQRS – CreateIssueCommand &amp; Handler
+ 
+// Application/Issues/Commands/CreateIssueCommand.cs
+public record CreateIssueCommand(
+    string ProjectKey,
+    string IssueType,
+    string Summary,
+    string? Description,
+    string Priority,
+    int? AssigneeId,
+    int? StoryPoints,
+    int? SprintId,
+    List&lt;string&gt; Labels,
+    Dictionary&lt;string, object&gt; CustomFields
+) : IRequest&lt;IssueDto&gt;;
+ 
+// Application/Issues/Commands/CreateIssueCommandHandler.cs
+public class CreateIssueCommandHandler : IRequestHandler&lt;CreateIssueCommand, IssueDto&gt;
+{
+    private readonly PmsDbContext _db;
+    private readonly ITenantContext _tenant;
+    private readonly IPublisher _eventBus;
+    private readonly IMapper _mapper;
+    private readonly IIssueKeyGenerator _keyGen;
+ 
+    public CreateIssueCommandHandler(PmsDbContext db, ITenantContext tenant,
+        IPublisher eventBus, IMapper mapper, IIssueKeyGenerator keyGen)
+    {
+        _db = db; _tenant = tenant;
+        _eventBus = eventBus; _mapper = mapper; _keyGen = keyGen;
+    }
+ 
+    public async Task&lt;IssueDto&gt; Handle(CreateIssueCommand cmd, CancellationToken ct)
+    {
+        var project = await _db.Projects
+            .FirstOrDefaultAsync(p =&gt; p.Key == cmd.ProjectKey, ct)
+            ?? throw new NotFoundException($&quot;Project {cmd.ProjectKey} not found&quot;);
+ 
+        var key = await _keyGen.NextKeyAsync(project.Id, ct);
+ 
+        var issue = Issue.Create(
+            _tenant.Id, project.Id, key,
+            Enum.Parse&lt;IssueType&gt;(cmd.IssueType),
+            cmd.Summary,
+            Enum.Parse&lt;Priority&gt;(cmd.Priority),
+            _tenant.UserId);
+ 
+        issue.SetDescription(cmd.Description);
+        if (cmd.AssigneeId.HasValue) issue.Assign(cmd.AssigneeId.Value);
+        if (cmd.StoryPoints.HasValue) issue.SetStoryPoints(cmd.StoryPoints.Value);
+        if (cmd.SprintId.HasValue) issue.AddToSprint(cmd.SprintId.Value);
+ 
+        _db.Issues.Add(issue);
+        await _db.SaveChangesAsync(ct);
+ 
+        // Publish domain events
+        foreach (var evt in issue.DomainEvents)
+            await _eventBus.Publish(evt, ct);
+ 
+        return _mapper.Map&lt;IssueDto&gt;(issue);
+    }
+}
+ 
+3.3 FluentValidation – CreateIssueValidator
+ 
+// Application/Issues/Commands/CreateIssueCommandValidator.cs
+public class CreateIssueCommandValidator : AbstractValidator&lt;CreateIssueCommand&gt;
+{
+    public CreateIssueCommandValidator()
+    {
+        RuleFor(x =&gt; x.ProjectKey)
+            .NotEmpty()
+            .MaximumLength(10)
+            .Matches(@&quot;^[A-Z]{2,10}$&quot;)
+            .WithMessage(&quot;Project key must be 2-10 uppercase letters&quot;);
+ 
+        RuleFor(x =&gt; x.Summary)
+            .NotEmpty()
+            .MaximumLength(255)
+            .WithMessage(&quot;Summary is required and max 255 characters&quot;);
+ 
+        RuleFor(x =&gt; x.IssueType)
+            .NotEmpty()
+            .Must(t =&gt; Enum.TryParse&lt;IssueType&gt;(t, out _))
+            .WithMessage(&quot;Invalid issue type&quot;);
+ 
+        RuleFor(x =&gt; x.Priority)
+            .NotEmpty()
+            .Must(p =&gt; Enum.TryParse&lt;Priority&gt;(p, out _))
+            .WithMessage(&quot;Invalid priority&quot;);
+ 
+        RuleFor(x =&gt; x.StoryPoints)
+            .GreaterThan(0)
+            .LessThanOrEqualTo(999)
+            .When(x =&gt; x.StoryPoints.HasValue);
+    }
+}
+ 
+3.4 JWT Authentication Setup
+ 
+// Extensions/ServiceCollectionExtensions.cs
+public static IServiceCollection AddPmsAuthentication(
+    this IServiceCollection services, IConfiguration config)
+{
+    var jwtSettings = config.GetSection(&quot;Jwt&quot;).Get&lt;JwtSettings&gt;()!;
+ 
+    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(opts =&gt;
+        {
+            opts.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer           = true,
+                ValidateAudience         = true,
+                ValidateLifetime         = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer              = jwtSettings.Issuer,
+                ValidAudience            = jwtSettings.Audience,
+                IssuerSigningKey         = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                ClockSkew                = TimeSpan.FromSeconds(30)
+            };
+            // Support SignalR JWT in query string
+            opts.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = ctx =&gt;
+                {
+                    var token = ctx.Request.Query[&quot;access_token&quot;];
+                    if (!string.IsNullOrEmpty(token) &amp;&amp;
+                        ctx.HttpContext.Request.Path.StartsWithSegments(&quot;/hubs&quot;))
+                        ctx.Token = token;
+                    return Task.CompletedTask;
+                }
+            };
+        });
+ 
+    services.AddAuthorization(opts =&gt;
+    {
+        opts.AddPolicy(Policies.CreateIssue, p =&gt; p.RequireClaim(&quot;permission&quot;, &quot;issues.create&quot;));
+        opts.AddPolicy(Policies.DeleteIssue, p =&gt; p.RequireClaim(&quot;permission&quot;, &quot;issues.delete&quot;));
+        opts.AddPolicy(Policies.ManageWorkflow, p =&gt; p.RequireClaim(&quot;permission&quot;, &quot;workflow.manage&quot;));
+    });
+ 
+    return services;
+}
+ 
+04
+Workflow Engine &amp; Automation
+4.1 Workflow Engine Service
+ 
+// Application/Workflows/WorkflowEngine.cs
+public class WorkflowEngine : IWorkflowEngine
+{
+    private readonly PmsDbContext _db;
+    private readonly IValidatorFactory _validators;
+    private readonly IPostFunctionExecutor _postFunctions;
+ 
+    public WorkflowEngine(PmsDbContext db, IValidatorFactory validators,
+        IPostFunctionExecutor postFunctions)
+    {
+        _db = db; _validators = validators; _postFunctions = postFunctions;
+    }
+ 
+    public async Task&lt;TransitionResult&gt; TransitionAsync(
+        Issue issue, int transitionId, User actor, CancellationToken ct)
+    {
+        var transition = await _db.WorkflowTransitions
+            .Include(t =&gt; t.ToStatus)
+            .FirstOrDefaultAsync(t =&gt; t.Id == transitionId &amp;&amp;
+                t.FromStatusId == issue.StatusId, ct)
+            ?? throw new InvalidTransitionException(transitionId);
+ 
+        // 1. Evaluate conditions
+        var conditionOk = await EvaluateConditionsAsync(
+            transition.Conditions, issue, actor, ct);
+        if (!conditionOk)
+            return TransitionResult.Forbidden(&quot;Transition condition not met&quot;);
+ 
+        // 2. Run validators
+        foreach (var validator in transition.Validators)
+        {
+            var vResult = await _validators
+                .Create(validator.Type)
+                .ValidateAsync(issue, validator.Config, ct);
+            if (!vResult.IsValid)
+                return TransitionResult.Failure(vResult.Error);
+        }
+ 
+        // 3. Execute transition
+        issue.Transition(transition.ToStatus, actor.Id);
+        await _db.SaveChangesAsync(ct);
+ 
+        // 4. Run post-functions
+        foreach (var pf in transition.PostFunctions)
+            await _postFunctions.ExecuteAsync(pf, issue, actor, ct);
+ 
+        return TransitionResult.Success();
+    }
+ 
+    private async Task&lt;bool&gt; EvaluateConditionsAsync(
+        IEnumerable&lt;WorkflowCondition&gt; conditions,
+        Issue issue, User actor, CancellationToken ct)
+    {
+        foreach (var c in conditions)
+        {
+            bool ok = c.Type switch
+            {
+                &quot;UserInRole&quot;  =&gt; actor.Roles.Contains(c.Config[&quot;role&quot;]),
+                &quot;FieldNotEmpty&quot; =&gt; !string.IsNullOrEmpty(
+                    issue.GetFieldValue(c.Config[&quot;field&quot;])),
+                _ =&gt; true
+            };
+            if (!ok) return false;
+        }
+        return true;
+    }
+}
+ 
+4.2 Automation Rule Engine
+ 
+// Application/Automation/AutomationRuleProcessor.cs
+public class AutomationRuleProcessor : IAutomationRuleProcessor
+{
+    private readonly PmsDbContext _db;
+    private readonly IActionExecutor _actionExecutor;
+ 
+    public async Task ProcessEventAsync(
+        string triggerType, int projectId,
+        Issue issue, CancellationToken ct)
+    {
+        var rules = await _db.AutomationRules
+            .Where(r =&gt; r.ProjectId == projectId &amp;&amp; r.IsActive)
+            .ToListAsync(ct);
+ 
+        foreach (var rule in rules)
+        {
+            var trigger = rule.GetTriggerConfig();
+            if (trigger.Type != triggerType) continue;
+ 
+            // Evaluate conditions
+            bool allMet = rule.GetConditions().All(c =&gt; EvaluateCondition(c, issue));
+            if (!allMet) continue;
+ 
+            // Execute actions
+            foreach (var action in rule.GetActions())
+                await _actionExecutor.ExecuteAsync(action, issue, ct);
+ 
+            rule.LastRunAt = DateTime.UtcNow;
+        }
+        await _db.SaveChangesAsync(ct);
+    }
+ 
+    private bool EvaluateCondition(AutomationCondition c, Issue issue) =&gt;
+        c.Type switch
+        {
+            &quot;FieldEquals&quot; =&gt; issue.GetFieldValue(c.Field)?.ToString() == c.Value,
+            &quot;PriorityIs&quot;  =&gt; issue.Priority.ToString() == c.Value,
+            &quot;IssueTypeIs&quot; =&gt; issue.IssueType.ToString() == c.Value,
+            _             =&gt; true
+        };
+}
+ 
+05
+React Frontend – Core Components
+5.1 App Shell &amp; Router Setup
+ 
+// src/App.tsx
+import { QueryClient, QueryClientProvider } from &apos;@tanstack/react-query&apos;;
+import { BrowserRouter, Routes, Route } from &apos;react-router-dom&apos;;
+import { Provider } from &apos;react-redux&apos;;
+import { store } from &apos;./store&apos;;
+import AppShell from &apos;./layouts/AppShell&apos;;
+ 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 60_000,
+            retry: (count, err: any) =&gt; err?.status !== 404 &amp;&amp; count &lt; 2,
+        }
+    }
+});
+ 
+export default function App() {
+    return (
+        &lt;Provider store={store}&gt;
+            &lt;QueryClientProvider client={queryClient}&gt;
+                &lt;BrowserRouter&gt;
+                    &lt;Routes&gt;
+                        &lt;Route path=&quot;/login&quot; element={&lt;LoginPage /&gt;} /&gt;
+                        &lt;Route element={&lt;AppShell /&gt;}&gt;
+                            &lt;Route path=&quot;/&quot; element={&lt;DashboardPage /&gt;} /&gt;
+                            &lt;Route path=&quot;/projects&quot; element={&lt;ProjectListPage /&gt;} /&gt;
+                            &lt;Route path=&quot;/projects/:key/board&quot; element={&lt;BoardPage /&gt;} /&gt;
+                            &lt;Route path=&quot;/projects/:key/backlog&quot; element={&lt;BacklogPage /&gt;} /&gt;
+                            &lt;Route path=&quot;/issues/:key&quot; element={&lt;IssueDetailPage /&gt;} /&gt;
+                            &lt;Route path=&quot;/admin/*&quot; element={&lt;AdminLayout /&gt;} /&gt;
+                        &lt;/Route&gt;
+                    &lt;/Routes&gt;
+                &lt;/BrowserRouter&gt;
+            &lt;/QueryClientProvider&gt;
+        &lt;/Provider&gt;
+    );
+}
+ 
+5.2 Kanban Board Component
+ 
+// src/features/boards/KanbanBoard.tsx
+import { DragDropContext, Droppable, Draggable, DropResult } from &apos;react-beautiful-dnd&apos;;
+import { useBoardQuery, useTransitionIssueMutation } from &apos;../../api/boardApi&apos;;
+ 
+export default function KanbanBoard({ boardId }: { boardId: number }) {
+    const { data: board, isLoading } = useBoardQuery(boardId);
+    const transition = useTransitionIssueMutation();
+ 
+    const onDragEnd = async (result: DropResult) =&gt; {
+        const { draggableId, destination, source } = result;
+        if (!destination || destination.droppableId === source.droppableId) return;
+ 
+        const issueId  = parseInt(draggableId);
+        const statusId = parseInt(destination.droppableId);
+ 
+        // Optimistic update
+        queryClient.setQueryData([&apos;board&apos;, boardId], (old: Board) =&gt; ({
+            ...old,
+            columns: old.columns.map(col =&gt; {
+                if (col.statusId === parseInt(source.droppableId))
+                    return { ...col, issues: col.issues.filter(i =&gt; i.id !== issueId) };
+                if (col.statusId === statusId)
+                    return { ...col, issues: [...col.issues, movedIssue] };
+                return col;
+            })
+        }));
+ 
+        try {
+            await transition.mutateAsync({ issueId, targetStatusId: statusId });
+        } catch {
+            queryClient.invalidateQueries({ queryKey: [&apos;board&apos;, boardId] });
+        }
+    };
+ 
+    if (isLoading) return &lt;BoardSkeleton /&gt;;
+ 
+    return (
+        &lt;DragDropContext onDragEnd={onDragEnd}&gt;
+            &lt;div className=&quot;board-container&quot;&gt;
+                {board.columns.map(col =&gt; (
+                    &lt;BoardColumn key={col.id} column={col} /&gt;
+                ))}
+            &lt;/div&gt;
+        &lt;/DragDropContext&gt;
+    );
+}
+ 
+function BoardColumn({ column }: { column: BoardColumn }) {
+    const isOverLimit = column.issues.length &gt;= column.wipLimit;
+    const isWarning   = column.issues.length &gt;= column.wipLimit * 0.8;
+ 
+    return (
+        &lt;div className={`board-column ${isOverLimit ? &apos;wip-exceeded&apos; : isWarning ? &apos;wip-warning&apos; : &apos;&apos;}`}&gt;
+            &lt;div className=&quot;column-header&quot;&gt;
+                &lt;span className=&quot;status-name&quot;&gt;{column.name}&lt;/span&gt;
+                &lt;span className={`wip-badge ${isOverLimit ? &apos;red&apos; : isWarning ? &apos;yellow&apos; : &apos;&apos;}`}&gt;
+                    {column.issues.length}/{column.wipLimit}
+                &lt;/span&gt;
+                &lt;button className=&quot;add-issue-btn&quot;&gt;+&lt;/button&gt;
+            &lt;/div&gt;
+            &lt;Droppable droppableId={String(column.statusId)}&gt;
+                {(provided, snapshot) =&gt; (
+                    &lt;div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`column-body ${snapshot.isDraggingOver ? &apos;drag-over&apos; : &apos;&apos;}`}
+                    &gt;
+                        {column.issues.map((issue, index) =&gt; (
+                            &lt;IssueCard key={issue.id} issue={issue} index={index} /&gt;
+                        ))}
+                        {provided.placeholder}
+                    &lt;/div&gt;
+                )}
+            &lt;/Droppable&gt;
+        &lt;/div&gt;
+    );
+}
+ 
+5.3 Issue Detail Page – Right Panel
+ 
+// src/features/issues/IssueDetailPage.tsx
+import { useParams } from &apos;react-router-dom&apos;;
+import { useQuery, useMutation } from &apos;@tanstack/react-query&apos;;
+import { issueApi } from &apos;../../api/issueApi&apos;;
+import TipTapEditor from &apos;../../components/TipTapEditor&apos;;
+ 
+export default function IssueDetailPage() {
+    const { key } = useParams&lt;{ key: string }&gt;();
+    const { data: issue } = useQuery({
+        queryKey: [&apos;issue&apos;, key],
+        queryFn: () =&gt; issueApi.getByKey(key!)
+    });
+ 
+    const updateField = useMutation({
+        mutationFn: (patch: Partial&lt;Issue&gt;) =&gt; issueApi.patch(issue!.id, patch),
+        onSuccess: () =&gt; queryClient.invalidateQueries({ queryKey: [&apos;issue&apos;, key] })
+    });
+ 
+    if (!issue) return &lt;IssueDetailSkeleton /&gt;;
+ 
+    return (
+        &lt;div className=&quot;issue-detail&quot;&gt;
+            {/* ── Left panel (65%) ── */}
+            &lt;div className=&quot;issue-main&quot;&gt;
+                &lt;InlineEditText
+                    value={issue.summary}
+                    className=&quot;issue-summary&quot;
+                    onSave={v =&gt; updateField.mutate({ summary: v })}
+                /&gt;
+                &lt;TipTapEditor
+                    content={issue.description}
+                    onSave={v =&gt; updateField.mutate({ description: v })}
+                    placeholder=&quot;Add a description...&quot;
+                /&gt;
+                &lt;AttachmentGallery issueId={issue.id} /&gt;
+                &lt;CommentThread issueId={issue.id} /&gt;
+                &lt;ActivityLog issueId={issue.id} /&gt;
+            &lt;/div&gt;
+ 
+            {/* ── Right panel (35%) ── */}
+            &lt;div className=&quot;issue-sidebar&quot;&gt;
+                &lt;WorkflowTransitionButton issue={issue} /&gt;
+                &lt;IssueFieldGroup&gt;
+                    &lt;UserPickerField label=&quot;Assignee&quot; value={issue.assignee}
+                        onChange={u =&gt; updateField.mutate({ assigneeId: u?.id })} /&gt;
+                    &lt;PriorityField label=&quot;Priority&quot; value={issue.priority}
+                        onChange={p =&gt; updateField.mutate({ priority: p })} /&gt;
+                    &lt;StoryPointsField value={issue.storyPoints}
+                        onChange={sp =&gt; updateField.mutate({ storyPoints: sp })} /&gt;
+                    &lt;DateField label=&quot;Due Date&quot; value={issue.dueDate}
+                        onChange={d =&gt; updateField.mutate({ dueDate: d })} /&gt;
+                    &lt;SprintField value={issue.sprint}
+                        onChange={s =&gt; updateField.mutate({ sprintId: s?.id })} /&gt;
+                &lt;/IssueFieldGroup&gt;
+                &lt;LinkedIssuesSection issue={issue} /&gt;
+                &lt;ChildIssuesList issue={issue} /&gt;
+                &lt;WatchersList issue={issue} /&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+ 
+5.4 Sprint Planning Screen
+ 
+// src/features/sprints/SprintPlanningPage.tsx
+import { DragDropContext } from &apos;react-beautiful-dnd&apos;;
+ 
+export default function SprintPlanningPage() {
+    const { projectKey } = useParams();
+    const { data: backlog } = useBacklogQuery(projectKey!);
+    const { data: sprint }  = useActiveSprintQuery(projectKey!);
+    const moveMutation      = useMoveToSprintMutation();
+ 
+    const totalPoints = sprint?.issues.reduce((s, i) =&gt; s + (i.storyPoints ?? 0), 0) ?? 0;
+    const capacity    = sprint?.capacityPoints ?? 40;
+    const pct         = Math.min((totalPoints / capacity) * 100, 100);
+ 
+    return (
+        &lt;DragDropContext onDragEnd={handleDrop}&gt;
+            &lt;div className=&quot;sprint-planning&quot;&gt;
+ 
+                {/* Backlog panel */}
+                &lt;div className=&quot;backlog-panel&quot;&gt;
+                    &lt;header&gt;
+                        &lt;h2&gt;Backlog&lt;/h2&gt;
+                        &lt;IqlSearchBar onSearch={setFilter} /&gt;
+                    &lt;/header&gt;
+                    &lt;GroupSelector value={groupBy} onChange={setGroupBy} /&gt;
+                    &lt;Droppable droppableId=&quot;backlog&quot;&gt;
+                        {provided =&gt; (
+                            &lt;div ref={provided.innerRef} {...provided.droppableProps}&gt;
+                                {backlog?.issues.map((issue, i) =&gt; (
+                                    &lt;BacklogRow key={issue.id} issue={issue} index={i} /&gt;
+                                ))}
+                                {provided.placeholder}
+                            &lt;/div&gt;
+                        )}
+                    &lt;/Droppable&gt;
+                &lt;/div&gt;
+ 
+                {/* Sprint bucket panel */}
+                &lt;div className=&quot;sprint-panel&quot;&gt;
+                    &lt;header&gt;
+                        &lt;h2&gt;{sprint?.name ?? &apos;No Active Sprint&apos;}&lt;/h2&gt;
+                        &lt;CapacityBar pct={pct} label={`${totalPoints}/${capacity} pts`} /&gt;
+                    &lt;/header&gt;
+                    &lt;SprintGoalInput value={sprint?.goal} /&gt;
+                    &lt;Droppable droppableId=&quot;sprint&quot;&gt;
+                        {provided =&gt; (
+                            &lt;div ref={provided.innerRef} {...provided.droppableProps}&gt;
+                                {sprint?.issues.map((issue, i) =&gt; (
+                                    &lt;SprintIssueRow key={issue.id} issue={issue} index={i} /&gt;
+                                ))}
+                                {provided.placeholder}
+                            &lt;/div&gt;
+                        )}
+                    &lt;/Droppable&gt;
+                    &lt;StartSprintButton sprint={sprint} /&gt;
+                &lt;/div&gt;
+ 
+            &lt;/div&gt;
+        &lt;/DragDropContext&gt;
+    );
+}
+ 
+06
+Real-Time Communication – SignalR
+6.1 PmsHub.cs – Server Hub
+ 
+// API/Hubs/PmsHub.cs
+[Authorize]
+public class PmsHub : Hub
+{
+    public override async Task OnConnectedAsync()
+    {
+        var userId   = Context.UserIdentifier!;
+        var tenantId = Context.User!.FindFirst(&quot;tenantId&quot;)!.Value;
+ 
+        // Auto-join user-specific group
+        await Groups.AddToGroupAsync(Context.ConnectionId, $&quot;user:{userId}&quot;);
+        await Groups.AddToGroupAsync(Context.ConnectionId, $&quot;tenant:{tenantId}&quot;);
+        await base.OnConnectedAsync();
+    }
+ 
+    public async Task JoinBoard(int boardId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $&quot;board:{boardId}&quot;);
+    }
+ 
+    public async Task LeaveBoard(int boardId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $&quot;board:{boardId}&quot;);
+    }
+}
+ 
+// Sending from application layer
+public class BoardBroadcastService : IBoardBroadcastService
+{
+    private readonly IHubContext&lt;PmsHub&gt; _hub;
+    public BoardBroadcastService(IHubContext&lt;PmsHub&gt; hub) =&gt; _hub = hub;
+ 
+    public async Task BroadcastIssueMovedAsync(int boardId, IssueMoved evt)
+    {
+        await _hub.Clients
+            .Group($&quot;board:{boardId}&quot;)
+            .SendAsync(&quot;IssueStatusChanged&quot;, evt);
+    }
+}
+ 
+6.2 React SignalR Hook
+ 
+// src/hooks/useSignalR.ts
+import { HubConnection, HubConnectionBuilder, LogLevel } from &apos;@microsoft/signalr&apos;;
+import { useEffect, useRef } from &apos;react&apos;;
+import { useQueryClient } from &apos;@tanstack/react-query&apos;;
+ 
+export function useBoardSignalR(boardId: number) {
+    const connRef = useRef&lt;HubConnection | null&gt;(null);
+    const queryClient = useQueryClient();
+ 
+    useEffect(() =&gt; {
+        const conn = new HubConnectionBuilder()
+            .withUrl(&apos;/hubs/pms&apos;, {
+                accessTokenFactory: () =&gt; localStorage.getItem(&apos;access_token&apos;) ?? &apos;&apos;
+            })
+            .withAutomaticReconnect({
+                nextRetryDelayInMilliseconds: attempt =&gt;
+                    Math.min(1000 * Math.pow(2, attempt), 30_000)
+            })
+            .configureLogging(LogLevel.Warning)
+            .build();
+ 
+        conn.on(&apos;IssueStatusChanged&apos;, (evt) =&gt; {
+            queryClient.invalidateQueries({ queryKey: [&apos;board&apos;, boardId] });
+        });
+ 
+        conn.on(&apos;NotificationReceived&apos;, (notif) =&gt; {
+            // Dispatch to Redux notification slice
+        });
+ 
+        conn.start()
+            .then(() =&gt; conn.invoke(&apos;JoinBoard&apos;, boardId))
+            .catch(console.error);
+ 
+        connRef.current = conn;
+ 
+        return () =&gt; {
+            conn.invoke(&apos;LeaveBoard&apos;, boardId).finally(() =&gt; conn.stop());
+        };
+    }, [boardId]);
+ 
+    return connRef;
+}
+ 
+07
+IQL Search &amp; Elasticsearch
+7.1 IQL Parser
+ 
+// Application/Search/IqlParser.cs
+public class IqlParser
+{
+    // Parses: project = DIG AND status IN (&quot;In Progress&quot;) ORDER BY priority DESC
+    public IqlQuery Parse(string iql)
+    {
+        var tokens = Tokenize(iql);
+        return new IqlQuery
+        {
+            Clauses  = ParseClauses(tokens),
+            OrderBy  = ParseOrderBy(tokens),
+            MaxResults = 50
+        };
+    }
+ 
+    private List&lt;IqlClause&gt; ParseClauses(IEnumerable&lt;Token&gt; tokens)
+    {
+        var clauses = new List&lt;IqlClause&gt;();
+        // tokenise → field, operator, value(s)
+        // supports: = != &gt; &gt;= &lt; &lt;= IN NOT IN ~ !~
+        // supports functions: currentUser(), openSprints(), startOfDay()
+        return clauses;
+    }
+}
+ 
+// Application/Search/IqlToElasticsearchTranslator.cs
+public class IqlToElasticsearchTranslator
+{
+    public SearchRequest Translate(IqlQuery query, int tenantId)
+    {
+        var must = new List&lt;Query&gt;();
+ 
+        // Always scope to tenant
+        must.Add(new TermQuery(&quot;tenantId&quot;) { Value = tenantId });
+ 
+        foreach (var clause in query.Clauses)
+        {
+            must.Add(clause.Operator switch
+            {
+                &quot;=&quot;  =&gt; new TermQuery(MapField(clause.Field))
+                           { Value = ResolveValue(clause.Value) },
+                &quot;IN&quot; =&gt; new TermsQuery { Field = MapField(clause.Field),
+                           Terms = clause.Values.Select(ResolveValue) },
+                &quot;~&quot;  =&gt; new MatchPhraseQuery(MapField(clause.Field))
+                           { Query = clause.Value.ToString()! },
+                &quot;&gt;=&quot;  =&gt; new DateRangeQuery(MapField(clause.Field))
+                           { GreaterThanOrEqualTo = ParseDate(clause.Value) },
+                _    =&gt; throw new IqlParseException($&quot;Unsupported operator: {clause.Operator}&quot;)
+            });
+        }
+ 
+        return new SearchRequest
+        {
+            Query = new BoolQuery { Must = must },
+            Sort  = BuildSort(query.OrderBy),
+            Size  = query.MaxResults,
+            From  = query.StartAt
+        };
+    }
+}
+ 
+08
+Docker, Kubernetes &amp; CI/CD
+8.1 Multi-Stage Dockerfile
+ 
+# Digiprise.PMS.API/Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+ 
+# Restore dependencies (layer cache optimization)
+COPY [&quot;Digiprise.PMS.API/Digiprise.PMS.API.csproj&quot;, &quot;Digiprise.PMS.API/&quot;]
+COPY [&quot;Digiprise.PMS.Application/Digiprise.PMS.Application.csproj&quot;, &quot;Digiprise.PMS.Application/&quot;]
+COPY [&quot;Digiprise.PMS.Domain/Digiprise.PMS.Domain.csproj&quot;, &quot;Digiprise.PMS.Domain/&quot;]
+COPY [&quot;Digiprise.PMS.Infrastructure/Digiprise.PMS.Infrastructure.csproj&quot;, &quot;Digiprise.PMS.Infrastructure/&quot;]
+RUN dotnet restore &quot;Digiprise.PMS.API/Digiprise.PMS.API.csproj&quot;
+ 
+# Build &amp; publish
+COPY . .
+RUN dotnet publish &quot;Digiprise.PMS.API/Digiprise.PMS.API.csproj&quot; \
+    -c Release -o /app/publish /p:UseAppHost=false
+ 
+# Runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+ 
+# Security: non-root user
+RUN adduser --disabled-password --gecos &apos;&apos; appuser &amp;&amp; chown -R appuser /app
+USER appuser
+ 
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+ENTRYPOINT [&quot;dotnet&quot;, &quot;Digiprise.PMS.API.dll&quot;]
+ 
+8.2 Docker Compose – Local Development
+ 
+# docker-compose.yml
+version: &apos;3.9&apos;
+services:
+  api:
+    build: .
+    ports: [&quot;5000:8080&quot;]
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=DigipriseDB;...
+      - Redis__ConnectionString=redis:6379
+      - Elasticsearch__Uri=http://elasticsearch:9200
+    depends_on: [sqlserver, redis, elasticsearch, rabbitmq]
+ 
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStr0ngPassword!
+    ports: [&quot;1433:1433&quot;]
+    volumes: [sqldata:/var/opt/mssql]
+ 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass redispass
+    ports: [&quot;6379:6379&quot;]
+ 
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports: [&quot;9200:9200&quot;]
+ 
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    ports: [&quot;5672:5672&quot;, &quot;15672:15672&quot;]
+ 
+volumes:
+  sqldata:
+ 
+8.3 GitHub Actions CI/CD Pipeline
+ 
+# .github/workflows/ci.yml
+name: CI/CD Pipeline
+ 
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+ 
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: &apos;8.0.x&apos; }
+ 
+      - name: Restore
+        run: dotnet restore
+ 
+      - name: Build
+        run: dotnet build --no-restore -c Release
+ 
+      - name: Test
+        run: dotnet test --no-build -c Release --logger trx \
+             --collect:&quot;XPlat Code Coverage&quot;
+ 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env: { SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} }
+ 
+  docker-push:
+    needs: build-test
+    if: github.ref == &apos;refs/heads/main&apos;
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+ 
+      - name: Build &amp; Push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+ 
+09
+UI Styling &amp; CSS Design System
+9.1 CSS Design Tokens
+ 
+/* src/styles/tokens.css */
+:root {
+  /* Brand Colors */
+  --color-brand-dark:    #1B3A6B;
+  --color-brand-mid:     #2E6DB4;
+  --color-brand-light:   #D5E8F0;
+  --color-accent:        #FF6B35;
+ 
+  /* Priority Colors */
+  --priority-blocker:   #CC0000;
+  --priority-critical:  #FF4444;
+  --priority-major:     #FF8C00;
+  --priority-minor:     #2E86DE;
+  --priority-trivial:   #95A5A6;
+ 
+  /* Status Category Colors */
+  --status-todo:        #DFE1E6;
+  --status-inprogress:  #0052CC;
+  --status-done:        #00875A;
+ 
+  /* Spacing scale (4px base) */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px; --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px; --space-10: 40px; --space-12: 48px;
+ 
+  /* Typography */
+  --font-sans: &apos;Inter&apos;, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: &apos;JetBrains Mono&apos;, &apos;Fira Code&apos;, monospace;
+  --text-xs: 11px; --text-sm: 13px; --text-base: 14px;
+  --text-lg: 16px; --text-xl: 20px; --text-2xl: 24px;
+ 
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.25);
+  --shadow-dropdown: 0 8px 24px rgba(0,0,0,0.15);
+ 
+  /* Border radius */
+  --radius-sm: 3px; --radius-md: 6px;
+  --radius-lg: 10px; --radius-xl: 16px;
+}
+ 
+9.2 Kanban Board CSS
+ 
+/* src/features/boards/KanbanBoard.css */
+.board-container {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding: var(--space-4);
+  min-height: calc(100vh - 120px);
+  align-items: flex-start;
+}
+ 
+.board-column {
+  width: 280px;
+  flex-shrink: 0;
+  background: #F4F5F7;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 140px);
+}
+ 
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: #EBECF0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-brand-dark);
+}
+ 
+.column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+ 
+.column-body.drag-over {
+  background: rgba(46, 109, 180, 0.08);
+}
+ 
+/* Issue card */
+.issue-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
+  cursor: grab;
+  border-left: 3px solid transparent;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+ 
+.issue-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.16); transform: translateY(-1px); }
+.issue-card:active { cursor: grabbing; }
+ 
+.issue-card .card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+ 
+.wip-badge.yellow { background: #FFF3CD; color: #856404; }
+.wip-badge.red    { background: #FEE2E2; color: #B91C1C; }
+.board-column.wip-exceeded { outline: 2px solid var(--priority-critical); }
+ 
+10
+Testing Strategy &amp; Implementation
+10.1 Unit Tests – CreateIssueCommandHandler
+ 
+// Tests/Application/Issues/CreateIssueCommandHandlerTests.cs
+public class CreateIssueCommandHandlerTests
+{
+    private readonly PmsDbContext _db;
+    private readonly CreateIssueCommandHandler _handler;
+ 
+    public CreateIssueCommandHandlerTests()
+    {
+        var opts = new DbContextOptionsBuilder&lt;PmsDbContext&gt;()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+ 
+        var tenantCtx = Substitute.For&lt;ITenantContext&gt;();
+        tenantCtx.Id.Returns(1);
+        tenantCtx.UserId.Returns(10);
+ 
+        _db      = new PmsDbContext(opts, tenantCtx);
+        _handler = new CreateIssueCommandHandler(
+            _db, tenantCtx,
+            Substitute.For&lt;IPublisher&gt;(),
+            MapperHelper.Create(),
+            new IssueKeyGenerator(_db));
+    }
+ 
+    [Fact]
+    public async Task Handle_ValidCommand_CreatesIssue()
+    {
+        // Arrange
+        var project = new Project { Key = &quot;DIG&quot;, TenantId = 1 };
+        _db.Projects.Add(project);
+        await _db.SaveChangesAsync();
+ 
+        var cmd = new CreateIssueCommand(
+            &quot;DIG&quot;, &quot;Story&quot;, &quot;Implement login&quot;, null, &quot;Major&quot;,
+            null, 5, null, [], new Dictionary&lt;string, object&gt;());
+ 
+        // Act
+        var result = await _handler.Handle(cmd, CancellationToken.None);
+ 
+        // Assert
+        result.Should().NotBeNull();
+        result.Summary.Should().Be(&quot;Implement login&quot;);
+        result.IssueKey.Should().StartWith(&quot;DIG-&quot;);
+ 
+        var saved = await _db.Issues.FirstAsync();
+        saved.Priority.Should().Be(Priority.Major);
+    }
+ 
+    [Fact]
+    public async Task Handle_InvalidProject_ThrowsNotFoundException()
+    {
+        var cmd = new CreateIssueCommand(
+            &quot;INVALID&quot;, &quot;Story&quot;, &quot;Test&quot;, null, &quot;Minor&quot;,
+            null, null, null, [], []);
+ 
+        await FluentActions
+            .Invoking(() =&gt; _handler.Handle(cmd, CancellationToken.None))
+            .Should().ThrowAsync&lt;NotFoundException&gt;();
+    }
+}
+ 
+10.2 Integration Tests – API Endpoint
+ 
+// Tests/API/IssuesEndpointTests.cs
+public class IssuesEndpointTests : IClassFixture&lt;WebApplicationFactory&lt;Program&gt;&gt;
+{
+    private readonly HttpClient _client;
+ 
+    public IssuesEndpointTests(WebApplicationFactory&lt;Program&gt; factory)
+    {
+        _client = factory
+            .WithWebHostBuilder(b =&gt; b.ConfigureServices(s =&gt;
+            {
+                // Replace DB with test container
+                s.RemoveAll&lt;DbContextOptions&lt;PmsDbContext&gt;&gt;();
+                s.AddDbContext&lt;PmsDbContext&gt;(o =&gt;
+                    o.UseSqlServer(TestContainerFixture.ConnectionString));
+            }))
+            .CreateClient();
+ 
+        _client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue(&quot;Bearer&quot;, TestJwtHelper.GenerateToken());
+    }
+ 
+    [Fact]
+    public async Task POST_Issues_Returns201WithLocation()
+    {
+        var payload = new {
+            projectKey = &quot;DIG&quot;, issueType = &quot;Story&quot;,
+            summary = &quot;Integration test story&quot;, priority = &quot;Major&quot;
+        };
+ 
+        var response = await _client.PostAsJsonAsync(&quot;/api/v1/issues&quot;, payload);
+ 
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.Headers.Location.Should().NotBeNull();
+    }
+}
+ 
+11
+Kubernetes Deployment Guide
+11.1 Kubernetes Deployment Manifest
+ 
+# k8s/api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pms-api
+  namespace: digiprise
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: pms-api }
+  template:
+    metadata:
+      labels: { app: pms-api }
+    spec:
+      containers:
+        - name: pms-api
+          image: ghcr.io/digiprise/pms-api:latest
+          ports: [{ containerPort: 8080 }]
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef: { name: pms-secrets, key: db-connection }
+            - name: Redis__ConnectionString
+              valueFrom:
+                secretKeyRef: { name: pms-secrets, key: redis-connection }
+          resources:
+            requests: { cpu: &apos;500m&apos;, memory: &apos;512Mi&apos; }
+            limits:   { cpu: &apos;2000m&apos;, memory: &apos;2Gi&apos; }
+          livenessProbe:
+            httpGet: { path: /health/live, port: 8080 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /health/ready, port: 8080 }
+            initialDelaySeconds: 15
+            periodSeconds: 5
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pms-api-hpa
+  namespace: digiprise
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pms-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 60 }
+ 
+11.2 appsettings.Production.json
+ 
+{
+  &quot;Logging&quot;: { &quot;LogLevel&quot;: { &quot;Default&quot;: &quot;Warning&quot; } },
+  &quot;Jwt&quot;: {
+    &quot;Issuer&quot;:    &quot;https://auth.digiprise.io&quot;,
+    &quot;Audience&quot;:  &quot;digiprise-pms&quot;,
+    &quot;ExpiryMin&quot;: 15
+    // SecretKey from environment / Azure Key Vault
+  },
+  &quot;RateLimit&quot;: {
+    &quot;UserRequestsPerMinute&quot;:   200,
+    &quot;TenantRequestsPerMinute&quot;: 5000
+  },
+  &quot;Redis&quot;: {
+    &quot;InstanceName&quot;: &quot;pms:&quot;,
+    &quot;DefaultTtlSec&quot;: 300
+  },
+  &quot;Elasticsearch&quot;: {
+    &quot;IndexPrefix&quot;: &quot;pms_issues&quot;,
+    &quot;NumberOfShards&quot;:   3,
+    &quot;NumberOfReplicas&quot;: 1
+  },
+  &quot;RabbitMQ&quot;: {
+    &quot;QueueName&quot;:    &quot;pms.events&quot;,
+    &quot;DlqName&quot;:      &quot;pms.events.dlq&quot;,
+    &quot;RetryCount&quot;:   3,
+    &quot;RetryDelayMs&quot;: 2000
+  }
+}
+ 
+12
+Complete API Reference
+12.1 REST API Endpoints
+Method
+Endpoint
+Description
+Auth
+GET
+/api/v1/projects
+List all projects (paginated)
+Bearer
+POST
+/api/v1/projects
+Create new project
+Bearer
+GET
+/api/v1/projects/{key}
+Project detail + stats
+Bearer
+PUT
+/api/v1/projects/{key}
+Update project settings
+Bearer+Admin
+DELETE
+/api/v1/projects/{key}
+Archive/delete project
+Bearer+Admin
+GET
+/api/v1/issues/{id}
+Full issue detail
+Bearer
+POST
+/api/v1/issues
+Create issue
+Bearer
+PATCH
+/api/v1/issues/{id}
+Partial update issue fields
+Bearer
+DELETE
+/api/v1/issues/{id}
+Delete issue
+Bearer+Perm
+POST
+/api/v1/issues/search
+IQL search with pagination
+Bearer
+POST
+/api/v1/issues/{id}/transitions
+Execute workflow transition
+Bearer
+GET
+/api/v1/issues/{id}/history
+Field change history
+Bearer
+POST
+/api/v1/issues/{id}/comments
+Add comment with @mentions
+Bearer
+POST
+/api/v1/issues/{id}/attachments
+Upload attachment (multipart)
+Bearer
+GET
+/api/v1/boards/{id}
+Board columns + issues
+Bearer
+GET
+/api/v1/boards/{id}/sprints
+All sprints for board
+Bearer
+POST
+/api/v1/sprints
+Create sprint
+Bearer+PM
+POST
+/api/v1/sprints/{id}/start
+Start sprint (activates it)
+Bearer+SM
+POST
+/api/v1/sprints/{id}/close
+Close sprint, move incomplete issues
+Bearer+SM
+GET
+/api/v1/sprints/{id}/burndown
+Burndown chart data points
+Bearer
+GET
+/api/v1/dashboards/{id}
+Dashboard with widget configs
+Bearer
+POST
+/api/v1/dashboards/{id}/widgets
+Add widget to dashboard
+Bearer
+POST
+/api/v1/webhooks
+Register outbound webhook
+Bearer+Admin
+GET
+/health/live
+Liveness probe
+None
+GET
+/health/ready
+Readiness probe (DB+Redis+ES)
+None
+12.2 Sample API Request/Response
+POST /api/v1/issues
+ 
+// Request body
+{
+  &quot;projectKey&quot;:   &quot;DIG&quot;,
+  &quot;issueType&quot;:    &quot;Story&quot;,
+  &quot;summary&quot;:      &quot;Implement OAuth2 login for mobile app&quot;,
+  &quot;description&quot;:  &quot;&lt;p&gt;As a user I want to log in with Google...&lt;/p&gt;&quot;,
+  &quot;priority&quot;:     &quot;Major&quot;,
+  &quot;assigneeId&quot;:   42,
+  &quot;storyPoints&quot;:  5,
+  &quot;sprintId&quot;:     17,
+  &quot;labels&quot;:       [&quot;auth&quot;, &quot;mobile&quot;],
+  &quot;customFields&quot;: { &quot;CF_001&quot;: &quot;Q3&quot;, &quot;CF_004&quot;: &quot;2024-09-30&quot; }
+}
+ 
+// Response: 201 Created
+// Location: /api/v1/issues/1428
+{
+  &quot;id&quot;:        1428,
+  &quot;issueKey&quot;:  &quot;DIG-1428&quot;,
+  &quot;summary&quot;:   &quot;Implement OAuth2 login for mobile app&quot;,
+  &quot;status&quot;:    { &quot;id&quot;: 1, &quot;name&quot;: &quot;To Do&quot;, &quot;category&quot;: &quot;ToDo&quot; },
+  &quot;priority&quot;:  &quot;Major&quot;,
+  &quot;assignee&quot;:  { &quot;id&quot;: 42, &quot;name&quot;: &quot;Alice Chen&quot;, &quot;avatarUrl&quot;: &quot;...&quot; },
+  &quot;createdAt&quot;: &quot;2024-09-01T10:23:45Z&quot;,
+  &quot;updatedAt&quot;: &quot;2024-09-01T10:23:45Z&quot;
+}
+ 
+13
+Implementation Roadmap &amp; Checklist
+Phase 1 – Foundation (Weeks 1–3)
+Task
+Owner
+Priority
+Status
+Create Visual Studio solution structure
+Backend Lead
+P0
+☐ Todo
+Configure EF Core + PmsDbContext + migrations
+Backend Lead
+P0
+☐ Todo
+Implement JWT authentication + refresh tokens
+Backend Lead
+P0
+☐ Todo
+Create Tenant middleware + global query filters
+Backend Lead
+P0
+☐ Todo
+Setup React app with routing + Redux Toolkit
+Frontend Lead
+P0
+☐ Todo
+Setup Docker Compose for local dev
+DevOps
+P0
+☐ Todo
+GitHub Actions CI pipeline (build + test)
+DevOps
+P0
+☐ Todo
+Phase 2 – Core Features (Weeks 4–7)
+Task
+Owner
+Priority
+Status
+Issues CRUD API (CreateIssueCommand + all PATCH fields)
+Backend
+P0
+☐ Todo
+Workflow engine with validators + post-functions
+Backend
+P0
+☐ Todo
+Kanban board + drag-drop with optimistic UI
+Frontend
+P0
+☐ Todo
+Issue detail page (inline edit + TipTap editor)
+Frontend
+P0
+☐ Todo
+SignalR hub + React useSignalR hook
+Backend + FE
+P0
+☐ Todo
+IQL parser + Elasticsearch integration
+Backend
+P1
+☐ Todo
+Sprint creation + start/close lifecycle
+Backend
+P1
+☐ Todo
+Sprint planning drag-drop screen
+Frontend
+P1
+☐ Todo
+Phase 3 – Advanced Features (Weeks 8–11)
+Task
+Owner
+Priority
+Status
+Dashboard widget system + burndown chart
+Full Stack
+P1
+☐ Todo
+Automation rule engine (trigger → condition → action)
+Backend
+P1
+☐ Todo
+Custom fields framework + field configuration schemes
+Backend
+P1
+☐ Todo
+Notification system (SignalR + email via RabbitMQ)
+Backend
+P1
+☐ Todo
+Audit log + tamper-evident hash chain
+Backend
+P2
+☐ Todo
+Admin workflow designer UI (react-flow canvas)
+Frontend
+P2
+☐ Todo
+Webhook integration + outbound webhook log
+Backend
+P2
+☐ Todo
+Phase 4 – Production Hardening (Weeks 12–14)
+Task
+Owner
+Priority
+Status
+Kubernetes manifests + HPA autoscaling
+DevOps
+P0
+☐ Todo
+Redis backplane for SignalR scale-out
+Backend
+P0
+☐ Todo
+SQL Server read replica for dashboard queries
+DevOps
+P0
+☐ Todo
+Performance testing with k6 (1,000+ VUs)
+QA
+P0
+☐ Todo
+Security pen-test + OWASP checklist
+Security
+P0
+☐ Todo
+Prometheus metrics + Grafana dashboards
+DevOps
+P1
+☐ Todo
+WCAG 2.1 AA accessibility audit + fixes
+Frontend
+P1
+☐ Todo
+Document Prepared for Digiprise Engineering Team
+ASP.NET Core 8 · React 18 · SQL Server 2022 · Redis · Elasticsearch · RabbitMQ · Kubernetes

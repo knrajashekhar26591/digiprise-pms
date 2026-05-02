@@ -64,6 +64,9 @@
         <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetComments(System.Int32,System.Threading.CancellationToken)">
             <summary>Get all comments for an issue</summary>
         </member>
+        <member name="M:Digiprise.PMS.API.Controllers.IssuesController.GetWithBaseline(System.Int32,System.DateTimeOffset,System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <summary>Get issues with baseline comparison</summary>
+        </member>
         <member name="T:Digiprise.PMS.API.Controllers.SprintsController">
             <summary>Sprint lifecycle management — start, close, burndown</summary>
         </member>

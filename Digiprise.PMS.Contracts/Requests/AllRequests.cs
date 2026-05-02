@@ -59,6 +59,7 @@ public class CreateIssueRequest
     public int? SprintId { get; set; }
     public int? ParentIssueId { get; set; }
     public string[]? Labels { get; set; }
+    public DateTime? StartDate { get; set; }
     public DateTime? DueDate { get; set; }
     public Dictionary<string, string>? CustomFields { get; set; }
 }
@@ -72,6 +73,7 @@ public class UpdateIssueRequest
     public int? StoryPoints { get; set; }
     public int? SprintId { get; set; }
     public string[]? Labels { get; set; }
+    public DateTime? StartDate { get; set; }
     public DateTime? DueDate { get; set; }
 }
 
@@ -134,3 +136,34 @@ public class AddMemberRequest
     [Required] public int UserId { get; set; }
     [Required] public string Role { get; set; } = "Developer";
 }
+
+// ── Phase 3: Enterprise Module Requests ───────────────────────────────
+public class CreateBudgetRequest
+{
+    [Required] public int ProjectId { get; set; }
+    [Required] public string Name { get; set; } = string.Empty;
+    public decimal MaterialBudgetCents { get; set; }
+    public decimal LaborBudgetCents { get; set; }
+    public string? Description { get; set; }
+}
+
+public class CreateCostEntryRequest
+{
+    [Required] public int IssueId { get; set; }
+    [Required] public int CostTypeId { get; set; }
+    [Required] public DateTime SpentOn { get; set; }
+    [Required] public decimal Units { get; set; }
+    [Required] public long UnitCostCents { get; set; }
+    public string? Comment { get; set; }
+    public int? BudgetId { get; set; }
+}
+
+public class CreateSlaPolicyRequest
+{
+    [Required] public int ProjectId { get; set; }
+    [Required] public string Name { get; set; } = string.Empty;
+    public string? TargetPriority { get; set; }
+    [Required] public int ResponseSecs { get; set; }
+    [Required] public int ResolutionSecs { get; set; }
+}
+

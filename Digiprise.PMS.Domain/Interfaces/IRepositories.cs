@@ -28,6 +28,7 @@ public interface IIssueRepository : IRepository<Issue>
     Task<IEnumerable<Issue>> GetByAssigneeAsync(int userId, int tenantId, CancellationToken ct = default);
     Task<string> GenerateIssueKeyAsync(int projectId, string projectKey, CancellationToken ct = default);
     Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int page, int pageSize, CancellationToken ct = default);
+    Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default);
 }
 
 public interface ISprintRepository : IRepository<Sprint>
@@ -59,3 +60,21 @@ public interface IAuditLogRepository : IRepository<AuditLog>
     Task<IEnumerable<AuditLog>> GetByEntityAsync(string entityType, int entityId, CancellationToken ct = default);
     Task<string?> GetLastHashAsync(int tenantId, CancellationToken ct = default);
 }
+
+public interface ICostRepository : IRepository<CostEntry>
+{
+    Task<IEnumerable<CostEntry>> GetByIssueAsync(int issueId, CancellationToken ct = default);
+    Task<IEnumerable<CostEntry>> GetByProjectAsync(int projectId, CancellationToken ct = default);
+}
+
+public interface IBudgetRepository : IRepository<Budget>
+{
+    Task<IEnumerable<Budget>> GetByProjectAsync(int projectId, CancellationToken ct = default);
+}
+
+public interface ISlaRepository : IRepository<SlaPolicy>
+{
+    Task<IEnumerable<SlaPolicy>> GetByProjectAsync(int projectId, CancellationToken ct = default);
+    Task<IEnumerable<SlaBreach>> GetBreachesByIssueAsync(int issueId, CancellationToken ct = default);
+}
+

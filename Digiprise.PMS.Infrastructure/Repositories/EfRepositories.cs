@@ -115,6 +115,24 @@ public class EfIssueRepository : EfRepository<Issue>, IIssueRepository
         // Basic IQL mock fallback
         return await _context.Issues.Where(i => i.TenantId == tenantId).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
     }
+
+    public async Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default)
+    {
+        var result = new Dictionary<int, string>();
+        foreach (var id in issueIds)
+        {
+            var journal = await _context.IssueJournals
+                .Where(j => j.IssueId == id && j.CreatedAt <= baseline)
+                .OrderByDescending(j => j.CreatedAt)
+                .FirstOrDefaultAsync(ct);
+
+            if (journal != null)
+            {
+                result[id] = journal.ChangedFields;
+            }
+        }
+        return result;
+    }
 }
 
 public class EfSprintRepository : EfRepository<Sprint>, ISprintRepository
@@ -196,3 +214,44 @@ public class EfAuditLogRepository : EfRepository<AuditLog>, IAuditLogRepository
         return last?.PrevHash;
     }
 }
+
+public class EfCostRepository : EfRepository<CostEntry>, ICostRepository
+{
+    public EfCostRepository(PmsDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<CostEntry>> GetByIssueAsync(int issueId, CancellationToken ct = default)
+    {
+        return await _context.CostEntries.Where(c => c.IssueId == issueId).ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<CostEntry>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await _context.CostEntries.Include(c => c.Issue).Where(c => c.Issue!.ProjectId == projectId).ToListAsync(ct);
+    }
+}
+
+public class EfBudgetRepository : EfRepository<Budget>, IBudgetRepository
+{
+    public EfBudgetRepository(PmsDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<Budget>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await _context.Budgets.Where(b => b.ProjectId == projectId).ToListAsync(ct);
+    }
+}
+
+public class EfSlaRepository : EfRepository<SlaPolicy>, ISlaRepository
+{
+    public EfSlaRepository(PmsDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<SlaPolicy>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await _context.SlaPolicies.Where(s => s.ProjectId == projectId).ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<SlaBreach>> GetBreachesByIssueAsync(int issueId, CancellationToken ct = default)
+    {
+        return await _context.SlaBreaches.Where(s => s.IssueId == issueId).ToListAsync(ct);
+    }
+}
+

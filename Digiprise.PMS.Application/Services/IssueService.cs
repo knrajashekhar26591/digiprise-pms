@@ -67,6 +67,27 @@ public class IssueService : IIssueService
         return result;
     }
 
+    public async Task<BaselineResponse> GetWithBaselineAsync(int projectId, DateTimeOffset baseline, int tenantId, int page = 1, int pageSize = 50, CancellationToken ct = default)
+    {
+        var issues = await _issues.GetByProjectAsync(projectId, ct);
+        issues = issues.Where(i => i.TenantId == tenantId).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        
+        var issueIds = issues.Select(i => i.Id).ToList();
+        var baselineStates = await _issues.GetJournalsAtBaselineAsync(issueIds, baseline, ct);
+
+        var items = new List<BaselineIssueItem>();
+        foreach (var issue in issues)
+        {
+            var dto = (await MapFullAsync(issue, ct))!;
+            baselineStates.TryGetValue(issue.Id, out var baselineJson);
+            
+            string status = baselineJson == null ? "Added" : "Modified"; // simplified
+            items.Add(new BaselineIssueItem(dto, baselineJson, status));
+        }
+
+        return new BaselineResponse(items, issues.Count());
+    }
+
     public async Task<IssueDto> CreateAsync(CreateIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default)
     {
         var project = await _projects.GetByKeyAsync(tenantId, request.ProjectKey, ct)
@@ -94,6 +115,8 @@ public class IssueService : IIssueService
             issue.SetParent(request.ParentIssueId);
         if (request.Labels?.Any() == true)
             issue.SetLabels(JsonSerializer.Serialize(request.Labels));
+        if (request.StartDate.HasValue)
+            issue.SetStartDate(request.StartDate, currentUserId);
         if (request.DueDate.HasValue)
             issue.SetDueDate(request.DueDate, currentUserId);
 
@@ -125,6 +148,7 @@ public class IssueService : IIssueService
         if (request.StoryPoints != null) issue.SetStoryPoints(request.StoryPoints, currentUserId);
         if (request.SprintId != null) issue.AssignToSprint(request.SprintId, currentUserId);
         if (request.Labels != null) issue.SetLabels(JsonSerializer.Serialize(request.Labels));
+        if (request.StartDate != null) issue.SetStartDate(request.StartDate, currentUserId);
         if (request.DueDate != null) issue.SetDueDate(request.DueDate, currentUserId);
 
         await _issues.UpdateAsync(issue, ct);
@@ -231,7 +255,7 @@ public class IssueService : IIssueService
             i.StatusId, GetStatusName(i.StatusId), i.StatusId >= 4 ? "Done" : i.StatusId >= 2 ? "InProgress" : "ToDo",
             i.Priority.ToString(), i.AssigneeId, assignee?.DisplayName,
             i.ReporterId, reporter?.DisplayName ?? "Unknown",
-            i.ParentIssueId, i.SprintId, sprint?.Name, i.StoryPoints, i.DueDate,
+            i.ParentIssueId, i.SprintId, sprint?.Name, i.StoryPoints, i.StartDate, i.DueDate,
             i.Labels != null ? JsonSerializer.Deserialize<string[]>(i.Labels) : null,
             i.CreatedAt, i.UpdatedAt);
     }

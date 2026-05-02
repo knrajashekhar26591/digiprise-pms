@@ -29,6 +29,12 @@ public class InMemoryDataStore
     public ConcurrentDictionary<int, Notification> Notifications { get; } = new();
     public ConcurrentDictionary<int, AuditLog> AuditLogs { get; } = new();
     public ConcurrentDictionary<int, AutomationRule> AutomationRules { get; } = new();
+    public ConcurrentDictionary<int, IssueJournal> IssueJournals { get; } = new();
+    public ConcurrentDictionary<int, Budget> Budgets { get; } = new();
+    public ConcurrentDictionary<int, CostType> CostTypes { get; } = new();
+    public ConcurrentDictionary<int, CostEntry> CostEntries { get; } = new();
+    public ConcurrentDictionary<int, SlaPolicy> SlaPolicies { get; } = new();
+    public ConcurrentDictionary<int, SlaBreach> SlaBreaches { get; } = new();
 
     // Refresh token store: token -> (userId, tenantId, expiry)
     public ConcurrentDictionary<string, (int UserId, int TenantId, DateTime Expiry)> RefreshTokens { get; } = new();

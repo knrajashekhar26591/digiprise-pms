@@ -24,8 +24,13 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("post
 }
 
 // ── Entity Framework Core Database ──────────────────────────────────────
-builder.Services.AddDbContext<PmsDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddSingleton<Digiprise.PMS.Infrastructure.Data.Interceptors.IssueJournalInterceptor>();
+
+builder.Services.AddDbContext<PmsDbContext>((sp, options) =>
+{
+    options.UseNpgsql(connectionString);
+    options.AddInterceptors(sp.GetRequiredService<Digiprise.PMS.Infrastructure.Data.Interceptors.IssueJournalInterceptor>());
+});
 
 // ── Domain Repositories ────────────────────────────────────────────────
 builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();
@@ -35,14 +40,25 @@ builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<ITenantRepository, EfTenantRepository>();
 builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();
 builder.Services.AddScoped<IAuditLogRepository, EfAuditLogRepository>();
+builder.Services.AddScoped<ICostRepository, EfCostRepository>();
+builder.Services.AddScoped<IBudgetRepository, EfBudgetRepository>();
+builder.Services.AddScoped<ISlaRepository, EfSlaRepository>();
+
 
 // ── Application Services ───────────────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Digiprise.PMS.Application.Interfaces.ICurrentUserContext, Digiprise.PMS.API.Services.CurrentUserContext>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 builder.Services.AddScoped<ISprintService, SprintService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<ICostService, CostService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<ISlaService, SlaService>();
+
 
 // ── Infrastructure Services ────────────────────────────────────────────
 builder.Services.AddSingleton<IJwtService, JwtService>();

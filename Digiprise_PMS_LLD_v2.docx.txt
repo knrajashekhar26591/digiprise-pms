@@ -1,0 +1,1988 @@
+﻿DIGIPRISE CRM
+Jira-Like Project Management System
+Low-Level Design &amp; System Architecture v2.0
+Upgraded from v1.0 with 
+OpenProject
+ best practices
+Property
+Value
+Platform
+ASP.NET Core 8 / React 18 / SQL Server 2022
+Version
+2.0 — 
+OpenProject
+-upgraded
+Architecture
+Modular engine (Domain → Application → Infrastructure)
+Concurrent Users
+1,000+ (Jira Cloud parity)
+Key Upgrade Source
+OpenProject
+ (
+opf
+/
+openproject
+) — 14.5k stars, GPL-3.0
+New Modules
+Gantt+Baseline
+, Cost Tracking, Meetings, Wiki, Automation
+Classification
+Confidential — Internal Use Only
+1. What We Upgraded 
+From
+ 
+OpenProject
+OpenProject
+ (github.com/
+opf
+/
+openproject
+) is the leading open-source project management platform with 103,000+ commits, 14.5k stars, and a GPL-3.0 license. We analysed its architecture and module system to identify proven patterns missing from 
+Digiprise
+ PMS v1.0. The table below maps each upgrade.
+OpenProject
+ feature
+v1.0 status
+v2.0 upgrade
+Work package hierarchy (
+Epic→Story→Sub
+)
+Issues table only
+Full 4-level hierarchy with 
+WpTree
+ closure table
+Gantt chart with baseline comparison
+Not present
+Gantt module + 
+WorkPackageJournals
+ baseline snapshot API
+Backlogs (Scrum sprint board)
+Basic sprint CRUD
+Full backlog module: velocity chart, burndown, story points
+Costs &amp; time tracking module
+Not present
+CostEntries
+ + Budgets + 
+TimeEntries
+ per work package
+Meetings module (agenda + minutes)
+Not present
+Meetings table linked to work packages with PDF export
+Wiki per project
+Not present
+WikiPages
+ with Markdown, versioned, linked to work packages
+Automation engine (
+Trigger→Action
+)
+Not present
+AutomationRules
+ JSON config + background job runner
+Multi-tenant Row-Level Security
+TenantId
+ filter only
+EF Core global query filter + SQL Server RLS policy
+Audit log with hash chain
+Basic audit table
+SHA-256 chained 
+AuditLog
+ (tamper-evident, append-only)
+SLA tracking per priority
+Not present
+SlaPolicy
+ + 
+SlaState
+ per issue (
+WithinGoal
+/Breaching/Breached)
+Custom workflow transitions with validators
+Status 
+enum
+ only
+WorkflowTransitions with Conditions/Validators JSON (OP pattern)
+Baseline comparison API
+Not present
+WorkPackageJournals
+ + /
+api
+/v1/
+work-packages?baseline
+={date}
+IQL saved filters &amp; subscriptions
+Basic JQL search
+SavedFilters
+ table with email digest subscriptions
+Cumulative flow + velocity charts
+Not present
+DailyStatusSnapshots
+ + 
+SprintSnapshots
+ tables
+PDF export per issue/sprint
+Not present
+PdfExport
+ service using Puppeteer / 
+WeasyPrint
+ sidecar
+SignalR
+ real-time with Redis backplane
+Partial
+PmsHub
+ with board/project/user groups + Redis scale-out
+Primer design system alignment
+Custom CSS
+Primer-compatible component tokens in frontend
+2. Upgraded System Architecture
+2.1 Module Engine Pattern (from 
+OpenProject
+)
+OpenProject
+ organises features as Rails Engine plugins loaded via 
+Gemfile.modules
+. We replicate this in ASP.NET Core using Area-based module registration — each module is a self-contained class library that registers its own controllers, EF Core entity configurations, 
+MediatR
+ handlers, and menu items via an 
+IModuleRegistration
+ interface.
+// 
+Digiprise.PMS.ModuleHost
+/
+IModuleRegistration.cs
+public interface 
+IModuleRegistration
+ {
+    string 
+ModuleKey
+ 
+{ get; }
+               // e.g. "backlogs", "
+gantt
+", "costs"
+    void 
+ConfigureServices
+(
+IServiceCollection
+ services, 
+IConfiguration
+ 
+cfg
+);
+    void 
+ConfigureModelBuilder
+(
+ModelBuilder
+ mb);
+    
+IEnumerable
+&lt;
+MenuEntry
+&gt; 
+GetMenuEntries
+(
+);
+}
+// Registered in 
+Program.cs
+:
+builder.Services.AddPmsModules
+(
+cfg
+, new 
+IModuleRegistration
+[
+] {
+    new 
+BacklogsModule
+(
+), new 
+GanttModule
+(
+), new 
+CostsModule
+(
+),
+    new 
+MeetingsModule
+(
+), new 
+WikiModule
+(
+), new 
+AutomationModule
+(
+)
+});
+2.2 Project Structure (GitHub-ready)
+Digiprise.PMS
+/
+├── 
+Digiprise.PMS.API
+/              # ASP.NET Core 8 host
+├── 
+Digiprise.PMS.Application
+/      # 
+MediatR
+ CQRS use-cases
+├── 
+Digiprise.PMS.Domain
+/           # Aggregates, domain events
+├── 
+Digiprise.PMS.Infrastructure
+/   # EF Core, Redis, ES, 
+SignalR
+├── 
+Digiprise.PMS.Contracts
+/        # DTOs, 
+OpenAPI
+ models
+├── 
+Digiprise.PMS.ModuleHost
+/       # Module registration kernel
+├── modules/
+│   ├── 
+Digiprise.PMS.Backlogs
+/
+│   ├── 
+Digiprise.PMS.Gantt
+/
+│   ├── 
+Digiprise.PMS.Costs
+/
+│   ├── 
+Digiprise.PMS.Meetings
+/
+│   ├── 
+Digiprise.PMS.Wiki
+/
+│   └── 
+Digiprise.PMS.Automation
+/
+├── frontend/                       # React 18 SPA
+│   ├── 
+src
+/features/work-packages/
+│   ├── 
+src
+/features/
+gantt
+/         # Timeline + baseline view
+│   ├── 
+src
+/features/backlogs/      # Sprint board + burndown
+│   ├── 
+src
+/features/costs/
+│   ├── 
+src
+/features/meetings/
+│   └── 
+src
+/features/wiki/
+├── tests/
+│   ├── 
+Digiprise.PMS.UnitTests
+/    # 
+xUnit
+ + 
+Testcontainers
+│   └── 
+Digiprise.PMS.IntegrationTests
+/
+└── infra/
+    ├── docker-
+compose.yml
+    ├── k8s/
+    └── 
+schema.sql
+3. Upgraded Database Schema
+3.1 New Tables Added
+Table
+Source (
+OpenProject
+)
+Purpose
+WorkPackageJournals
+journals / 
+journal_details
+Immutable changelog for every WP field change. Powers Baseline Comparison API.
+Gantt_Dependencies
+relations (precedes/follows)
+Predecessor/successor links for Gantt critical path calculation.
+SprintSnapshots
+backlogs (velocity data)
+Daily burndown snapshots. 
+TotalPoints
+, 
+CompletedPoints
+, 
+ScopeChange
+ flag.
+CostTypes
+cost_types
+User-defined cost categories (e.g. Travel, Hosting, License).
+CostEntries
+cost_entries
+Individual cost records per work package. Units × 
+UnitCost
+.
+Budgets
+budgets
+Project-level budget with labour and material breakdown.
+TimeEntries
+time_entries
+Work-log: 
+UserId
+, 
+WorkPackageId
+, Hours, 
+ActivityType
+, Date, Comment.
+Meetings
+meeting_agenda_items
+Meeting metadata: Title, Location, 
+StartTime
+, Project.
+MeetingParticipants
+meeting_participants
+Attendee list with attended/invited distinction.
+MeetingAgendaItems
+meeting_agenda_items
+Ordered agenda items linked to work packages.
+WikiPages
+wiki_pages
+Hierarchical wiki; 
+ParentId
+ for nested pages; 
+VersionNumber
+.
+WikiPageVersions
+wiki_content_versions
+Full content history for wiki pages.
+AutomationRules
+n/a (OP has no automation)
+Trigger + Conditions + Actions JSON. Enabled flag. 
+LastRunAt
+.
+AutomationRunLog
+n/a
+Execution log per rule: success/failure, payload, duration.
+SlaBreaches
+n/a
+Per-issue SLA state: 
+PolicyId
+, 
+BreachAt
+, State, 
+PausedAt
+.
+SavedFilters
+queries table
+User/shared saved IQL filters with subscription digest config.
+DailyStatusSnapshots
+n/a
+Cumulative flow data: per-status issue count per calendar day.
+3.2 Baseline Comparison API (from 
+OpenProject
+)
+OpenProject's
+ baseline comparison (introduced in v12) allows comparing work package states at two timestamps. We implement this using an immutable journal pattern identical to 
+OpenProject's
+ journals table.
+-- 
+WorkPackageJournals
+: append-only, never updated
+CREATE TABLE 
+WorkPackageJournals
+ (
+    Id             BIGINT IDENTITY PRIMARY KEY,
+    
+TenantId
+       INT      NOT NULL,
+    
+WorkPackageId
+  UNIQUEIDENTIFIER
+ NOT NULL,
+    
+JournalNumber
+  INT
+      NOT 
+NULL,  --
+ auto-increment per WP
+    
+ActorId
+        INT      NOT NULL,
+    
+CreatedAt
+      DATETIMEOFFSET NOT NULL DEFAULT 
+SYSUTCDATETIME(
+),
+    
+ChangedFields
+  NVARCHAR
+(MAX) NOT 
+NULL  --
+ JSON diff object
+);
+CREATE INDEX 
+IX_Journal_WP_Date
+ ON 
+WorkPackageJournals
+ (
+WorkPackageId
+, 
+CreatedAt
+ DESC);
+-- API usage:
+GET /
+api
+/v1/
+work-packages?project
+=
+DIG&amp;baseline
+=2025-01-01T00:00:00Z
+-- Returns each WP with: current state + state at baseline + 
+changedAttributes
+[
+]
+3.3 Cost Tracking Schema
+CREATE TABLE 
+CostEntries
+ (
+    Id              UNIQUEIDENTIFIER PRIMARY KEY DEFAULT 
+NEWID(
+),
+    
+TenantId
+        INT NOT NULL,
+    
+WorkPackageId
+   UNIQUEIDENTIFIER NOT NULL REFERENCES 
+WorkPackages
+(
+Id),
+    
+UserId
+          INT NOT NULL REFERENCES 
+Users(
+Id),
+    
+CostTypeId
+      INT NOT NULL REFERENCES 
+CostTypes
+(
+Id),
+    
+SpentOn
+         DATE NOT NULL,
+    Units           
+DECIMAL(
+18,4) NOT NULL,
+    
+UnitCostCents
+   BIGINT NOT 
+NULL,  --
+ stored in cents
+    Comment         
+NVARCHAR(
+1000),
+    
+BudgetId
+        UNIQUEIDENTIFIER REFERENCES 
+Budgets(
+Id),
+    
+CreatedAt
+       DATETIMEOFFSET NOT NULL DEFAULT 
+SYSUTCDATETIME(
+)
+);
+3.4 SLA Tracking Schema
+CREATE TABLE 
+SlaPolicies
+ (
+    Id              INT IDENTITY PRIMARY KEY,
+    
+TenantId
+        INT NOT NULL,
+    
+ProjectId
+       UNIQUEIDENTIFIER NOT NULL,
+    Name            
+NVARCHAR(
+100) NOT NULL,
+    Priority        
+NVARCHAR(
+20
+),   
+-- NULL = all priorities
+    
+ResponseSecs
+    INT NOT 
+NULL,   
+-- SLA target in seconds
+    
+ResolutionSecs
+  INT
+ NOT NULL,
+    
+PauseStatuses
+   NVARCHAR(
+MAX)   
+-- JSON array of status IDs
+);
+CREATE TABLE 
+SlaBreaches
+ (
+    Id              BIGINT IDENTITY PRIMARY KEY,
+    
+WorkPackageId
+   UNIQUEIDENTIFIER NOT NULL,
+    
+PolicyId
+        INT NOT NULL REFERENCES 
+SlaPolicies
+(
+Id),
+    Type            
+VARCHAR(
+20) NOT NULL CHECK (Type IN ('
+response','resolution
+')),
+    State           
+VARCHAR(
+20) NOT NULL CHECK (State IN ('
+within_goal','breaching','breached
+')),
+    
+StartedAt
+       DATETIMEOFFSET NOT NULL,
+    
+BreachAt
+        DATETIMEOFFSET NOT 
+NULL,  --
+ computed: 
+StartedAt
+ + target
+    
+PausedSeconds
+   INT NOT NULL DEFAULT 0,
+    
+BreadchedAt
+     DATETIMEOFFSET             -- null until actually breached
+);
+4. Upgraded Backend — Key Code
+4.1 Multi-Tenant Row-Level Security
+Borrowed from 
+OpenProject's
+ per-request scope pattern. Every EF Core query automatically includes 
+TenantId
+ via a global filter combined with SQL Server RLS.
+// Infrastructure/Data/
+TrackrDbContext.cs
+protected override void 
+OnModelCreating
+(
+ModelBuilder
+ mb) {
+    foreach (var entity in 
+mb.Model.GetEntityTypes
+()
+        
+.Where
+(e =&gt; 
+typeof
+(
+ITenantScoped
+).
+IsAssignableFrom
+(
+e.ClrType
+))) {
+        
+mb.Entity
+(
+entity.ClrType
+).
+HasQueryFilter
+(
+            e =&gt; 
+EF.Property
+&lt;int
+&gt;(
+e, "
+TenantId
+") == _
+currentTenant.TenantId
+);
+    }
+}
+-- SQL Server Row-Level Security (extra defence-in-depth layer)
+CREATE FUNCTION 
+fn_rls_
+tenant
+(
+@tenantId INT) RETURNS TABLE WITH SCHEMABINDING AS
+    RETURN SELECT 1 AS result WHERE CAST(SESSION_CONTEXT(
+N'TenantId
+') AS INT) = @tenantId;
+CREATE SECURITY POLICY 
+TenantPolicy
+    ADD FILTER PREDICATE 
+dbo.fn
+_rls_
+tenant
+(
+TenantId
+) ON 
+dbo.WorkPackages
+,
+    ADD FILTER PREDICATE 
+dbo.fn
+_rls_
+tenant
+(
+TenantId
+) ON 
+dbo.Projects
+,
+    ADD FILTER PREDICATE 
+dbo.fn
+_rls_
+tenant
+(
+TenantId
+) ON 
+dbo.WorkPackageJournals
+    WITH (STATE = ON, SCHEMABINDING = ON);
+4.2 Baseline Comparison Command
+// Application/WorkPackages/Queries/GetWorkPackagesWithBaselineQuery.cs
+public record 
+GetWorkPackagesWithBaselineQuery
+(
+    string 
+Iql
+, 
+DateTimeOffset
+ Baseline, int Page, int 
+PageSize
+) :
+ 
+IRequest
+&lt;
+BaselineResponse
+&gt;;
+public class 
+GetWorkPackagesWithBaselineHandler
+(
+    
+IWorkPackageRepository
+ 
+wpRepo
+, 
+IWorkPackageJournalRepository
+ 
+journalRepo
+,
+    
+IIqlSearchService
+ 
+searchSvc
+) :
+ 
+IRequestHandler
+&lt;
+GetWorkPackagesWithBaselineQuery
+, 
+BaselineResponse
+&gt;
+{
+    public async Task&lt;
+BaselineResponse
+&gt; 
+Handle(
+GetWorkPackagesWithBaselineQuery
+ q, 
+CancellationToken
+ 
+ct
+) {
+        var current = await 
+searchSvc.SearchAsync
+(
+q.Iql
+, 
+q.Page
+, 
+q.PageSize
+, 
+ct
+);
+        var 
+baselineStates
+ = await 
+journalRepo.GetStateAtAsync
+(
+            
+current.Items.Select
+(
+wp
+ =&gt; 
+wp.Id
+), 
+q.Baseline
+, 
+ct
+);
+        return new 
+BaselineResponse
+ {
+            Items = 
+current.Items.Select
+(
+wp
+ =&gt; new 
+BaselineWorkPackageItem
+ {
+                Current = 
+wp
+,
+                Baseline = 
+baselineStates.GetValueOrDefault
+(
+wp.Id
+),
+                Status = 
+DiffStatus
+(
+wp
+, 
+baselineStates.GetValueOrDefault
+(
+wp.Id
+))
+            }
+).
+ToList
+(),
+            Total = 
+current.Total
+        };
+    }
+    private static 
+BaselineStatus
+ 
+DiffStatus
+(
+WorkPackageDto
+ current, 
+WorkPackageBaselineDto
+? baseline) =&gt;
+        baseline is 
+null ?
+ 
+BaselineStatus.Added
+ :
+        
+!
+current
+.
+MatchesFilter
+ ?
+ 
+BaselineStatus.Removed
+ :
+        
+HasChanges
+(
+current, baseline
+) ?
+ 
+BaselineStatus.Modified
+ :
+ 
+BaselineStatus.Unchanged
+;
+}
+4.3 Automation Engine
+Modelled after 
+OpenProject's
+ automation concept: rules fire on domain events via 
+MediatR
+ notifications, then execute a chain of configured actions.
+// Domain/Events/
+WorkPackageStatusChangedEvent.cs
+public record 
+WorkPackageStatusChangedEvent
+(
+    Guid 
+WpId
+, Guid 
+PreviousStatusId
+, Guid 
+NewStatusId
+, int 
+TenantId
+) :
+ 
+IDomainEvent
+;
+// Infrastructure/Automation/
+AutomationEventDispatcher.cs
+public class 
+AutomationEventDispatcher
+(
+IAutomationRuleRepository
+ 
+ruleRepo
+,
+    
+IAutomationActionExecutor
+ executor
+) :
+ 
+INotificationHandler
+&lt;
+WorkPackageStatusChangedEvent
+&gt;
+{
+    public async Task 
+Handle(
+WorkPackageStatusChangedEvent
+ 
+ev
+, 
+CancellationToken
+ 
+ct
+) {
+        var rules = await 
+ruleRepo.GetMatchingAsync
+(
+ev.TenantId
+, "
+StatusTransitioned
+", 
+ct
+);
+        foreach (var rule in 
+rules.Where
+(r =&gt; 
+EvaluateConditions
+(
+r, 
+ev
+))) {
+            foreach (var action in 
+rule.Actions
+)
+                await 
+executor.ExecuteAsync
+(action, 
+ev
+, 
+ct
+);
+        }
+    }
+}
+// Supported trigger types (JSON stored in 
+AutomationRules.TriggerConfig
+):
+// 
+WorkPackageCreated
+, 
+WorkPackageUpdated
+, 
+StatusTransitioned
+(
+from,to
+)
+// 
+CommentAdded
+, 
+SprintStarted
+, 
+SprintClosed
+, 
+SlaBreached
+, 
+ScheduledCron
+// Supported action types (
+AutomationRules.ActionConfig
+):
+// 
+AssignWorkPackage
+, 
+TransitionStatus
+, 
+CreateSubtask
+, 
+SendNotification
+// 
+SetFieldValue
+, 
+AddComment
+, 
+SendWebhook
+, 
+LogTime
+4.4 Cost Tracking Command
+// Application/Costs/Commands/
+LogCostEntryCommand.cs
+public record 
+LogCostEntryCommand
+(
+    Guid 
+WorkPackageId
+, int 
+CostTypeId
+, 
+DateOnly
+ 
+SpentOn
+,
+    decimal Units, long 
+UnitCostCents
+, string? Comment, Guid? 
+BudgetId
+) :
+ 
+IRequest
+&lt;
+CostEntryResponse
+&gt;;
+public class 
+LogCostEntryCommandHandler
+(
+ICostEntryRepository
+ repo,
+    
+IBudgetRepository
+ 
+budgetRepo
+, 
+ICurrentUserService
+ 
+currentUser
+,
+    
+IUnitOfWork
+ 
+uow
+) :
+ 
+IRequestHandler
+&lt;
+LogCostEntryCommand
+, 
+CostEntryResponse
+&gt;
+{
+    public async Task&lt;
+CostEntryResponse
+&gt; 
+Handle(
+LogCostEntryCommand
+ 
+cmd
+, 
+CancellationToken
+ 
+ct
+) {
+        var entry = new 
+CostEntry
+ {
+            
+WorkPackageId
+ = 
+cmd.WorkPackageId
+, 
+UserId
+ = 
+currentUser.UserId
+,
+            
+CostTypeId
+ = 
+cmd.CostTypeId
+, 
+SpentOn
+ = 
+cmd.SpentOn
+,
+            Units = 
+cmd.Units
+, 
+UnitCostCents
+ = 
+cmd.UnitCostCents
+,
+            Comment = 
+cmd.Comment
+, 
+BudgetId
+ = 
+cmd.BudgetId
+        };
+        await 
+repo.AddAsync
+(entry, 
+ct
+);
+        if (
+cmd.BudgetId.HasValue
+) await 
+budgetRepo.UpdateSpentAsync
+(
+cmd.BudgetId.Value
+, 
+ct
+);
+        await 
+uow.SaveChangesAsync
+(
+ct
+);
+        return 
+CostEntryResponse.From
+(entry);
+    }
+}
+5. Complete API Surface
+Method
+Endpoint
+Module
+Description
+GET/POST
+/
+api
+/v1/work-packages
+Core
+List (IQL) / Create work package
+GET/PATCH/DELETE
+/
+api
+/v1/work-packages/{id}
+Core
+Detail / Update / Delete
+POST
+/
+api
+/v1/work-packages/{id}/transitions
+Core
+Workflow status transition
+GET
+/
+api
+/v1/
+work-packages?baseline
+={iso}
+Gantt
+Work packages with baseline diff
+GET/POST
+/
+api
+/v1/projects/{id}/
+gantt
+Gantt
+Gantt data with dependencies
+POST
+/
+api
+/v1/
+gantt
+/dependencies
+Gantt
+Add predecessor/successor link
+GET/POST
+/
+api
+/v1/projects/{id}/backlogs
+Backlogs
+Sprint list / Create sprint
+POST
+/
+api
+/v1/sprints/{id}/start
+Backlogs
+Start sprint (with dates + goal)
+POST
+/
+api
+/v1/sprints/{id}/close
+Backlogs
+Close sprint; move incomplete WPs
+GET
+/
+api
+/v1/sprints/{id}/burndown
+Backlogs
+Daily burndown chart data
+GET
+/
+api
+/v1/sprints/{id}/velocity
+Backlogs
+Velocity: last N sprint comparison
+GET/POST
+/
+api
+/v1/projects/{id}/cost-entries
+Costs
+List / Log cost entry
+GET/POST
+/
+api
+/v1/projects/{id}/budgets
+Costs
+Budget list / Create budget
+GET
+/
+api
+/v1/projects/{id}/time-report
+Costs
+Aggregated time + cost report
+GET/POST
+/
+api
+/v1/projects/{id}/meetings
+Meetings
+List / Create meeting
+PATCH
+/
+api
+/v1/meetings/{id}/agenda
+Meetings
+Update agenda items
+POST
+/
+api
+/v1/meetings/{id}/close
+Meetings
+Close meeting; export minutes PDF
+GET/POST
+/
+api
+/v1/projects/{id}/wiki
+Wiki
+Wiki root / Create page
+GET/PATCH
+/
+api
+/v1/wiki/{id}
+Wiki
+Get / Update wiki page
+GET
+/
+api
+/v1/wiki/{id}/history
+Wiki
+Version history for wiki page
+GET/POST
+/
+api
+/v1/projects/{id}/automation
+Automation
+List / Create automation rule
+PATCH
+/
+api
+/v1/automation/{id}
+Automation
+Enable/disable / Edit rule
+GET
+/
+api
+/v1/automation/{id}/runs
+Automation
+Execution log for a rule
+GET
+/
+api
+/v1/projects/{id}/sla
+Core
+SLA status per work package
+GET/POST
+/
+api
+/v1/saved-filters
+Core
+IQL saved filters
+GET
+/
+api
+/v1/projects/{id}/
+cfd
+Reports
+Cumulative flow diagram data
+POST
+/
+api
+/v1/search
+Core
+IQL search with pagination + sort
+GET/POST
+/
+api
+/v1/webhooks
+Core
+Webhook registry
+GET
+/
+api
+/v1/audit-logs
+Core
+Tamper-evident audit log (admin)
+6. Frontend Upgrades
+6.1 Gantt Component with Baseline
+// frontend/
+src
+/features/
+gantt
+/
+GanttChart.tsx
+import 
+{ Gantt
+, Task, 
+ViewMode
+ }
+ from '
+gantt
+-task-react';
+import 
+{ 
+useQuery
+ } from '@
+tanstack
+/react-query';
+import 
+{ 
+useState
+ } from 'react';
+export function 
+GanttChart
+({ 
+projectId
+ }: 
+{ 
+projectId
+: 
+string }
+) {
+  
+const
+ [baseline, 
+setBaseline
+] = 
+useState
+&lt;string | null&gt;(null);
+  
+const
+ [
+viewMode
+, 
+setViewMode
+] = 
+useState
+&lt;
+ViewMode
+&gt;(
+ViewMode.Week
+);
+  
+const
+ 
+{ data
+ } = 
+useQuery
+(
+{
+    
+queryKey
+: ['
+gantt
+', 
+projectId
+, baseline],
+    
+queryFn
+: () =&gt; 
+ganttApi.getWorkPackages
+(
+projectId
+, baseline ?? undefined),
+  });
+  
+const
+ tasks: 
+Task[
+] = 
+data?.
+items.map
+(
+wp
+ =&gt; ({
+    id: wp.id, name: 
+wp.subject
+, start: new Date(
+wp.startDate
+),
+    end: new Date(
+wp.dueDate
+), progress: 
+wp.percentDone
+,
+    dependencies: 
+wp.predecessorIds
+,
+    styles: 
+wp.baselineStatus
+ === 'modified'
+      ? 
+{ 
+progressColor
+: '#EF9F27', 
+progressSelectedColor
+: '#BA7517
+' }
+      : undefined
+  })) ?? [];
+  return (
+    &lt;div&gt;
+      &lt;
+BaselineToolbar
+ baseline={baseline} 
+onBaselineChange
+={
+setBaseline
+} /&gt;
+      &lt;Gantt tasks={tasks} 
+viewMode
+={
+viewMode
+} locale="
+en
+-GB" /&gt;,
+      {baseline &amp;&amp; &lt;
+BaselineLegend
+ /&gt;}
+    &lt;/div&gt;
+  );
+}
+6.2 Cost Report Widget
+// frontend/
+src
+/features/costs/
+CostReportWidget.tsx
+export function 
+CostReportWidget
+({ 
+projectId
+ }: Props) {
+  
+const
+ 
+{ data
+ } = 
+useQuery
+(
+{
+    
+queryKey
+: ['cost-report', 
+projectId
+],
+    
+queryFn
+: () =&gt; 
+costsApi.getTimeReport
+(
+projectId
+),
+  });
+  return (
+    &lt;div 
+className
+="grid grid-cols-3 gap-4"&gt;
+      &lt;
+MetricCard
+ label="Budget" value={
+data?.
+budgetTotal
+} currency /&gt;
+      &lt;
+MetricCard
+ label="Spent" value={
+data?.
+spentTotal
+} currency
+         variant
+={
+data
+?.
+spentTotal
+ &gt; 
+data?.
+budgetTotal
+ ?
+ 'danger
+' :
+ 'success'} /&gt;
+      &lt;
+MetricCard
+ label="Time logged" value={data
+?.
+hoursLogged
+} unit="h" /&gt;
+      &lt;
+CostBreakdownTable
+ entries
+={
+data?.entries
+ ??
+ []} /&gt;
+    &lt;/div&gt;
+  );
+}
+6.3 Meetings Module
+// frontend/
+src
+/features/meetings/
+MeetingDetail.tsx
+export function 
+MeetingDetail
+({ 
+meetingId
+ }: Props) {
+  
+const
+ 
+{ data
+: 
+meeting }
+ = 
+useQuery
+(
+['meeting', 
+meetingId
+], () =&gt;
+    
+meetingsApi.get
+(
+meetingId
+));
+  
+const
+ 
+closeMutation
+ = 
+useMutation
+(
+{
+    
+mutationFn
+: () =&gt; 
+meetingsApi.close
+(
+meetingId
+),
+    
+onSuccess
+: () =&gt; {
+      // Export minutes as PDF
+      
+window.open
+(`/
+api
+/v1/meetings/${
+meetingId
+}/pdf`, '_blank');
+      
+queryClient.invalidateQueries
+(['meeting', 
+meetingId
+]);
+    }
+  });
+  return (
+    &lt;
+MeetingShell
+ meeting={meeting}&gt;
+      &lt;
+AgendaEditor
+ items={
+meeting?.
+agendaItems
+} /&gt;
+      &lt;
+ParticipantList
+ participants={
+meeting?.
+participants
+} /&gt;
+      &lt;
+LinkedWorkPackages
+ 
+wps
+={
+meeting?.
+linkedWorkPackages
+} /&gt;
+      &lt;Button 
+onClick
+={
+() =&gt; 
+closeMutation.mutate
+()}&gt;Close meeting&lt;/Button&gt;
+    &lt;/
+MeetingShell
+&gt;
+  );
+}
+7. Security Upgrades (v2.0)
+Concern
+v1.0
+v2.0 Upgrade
+Multi-tenant isolation
+EF Core global filter
+EF Core filter + SQL Server RLS policy (dual layer)
+Audit log integrity
+Append-only table
+SHA-256 hash chain (each record hashes previous record ID + payload)
+Attachment security
+Basic MIME check
+MIME check + 
+ClamAV
+ virus scan + AES-256 at-rest (Azure Blob SSE)
+Token security
+JWT HS256
+JWT RS256 option for enterprise; refresh token rotation; device fingerprint
+API rate limiting
+200 
+req
+/min per user
+200 
+req
+/min per user + 5000 
+req
+/min per tenant (tiered)
+MFA
+Not present
+TOTP / authenticator app per tenant (optional)
+OAuth/OIDC
+JWT SSO only
+Azure AD OIDC + Google Workspace + JWT fallback
+Input sanitisation
+Basic
+HtmlSanitizer
+ on all rich-text; CSP headers; HSTS enforced
+Dependency scanning
+Manual
+Dependabot
+ + 
+Snyk
+ in CI pipeline; dotnet list package --vulnerable
+7.1 Hash-Chain Audit Log Implementation
+// Domain/Entities/
+AuditLog.cs
+public class 
+AuditLog
+ {
+    public long Id 
+{ get
+; private set
+; }
+    public int 
+TenantId
+ 
+{ get
+; private set
+; }
+    public int 
+UserId
+ 
+{ get
+; private set
+; }
+    public string 
+EntityType
+ 
+{ get
+; private set
+; }
+ = 
+default!;
+    public string Action 
+{ get
+; private set
+; }
+ = 
+default!;
+    public string? 
+OldValue
+ 
+{ get
+; private set
+; }
+    public string? 
+NewValue
+ 
+{ get
+; private set
+; }
+    public string 
+PrevHash
+ 
+{ get
+; private set
+; }
+ = 
+default!;
+ // SHA-256 of 
+prev
+ record
+    public string Hash 
+{ get
+; private set
+; }
+ = 
+default!;
+     // SHA-256 of this record
+    public 
+DateTimeOffset
+ Timestamp 
+{ get
+; private set
+; }
+    public static 
+AuditLog
+ 
+Create(
+string 
+prevHash
+, /* all fields */) {
+        var log = new 
+AuditLog
+ 
+{ /
+* set all fields */, 
+PrevHash
+ = 
+prevHash
+ }
+;
+        var payload = $"{
+log.Id
+}|{
+log.EntityType
+}|{
+log.Action
+}|{
+prevHash
+}";
+        
+log.Hash
+ = Convert.ToHexString(SHA256.HashData(Encoding.UTF
+8.GetBytes
+(payload)));
+        return log;
+    }
+}
+8. Performance Targets (v2.0)
+Metric
+Target
+Method
+Board load (50 work packages)
+&lt; 1.5s
+Redis cache (5min TTL) + 
+SignalR
+ push on change
+IQL search
+&lt; 500ms p95
+Elasticsearch with per-tenant index shard
+Work package 
+create
+ API
+&lt; 300ms p99
+Async write + ES index via RabbitMQ
+Gantt with 500 WPs
+&lt; 2s
+Postgres CTE with closure table + Redis cache
+Baseline comparison
+&lt; 800ms p95
+WorkPackageJournals
+ index on (
+WpId
+, 
+CreatedAt
+)
+Burndown chart data
+&lt; 200ms
+SprintSnapshots
+ pre-aggregated daily by background worker
+Cumulative flow diagram
+&lt; 300ms
+DailyStatusSnapshots
+ pre-built; Redis 10min TTL
+Real-time notification
+&lt; 200ms
+SignalR
+ + Redis backplane
+Concurrent users
+1,000+ sustained
+K8s HPA: CPU &gt;60% → scale; min 2, max 20 pods
+Availability SLA
+99.9% monthly
+Rolling 
+deploy
+, liveness + readiness health checks
+8.1 SQL Server Indexing Strategy (Upgraded)
+-- Work packages: core board query
+CREATE INDEX 
+IX_WP_Tenant_Project_Status
+    ON 
+WorkPackages
+ (
+TenantId
+, 
+ProjectId
+, 
+StatusId
+) INCLUDE (Priority, 
+AssigneeId
+);
+-- Work package journals: baseline query
+CREATE INDEX 
+IX_Journal_WP_Date
+    ON 
+WorkPackageJournals
+ (
+WorkPackageId
+, 
+CreatedAt
+ DESC) INCLUDE (
+ChangedFields
+);
+-- SLA breach lookup
+CREATE INDEX 
+IX_SLA_State
+ ON 
+SlaBreaches
+ (
+WorkPackageId
+, State, 
+BreachAt
+)
+    WHERE State IN ('
+within_goal','breaching
+');
+-- Time entries: cost report
+CREATE INDEX 
+IX_TimeEntry_Project_Date
+    ON 
+TimeEntries
+ (
+TenantId
+, 
+ProjectId
+, 
+SpentOn
+ DESC) INCLUDE (Hours, 
+ActivityType
+);
+-- Partitioned issues table by year (large tenants)
+CREATE PARTITION FUNCTION 
+PF_Year
+ (DATETIMEOFFSET)
+    AS RANGE RIGHT FOR VALUES ('2023-01-01','2024-01-01','2025-01-01');
+9. Deployment &amp; DevOps
+9.1 Updated docker-
+compose.yml
+ (v2 services)
+services:
+  
+api
+:
+    build: 
+{ context: .
+, 
+dockerfile
+: 
+src
+/
+Digiprise.PMS.API
+/
+Dockerfile
+ }
+    environment:
+      - ConnectionStrings__SqlServer=Server=
+sqlserver;Database
+=
+pms
+;...
+      - 
+ConnectionStrings
+__Redis=redis:6379
+      - 
+Elasticsearch__Uri
+=http://elasticsearch:9200
+      - 
+RabbitMQ__Uri
+=amqp://rabbitmq:5672
+      - Jwt__Key=${JWT_SECRET}
+      - 
+Modules__Enabled
+=
+backlogs,gantt
+,
+costs,meetings
+,
+wiki,automation
+    
+depends_on
+: [
+sqlserver
+, 
+redis
+, 
+elasticsearch
+, 
+rabbitmq
+]
+  worker:   # Background job processor (automation, ES sync, notifications)
+    build: 
+{ context: .
+, 
+dockerfile
+: 
+src
+/
+Digiprise.PMS.Worker
+/
+Dockerfile
+ }
+    environment:
+      - 
+RabbitMQ__Uri
+=amqp://rabbitmq:5672
+      - ConnectionStrings__SqlServer=Server=
+sqlserver;Database
+=
+pms
+;...
+  
+sqlserver
+:
+    image: mcr.microsoft.com/
+mssql
+/server:2022-latest
+    environment: 
+{ ACCEPT
+_EULA: Y, SA_PASSWORD: ${SQL_PASSWORD
+} }
+  
+redis
+:      
+   {
+ image: redis:7-
+alpine }
+  
+elasticsearch
+: 
+{ image
+: elasticsearch:8.13.
+4 }
+  
+rabbitmq
+:   
+   {
+ image: rabbitmq:3.13-management-
+alpine }
+  
+mailhog
+:    
+   {
+ image: 
+mailhog
+/
+mailhog
+, profiles: [dev
+] }
+9.2 GitHub Actions CI Pipeline
+# .
+github
+/workflows/
+ci.yml
+jobs:
+  build-test:
+    steps:
+      - dotnet restore &amp;&amp; dotnet build -c Release
+      - dotnet test (unit + integration via 
+Testcontainers
+)
+      - 
+SonarCloud
+ analysis (code quality gate)
+      - dotnet list package --vulnerable (CVE check)
+      - docker 
+buildx
+ build (multi-stage)
+      - push to GHCR on main branch
+  deploy-staging:
+    needs: build-test
+    environment: staging
+    steps:
+      - 
+kubectl
+ apply -f infra/k8s/ -n 
+pms
+-staging
+      - 
+kubectl
+ rollout status deploy/
+pms-api
+ -n 
+pms
+-staging
+      - smoke test: curl /health/ready
+  deploy-production:
+    needs: deploy-staging
+    environment: production   # requires manual approval
+    on: 
+{ release
+: 
+{ types
+: [published
+] }
+ }
+10. AI Extension Roadmap (Bonus)
+Feature
+Trigger
+Implementation
+Smart issue summarisation
+Work package created
+Send description to LLM; store 1-line AI summary in WP metadata
+Auto-priority detection
+Issue created with no priority
+LLM classifies severity → sets priority field automatically
+Duplicate detection
+Work package created
+Embed summary via OpenAI; K-NN search in ES; notify reporter if &gt;92% similarity
+Smart sprint planning
+Sprint created
+LLM suggests backlog items fitting team velocity + epic priorities
+IQL natural language
+User types plain English
+Convert 'show me open bugs assigned to me' → IQL via LLM call
+Gantt schedule optimiser
+Sprint started
+Detect critical path bottlenecks; suggest rebalancing via LLM
+Meeting minutes AI draft
+Meeting closed
+Summarise agenda + comments → auto-draft minutes document
+Cost anomaly detection
+Cost entry logged
+Flag entries deviating &gt;2σ from historical average for that type
+Digiprise
+ PMS v2.0 — Confidential — Internal Engineering Use Only

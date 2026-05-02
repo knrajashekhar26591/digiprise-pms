@@ -14,7 +14,7 @@ public record IssueDto(
     string Priority, int? AssigneeId, string? AssigneeName,
     int ReporterId, string ReporterName, int? ParentIssueId,
     int? SprintId, string? SprintName, int? StoryPoints,
-    DateTime? DueDate, string[]? Labels, DateTime CreatedAt, DateTime UpdatedAt);
+    DateTime? StartDate, DateTime? DueDate, string[]? Labels, DateTime CreatedAt, DateTime UpdatedAt);
 
 public record IssueListItemDto(
     int Id, string IssueKey, string IssueType, string Summary,
@@ -43,3 +43,11 @@ public record AuthTokenDto(string AccessToken, string RefreshToken, DateTime Exp
 public record IssueStatDto(string Label, int Count);
 public record BurndownPointDto(DateTime Date, int Remaining, int Ideal);
 public record DashboardSummaryDto(int TotalIssues, int OpenIssues, int InProgressIssues, int DoneIssues, IEnumerable<IssueStatDto> ByPriority);
+
+// ── Phase 3: Enterprise Module DTOs ───────────────────────────────────
+public record BudgetDto(int Id, int ProjectId, string Name, decimal MaterialBudgetCents, decimal LaborBudgetCents, string? Description);
+public record CostTypeDto(int Id, string Name, string? Description, bool IsDefault);
+public record CostEntryDto(int Id, int IssueId, string IssueKey, int UserId, string UserName, int CostTypeId, string CostTypeName, DateTime SpentOn, decimal Units, long UnitCostCents, string? Comment);
+public record SlaPolicyDto(int Id, int ProjectId, string Name, string? TargetPriority, int ResponseSecs, int ResolutionSecs);
+public record SlaBreachDto(int Id, int IssueId, int PolicyId, string Type, string State, DateTimeOffset StartedAt, DateTimeOffset BreachAt, DateTimeOffset? BreachedAt);
+

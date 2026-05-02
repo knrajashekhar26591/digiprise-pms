@@ -1,8 +1,10 @@
 using Digiprise.PMS.Domain.Enums;
 
+using Digiprise.PMS.Domain.Interfaces;
+
 namespace Digiprise.PMS.Domain.Entities;
 
-public class Issue : BaseEntity
+public class Issue : BaseEntity, ITenantScoped
 {
     public int TenantId { get; private set; }
     public int ProjectId { get; private set; }
@@ -18,6 +20,7 @@ public class Issue : BaseEntity
     public int? SprintId { get; private set; }
     public int? EpicId { get; private set; }
     public int? StoryPoints { get; private set; }
+    public DateTime? StartDate { get; private set; }
     public DateTime? DueDate { get; private set; }
     public DateTime? ResolutionDate { get; private set; }
     public int? OriginalEstimateMinutes { get; private set; }
@@ -123,6 +126,13 @@ public class Issue : BaseEntity
     {
         RecordHistory("DueDate", DueDate?.ToString("yyyy-MM-dd") ?? "None", dueDate?.ToString("yyyy-MM-dd") ?? "None", byUserId);
         DueDate = dueDate;
+        Touch();
+    }
+
+    public void SetStartDate(DateTime? startDate, int byUserId)
+    {
+        RecordHistory("StartDate", StartDate?.ToString("yyyy-MM-dd") ?? "None", startDate?.ToString("yyyy-MM-dd") ?? "None", byUserId);
+        StartDate = startDate;
         Touch();
     }
 

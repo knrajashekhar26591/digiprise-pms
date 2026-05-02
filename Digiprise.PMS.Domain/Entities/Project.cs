@@ -1,8 +1,10 @@
 using Digiprise.PMS.Domain.Enums;
 
+using Digiprise.PMS.Domain.Interfaces;
+
 namespace Digiprise.PMS.Domain.Entities;
 
-public class Project : BaseEntity
+public class Project : BaseEntity, ITenantScoped
 {
     public int TenantId { get; private set; }
     public string Key { get; private set; } = string.Empty; // e.g. DIG, CRM

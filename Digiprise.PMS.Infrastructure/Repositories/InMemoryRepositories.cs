@@ -105,6 +105,11 @@ public class IssueRepository : InMemoryRepository<Issue>, IIssueRepository
         }
         return Task.FromResult<IEnumerable<Issue>>(query.OrderByDescending(i => i.UpdatedAt).Skip(page * pageSize).Take(pageSize).ToList());
     }
+
+    public Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default)
+    {
+        return Task.FromResult(new Dictionary<int, string>());
+    }
 }
 
 // ── Sprint Repository ─────────────────────────────────────────────────
@@ -178,3 +183,35 @@ public class AuditLogRepository : InMemoryRepository<AuditLog>, IAuditLogReposit
         return Task.FromResult(last?.PrevHash);
     }
 }
+
+public class CostRepository : InMemoryRepository<CostEntry>, ICostRepository
+{
+    public CostRepository(InMemoryDataStore db) : base(db.CostEntries, db) { }
+
+    public Task<IEnumerable<CostEntry>> GetByIssueAsync(int issueId, CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<CostEntry>>(_store.Values.Where(c => c.IssueId == issueId).ToList());
+
+    public Task<IEnumerable<CostEntry>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<CostEntry>>(_store.Values.Where(c => c.Issue != null && c.Issue.ProjectId == projectId).ToList());
+}
+
+public class BudgetRepository : InMemoryRepository<Budget>, IBudgetRepository
+{
+    public BudgetRepository(InMemoryDataStore db) : base(db.Budgets, db) { }
+
+    public Task<IEnumerable<Budget>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<Budget>>(_store.Values.Where(b => b.ProjectId == projectId).ToList());
+}
+
+public class SlaRepository : InMemoryRepository<SlaPolicy>, ISlaRepository
+{
+    private readonly InMemoryDataStore _db;
+    public SlaRepository(InMemoryDataStore db) : base(db.SlaPolicies, db) { _db = db; }
+
+    public Task<IEnumerable<SlaPolicy>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<SlaPolicy>>(_store.Values.Where(s => s.ProjectId == projectId).ToList());
+
+    public Task<IEnumerable<SlaBreach>> GetBreachesByIssueAsync(int issueId, CancellationToken ct = default)
+        => Task.FromResult<IEnumerable<SlaBreach>>(_db.SlaBreaches.Values.Where(s => s.IssueId == issueId).ToList());
+}
+

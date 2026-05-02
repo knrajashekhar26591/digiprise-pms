@@ -129,4 +129,12 @@ public class IssuesController : BaseController
         var comments = await _issues.GetCommentsAsync(id, CurrentTenantId, ct);
         return Ok(comments);
     }
+
+    /// <summary>Get issues with baseline comparison</summary>
+    [HttpGet("baseline")]
+    public async Task<IActionResult> GetWithBaseline([FromQuery] int projectId, [FromQuery] DateTimeOffset date, [FromQuery] int page = 1, [FromQuery] int pageSize = 50, CancellationToken ct = default)
+    {
+        var response = await _issues.GetWithBaselineAsync(projectId, date, CurrentTenantId, page, pageSize, ct);
+        return Ok(response);
+    }
 }

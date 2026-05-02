@@ -162,6 +162,46 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.ToTable("AutomationRules");
                 });
 
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Budget", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("LaborBudgetCents")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("MaterialBudgetCents")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Budgets");
+                });
+
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -199,6 +239,92 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.CostEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BudgetId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("text");
+
+                    b.Property<int>("CostTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IssueId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SpentOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("UnitCostCents")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Units")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId");
+
+                    b.HasIndex("CostTypeId");
+
+                    b.HasIndex("IssueId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CostEntries");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.CostType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CostTypes");
                 });
 
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Issue", b =>
@@ -377,6 +503,44 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.ToTable("IssueHistories");
                 });
 
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.IssueJournal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ChangedFields")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IssueId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("JournalNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssueId", "CreatedAt")
+                        .IsDescending(false, true);
+
+                    b.ToTable("IssueJournals");
+                });
+
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.IssueLink", b =>
                 {
                     b.Property<int>("Id")
@@ -501,9 +665,6 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TenantId1")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -515,8 +676,6 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.HasIndex("LeadUserId");
 
                     b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId1");
 
                     b.ToTable("Projects");
                 });
@@ -552,6 +711,95 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ProjectMembers");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.SlaBreach", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("BreachAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("BreachedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("IssueId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PausedSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PolicyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssueId");
+
+                    b.HasIndex("PolicyId");
+
+                    b.ToTable("SlaBreaches");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.SlaPolicy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ResolutionSecs")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ResponseSecs")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TargetPriority")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("SlaPolicies");
                 });
 
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Sprint", b =>
@@ -716,17 +964,12 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TenantId1")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId1");
 
                     b.ToTable("Users");
                 });
@@ -776,6 +1019,17 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Budget", b =>
+                {
+                    b.HasOne("Digiprise.PMS.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("Digiprise.PMS.Domain.Entities.Issue", null)
@@ -791,6 +1045,40 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.CostEntry", b =>
+                {
+                    b.HasOne("Digiprise.PMS.Domain.Entities.Budget", "Budget")
+                        .WithMany("CostEntries")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Digiprise.PMS.Domain.Entities.CostType", "CostType")
+                        .WithMany()
+                        .HasForeignKey("CostTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Digiprise.PMS.Domain.Entities.Issue", "Issue")
+                        .WithMany()
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Digiprise.PMS.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
+
+                    b.Navigation("CostType");
+
+                    b.Navigation("Issue");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Issue", b =>
@@ -870,14 +1158,10 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Digiprise.PMS.Domain.Entities.Tenant", "Tenant")
-                        .WithMany()
+                        .WithMany("Projects")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Digiprise.PMS.Domain.Entities.Tenant", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("TenantId1");
 
                     b.Navigation("Lead");
 
@@ -901,6 +1185,36 @@ namespace Digiprise.PMS.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.SlaBreach", b =>
+                {
+                    b.HasOne("Digiprise.PMS.Domain.Entities.Issue", "Issue")
+                        .WithMany()
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Digiprise.PMS.Domain.Entities.SlaPolicy", "Policy")
+                        .WithMany()
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Issue");
+
+                    b.Navigation("Policy");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.SlaPolicy", b =>
+                {
+                    b.HasOne("Digiprise.PMS.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Sprint", b =>
                 {
                     b.HasOne("Digiprise.PMS.Domain.Entities.Project", null)
@@ -913,16 +1227,17 @@ namespace Digiprise.PMS.Infrastructure.Migrations
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.User", b =>
                 {
                     b.HasOne("Digiprise.PMS.Domain.Entities.Tenant", "Tenant")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Digiprise.PMS.Domain.Entities.Tenant", null)
-                        .WithMany("Users")
-                        .HasForeignKey("TenantId1");
-
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Budget", b =>
+                {
+                    b.Navigation("CostEntries");
                 });
 
             modelBuilder.Entity("Digiprise.PMS.Domain.Entities.Issue", b =>

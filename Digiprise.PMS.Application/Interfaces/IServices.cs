@@ -30,6 +30,7 @@ public interface IIssueService
     Task<IEnumerable<IssueListItemDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<IssueListItemDto>> GetBacklogAsync(int projectId, int tenantId, CancellationToken ct = default);
     Task<IEnumerable<IssueListItemDto>> SearchAsync(IssueSearchRequest request, int tenantId, CancellationToken ct = default);
+    Task<BaselineResponse> GetWithBaselineAsync(int projectId, DateTimeOffset baseline, int tenantId, int page = 1, int pageSize = 50, CancellationToken ct = default);
     Task<IssueDto> CreateAsync(CreateIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
     Task<IssueDto> UpdateAsync(int issueId, UpdateIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
     Task TransitionAsync(int issueId, TransitionIssueRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
@@ -90,3 +91,25 @@ public interface IEventBus
 {
     Task PublishAsync<T>(T domainEvent, CancellationToken ct = default) where T : class;
 }
+
+// ── Phase 3: Enterprise Module Services ───────────────────────────────
+public interface ICostService
+{
+    Task<IEnumerable<CostEntryDto>> GetByIssueAsync(int issueId, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<CostEntryDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<CostEntryDto> CreateAsync(CreateCostEntryRequest request, int tenantId, int currentUserId, CancellationToken ct = default);
+}
+
+public interface IBudgetService
+{
+    Task<IEnumerable<BudgetDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<BudgetDto> CreateAsync(CreateBudgetRequest request, int tenantId, CancellationToken ct = default);
+}
+
+public interface ISlaService
+{
+    Task<IEnumerable<SlaPolicyDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<IEnumerable<SlaBreachDto>> GetBreachesByIssueAsync(int issueId, int tenantId, CancellationToken ct = default);
+    Task<SlaPolicyDto> CreatePolicyAsync(CreateSlaPolicyRequest request, int tenantId, CancellationToken ct = default);
+}
+

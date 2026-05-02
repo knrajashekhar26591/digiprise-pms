@@ -1,4 +1,5 @@
 using Digiprise.PMS.Domain.Enums;
+using Digiprise.PMS.Domain.Interfaces;
 
 namespace Digiprise.PMS.Domain.Entities;
 
@@ -222,7 +223,7 @@ public class SprintSnapshot : BaseEntity
     }
 }
 
-public class Notification : BaseEntity
+public class Notification : BaseEntity, ITenantScoped
 {
     public int UserId { get; private set; }
     public int TenantId { get; private set; }
@@ -240,7 +241,7 @@ public class Notification : BaseEntity
     public void MarkRead() { IsRead = true; Touch(); }
 }
 
-public class AuditLog : BaseEntity
+public class AuditLog : BaseEntity, ITenantScoped
 {
     public int TenantId { get; private set; }
     public int UserId { get; private set; }

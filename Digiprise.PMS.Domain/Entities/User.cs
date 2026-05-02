@@ -1,6 +1,8 @@
+using Digiprise.PMS.Domain.Interfaces;
+
 namespace Digiprise.PMS.Domain.Entities;
 
-public class User : BaseEntity
+public class User : BaseEntity, ITenantScoped
 {
     public int TenantId { get; private set; }
     public string Email { get; private set; } = string.Empty;

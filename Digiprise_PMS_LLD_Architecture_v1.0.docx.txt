@@ -1,0 +1,1644 @@
+﻿DIGIPRISE CRM
+JIRA-LIKE PROJECT MANAGEMENT SYSTEM
+Low-Level Requirement Document &amp; System Architecture Design
+Enterprise 
+Edition  |
+  Version 1.0
+Document Type
+Low-Level Design (LLD) + Architecture
+Platform
+ASP.NET Core / React.js / SQL Server
+Version
+1.0 — Initial Release
+Audience
+Engineering, Product, DevOps Teams
+Classification
+Confidential — Internal Use Only
+Concurrent Users
+1,000+ Active Users (Jira Cloud Parity)
+Architecture Diagram
+1. Executive Summary
+1.1 Purpose
+This document defines the Low-Level Design (LLD) and System Architecture for a Jira-equivalent Project Management System (PMS) embedded natively within the 
+Digiprise
+ CRM platform. The system is architected to deliver enterprise-grade agile project management capabilities, supporting Scrum, Kanban, and hybrid methodologies at scale for 1,000+ concurrent active users with sub-2-second response times.
+The specification covers functional requirements, database design, backend service architecture, UI/UX screen layouts, security, DevOps pipelines, and non-functional requirements at production grade.
+1.2 Scope Within 
+Digiprise
+ CRM
+Digiprise
+ CRM is an ASP.NET Core-based enterprise platform serving sales, service, and operations teams. This PMS module integrates directly into the CRM's authentication, user management, notification, and data layers as a first-class module — not an external integration.
+Single Sign-On (SSO) with 
+Digiprise
+ identity — no separate login
+Shared notification infrastructure (email, in-app alerts)
+CRM entities (Accounts, Contacts, Deals) linkable to Issues and Epics
+Unified audit log across CRM and PMS activity
+Multi-tenant: each CRM tenant maintains isolated project data
+1.3 Target Users
+Role
+User Type
+Primary Use Cases
+System Admin
+IT / Platform Admin
+Tenant config, user provisioning, global settings
+Project Admin
+Team Lead / PM
+Project setup, workflow design, permissions
+Scrum Master
+Agile Coach
+Sprint planning, burndown tracking, retrospectives
+Developer
+Engineering
+Issue management, time logging, code linking
+QA Engineer
+Quality Assurance
+Bug tracking, test case management, sign-off
+Business User
+Stakeholder / BA
+Epic/Story creation, dashboard views, reports
+2. Product Overview
+2.1 JIRA-Like Capabilities
+The system replicates and extends the core Jira Cloud feature set within a fully owned, on-premise-deployable architecture. Key capabilities include:
+Full issue hierarchy: Epic → Story → Subtask → Sub-Subtask
+Custom workflows with conditional transitions and validators
+JQL-equivalent advanced query language (IQL — Internal Query Language)
+Scrum boards with sprint management, velocity, and burndown
+Kanban boards with WIP limits and 
+swimlanes
+Custom fields, issue types, and dynamic forms
+Automation engine: Trigger → Condition → Action rules
+Role-based access control at project, issue, and field level
+REST API + Webhook integration layer
+Elasticsearch-powered full-text issue search
+Redis-cached dashboards and query results
+Real-time notifications (in-app + email)
+2.2 Agile + Kanban + Hybrid Model Support
+The system supports three distinct project methodologies configurable per project:
+Mode
+Key Features
+Board Type
+Scrum
+Sprints, velocity, burndown, story points, retrospectives
+Sprint board + backlog
+Kanban
+Continuous flow, WIP limits, cycle time, lead time metrics
+Kanban board (no sprints)
+Hybrid
+Sprints optionally enabled, custom columns, mixed workflows
+Configurable board
+2.3 Multi-Project &amp; Multi-Tenant Architecture
+Each CRM tenant = isolated workspace with its own projects, users, and data
+A user can belong to multiple projects within the same tenant with different roles
+Cross-project issue linking (e.g., Story in Project A blocks Epic in Project B)
+Tenant-level global configurations: custom fields, issue types, workflows
+Row-level security enforced at the database query layer via 
+TenantId
+ scoping
+3. Functional Requirements
+3.1 Project Management
+3.1.1 Project CRUD Operations
+Projects are the top-level containers for all work items. Each project has:
+Unique project key (e.g., DIG, CRM, OPS) — auto-generated or manual, uppercase, 2–10 chars
+Project name, description, icon (emoji or uploaded image), category, and 
+color
+Lead user, default assignee policy (unassigned / project lead / component lead)
+Start date, target date, status (Active / Archived / Deleted)
+3.1.2 Project Templates
+Template
+Pre-configured Workflow
+Board Type
+Scrum
+To Do → In Progress → In Review → Done
+Sprint board + backlog
+Kanban
+Backlog → Selected → In Progress → Done
+Kanban continuous flow
+Bug Tracking
+Open → Triaged → In Progress → QA → Closed
+Kanban (priority lanes)
+Custom
+User-defined statuses and transitions
+Configurable
+3.1.3 Role-Based Project Access
+Roles: Project Admin, Developer, Reporter, Viewer, QA, Scrum Master
+Roles map to permission schemes defining CRUD access per action type
+Users inherit permissions from their role; field-level overrides supported
+Guest access: read-only view of public projects across tenants
+3.2 Issue Hierarchy
+3.2.1 Hierarchy Levels
+The system enforces a strict four-level hierarchy:
+Level 1 — EPIC: Large feature or initiative. Cannot have a parent. Contains Stories.
+Level 2 — STORY: User-facing requirement or feature slice. Parent = Epic.
+Level 3 — SUBTASK: Atomic work unit. Parent = Story. Assigned to single dev.
+Level 4 — SUB-SUBTASK: Granular breakdown for complex tasks. Parent = Subtask.
+3.2.2 Issue Linking Types
+Link Type
+Description
+Bidirectional?
+blocks / is blocked by
+Issue A cannot be completed until Issue B is done
+Yes — auto-inverse created
+relates to
+Informational association between issues
+Yes — symmetric
+duplicates / is duplicated by
+Issue A is a copy of Issue B
+Yes — auto-inverse created
+clones / is cloned by
+Issue A was created from Issue B template
+Yes — tracks lineage
+caused by / is causing
+Root cause tracing for bug chains
+Yes
+3.2.3 Dependency Mapping
+Dependency graph rendered as an interactive SVG network diagram in the issue detail view
+Critical path calculated using longest path algorithm across linked issues
+Blocking issues highlighted in red with badge count on board cards
+Circular dependency detection at link creation — validation error returned
+3.3 Issue Management
+3.3.1 Issue Fields (Standard)
+Field
+Type
+Notes
+Summary
+Text (255)
+Required. Indexed in Elasticsearch.
+Description
+Rich Text (HTML)
+TipTap
+ editor with @mention, code blocks, tables.
+Issue Type
+Enum
+Epic, Story, Subtask, Sub-Subtask, Bug, Task
+Priority
+Enum
+Blocker &gt; Critical &gt; Major &gt; Minor &gt; Trivial
+Status
+Workflow-linked
+Controlled by workflow engine transitions.
+Assignee
+User Picker
+Project members only; multi-assign optional.
+Reporter
+User Picker
+Default = current user. Editable by admin.
+Story Points
+Integer
+Fibonacci sequence enforced optionally.
+Sprint
+Sprint Picker
+Multi-sprint assignment blocked (single active).
+Labels
+Multi-Tag
+Freeform text tags, autocomplete on existing.
+Components
+Multi-Select
+Project-scoped component list with lead user.
+Fix Version
+Version Picker
+Links to release management module.
+Due Date
+Date
+SLA-aware; triggers alerts at configurable threshold.
+Time Tracking
+Duration
+Original estimate, time spent, time remaining.
+3.3.2 Bulk Operations
+Select multiple issues via checkbox on board or issue list view
+Bulk actions: Assign, Change Status, Set Priority, Add Label, Move to Sprint, Delete
+Bulk edit limited to 50 issues per operation (performance guard)
+Progress modal with real-time feedback and rollback on partial failure
+3.3.3 Activity History
+Every field change, comment, transition, link, and attachment logged to 
+IssueHistory
+ table
+Activity timeline displayed chronologically in issue detail panel
+Diff view for description changes (before/after comparison)
+History 
+queryable
+ via IQL: project = DIG AND updated &gt;= -7d
+3.4 Workflow Engine
+3.4.1 Workflow Structure
+A workflow is a directed graph of Statuses connected by Transitions. Each project is bound to a workflow scheme that maps issue types to workflows.
+Statuses: system-defined categories (To Do, In Progress, Done) with custom names
+Transitions: named edges between statuses (e.g., 'Start Progress' from To Do → In Progress)
+Validators: pre-conditions checked before transition executes
+Post-Functions: side effects executed after transition (e.g., set Assignee, trigger webhook)
+Conditions: user role or field-value constraints limiting who can trigger a transition
+3.4.2 Built-in Validators
+FieldRequired
+(
+fieldName
+)   
+     — Blocks transition if specified field is empty
+UserInRole
+(
+roleName
+)   
+         — Only users in role can perform this transition
+PermissionCondition
+(permission) — Checks named permission key
+PreviousStatusValidator
+(status) — Enforces transition sequence
+SubtasksCompletedValidator
+(
+)    — Blocks parent close if subtasks open
+3.4.3 SLA Tracking
+SLA policies defined at project level: response time, resolution time per priority
+SLA timer starts on issue creation, paused in configured statuses (e.g., 'Waiting for Customer')
+SLA breach at 100%, warning at configurable threshold (default 80%)
+SLA state stored as: 
+WithinGoal
+, 
+BreachingNow
+, Breached
+Dashboard widget and IQL operator: 
+sla.breached
+ = true
+3.5 Custom Fields
+Custom fields are created at tenant level and scoped to issue type / project via field configuration schemes.
+Field Type
+Storage Column
+UI Component
+Short Text
+VARCHAR(
+500)
+Input[type=text]
+Paragraph
+NVARCHAR(MAX)
+Rich text / markdown editor
+Number
+DECIMAL(
+18,4)
+Number input with min/max validation
+Date / 
+DateTime
+DATETIMEOFFSET
+Date picker with 
+timezone
+ support
+Dropdown (Single)
+INT (FK to Options)
+Select2 dropdown, searchable
+Multi-Select
+Junction table
+Chip multi-select with search
+User Picker
+INT (FK to Users)
+Avatar user search dropdown
+Checkbox
+BIT
+Toggle switch
+URL
+VARCHAR(
+2048)
+Text input with URL validation + clickable link
+Cascading Select
+Two FK columns
+Parent → child linked dropdowns
+3.6 IQL — Internal Query Language
+3.6.1 Syntax Reference
+IQL (
+modeled
+ on Jira's JQL) is a structured query language for filtering issues. Queries are parsed server-side into parameterized SQL + Elasticsearch queries.
+project = DIG AND status IN ("In Progress", "In Review")
+assignee = 
+currentUser
+(
+) AND updated &gt;= -7d ORDER BY priority DESC
+issuetype
+ = Bug AND priority IN (Critical, Blocker) AND sprint = 
+openSprints
+(
+)
+labels = "tech-debt" AND NOT status = Done AND 
+fixVersion
+ = "v2.1"
+3.6.2 Supported Functions
+currentUser
+(
+) — resolves to authenticated user's ID
+openSprints
+(
+) — returns IDs of all active sprints
+closedSprints
+(
+) — returns all completed sprints
+membersOf
+(
+roleName
+) — returns user IDs in a project role
+now(
+) — current server datetime
+startOfDay
+(
+) / 
+endOfDay
+(
+) / 
+startOfWeek
+(
+) / 
+startOfMonth
+(
+)
+3.6.3 Saved &amp; Shared Filters
+Filters saved to 
+UserFilters
+ table with name, IQL string, and visibility (Private/Public/Shared)
+Shared filters available in project dashboard widget configuration
+Filter subscriptions: email digest of new results on schedule
+Starred filters pinned to sidebar for fast access
+3.7 Boards — Scrum &amp; Kanban
+3.7.1 Kanban Board
+Columns mapped 1:1 to workflow statuses or status categories
+Cards show: issue key, summary, assignee avatar, priority icon, story point badge
+Drag-and-drop: React Beautiful 
+DnD
+ with optimistic UI updates, server confirmation on drop
+WIP limits: yellow warning at 80%, red block (soft) at 100% with override confirmation
+Swimlanes
+: group by Assignee, Epic, Priority, Label, or None
+Card 
+color
+ rules: configurable by priority, label, or IQL condition
+3.7.2 Scrum Board
+Active sprint view with column layout identical to Kanban
+Sprint header: sprint name, start/end dates, issue count, story point total, days remaining
+Backlog accessible via sidebar toggle — full backlog list below sprint panel
+Epic lane: 
+colored
+ stripe at left edge of card indicating parent epic
+Quick add: inline issue creation from board column without modal
+3.7.3 Sprint Planning Screen
+Dual-panel: left = backlog issues, right = sprint bucket
+Drag issues from backlog to sprint; story points auto-sum in sprint header
+Velocity reference panel: last 3 sprint velocities displayed as guide
+Sprint goal text field with 500-char limit, displayed on board header
+Capacity planning: team member working hours input with availability percentage
+3.8 Sprint Management
+3.8.1 Sprint Lifecycle
+State
+Allowed Actions
+Constraints
+Created
+Edit, Add Issues, Delete
+Only 1 future sprint can exist in Created state
+Active
+Start, Add/Remove Issues, Close
+Only 1 sprint active per board at a time
+Closed
+View, Re-open (admin only)
+Incomplete issues moved to next sprint or backlog
+3.8.2 Burndown Chart Data
+Burndown is calculated from a daily snapshot stored in 
+SprintSnapshots
+ table:
+X-axis: calendar days of sprint (start to end)
+Y-axis: remaining story points (or issue count)
+Ideal line: straight diagonal from total points to zero
+Actual line: daily remaining points from snapshot
+Scope change markers: vertical dotted lines when issues added/removed mid-sprint
+3.9 Dashboards &amp; Reporting
+3.9.1 Dashboard Architecture
+Each user has a personal dashboard and can create shared dashboards
+Dashboards composed of widgets arranged in a configurable 12-column grid
+Widget resize: min 3×2 
+cols
+, max 12×8 cols
+Dashboard refresh: manual or auto-refresh at 5/15/30/60-minute intervals
+3.9.2 Available Widgets
+Widget
+Data Source
+Config Options
+Issue Statistics
+SQL aggregate query
+Filter, group-by field, display (pie/bar/table)
+Burndown Chart
+SprintSnapshots
+ table
+Sprint selector, Y-axis: points or count
+Velocity Chart
+Completed sprint data
+Project, sprint count (last N)
+Cumulative Flow
+Daily status snapshots
+Date range, workflow columns
+Activity Feed
+IssueHistory
+ + Elasticsearch
+Filter by project / user / action type
+Assigned to Me
+Issues table
+Priority sort, max items
+Workload Heatmap
+Issues + time tracking
+Team, sprint, metric: points or hours
+SLA Status
+SLA tracking table
+Project, SLA type, breach status
+3.10 Automation Engine
+3.10.1 Rule Structure
+Each automation rule follows a Trigger → Conditions → Actions model stored as JSON configuration:
+{ "
+trigger": 
+{ "
+type": "
+IssueCreated
+", "
+projectId
+": 
+42 }
+,
+  "conditions": 
+[{ "
+type": "
+FieldEquals
+", "field": "priority", "value": "Blocker
+" }
+],
+  "actions": 
+[{ "
+type": "
+AssignIssue
+", "
+userId
+": 
+7 }
+, 
+{ "
+type": "
+SendNotification
+", "scheme": "urgent
+" }
+] }
+3.10.2 Trigger Types
+IssueCreated
+, 
+IssueUpdated
+, 
+IssueDeleted
+StatusTransitioned
+(
+fromStatus
+, 
+toStatus
+)
+CommentAdded
+, 
+AttachmentAdded
+SprintStarted
+, 
+SprintClosed
+SLABreached
+, 
+SLAWarning
+ScheduledTime
+ (
+cron
+ expression)
+WebhookReceived
+ (incoming webhook trigger)
+3.10.3 Action Types
+AssignIssue
+(
+userId
+ | 
+currentUser
+ | unassigned | 
+projectLead
+)
+TransitionIssue
+(
+targetStatus
+) — automated workflow transition
+CreateSubtask
+(
+summary, 
+issueType
+, assignee)
+SendNotification
+(
+userList
+ | 
+roleList
+ | 
+watcherList
+)
+SetFieldValue
+(
+fieldId
+, value)
+AddComment
+(
+body, visibility)
+SendWebhook
+(
+url
+, payload)
+CreateIssue
+(
+projectId
+, 
+issueType
+, fields)
+LogWork
+(
+timeSpent
+)
+3.11 Notifications &amp; Alerts
+Notification schemes define event-to-recipient mappings per project
+Recipients resolved from: Reporter, Assignee, Watchers, Role, User, Group
+Channels: In-App (real-time via 
+SignalR
+), Email (queued via background worker)
+Email templates: HTML with project branding, issue summary, and deep-link
+Notification batching: digest mode collects events over 5-minute window
+User preferences: per-event opt-in/out; quiet hours configuration
+@mention in comments triggers instant notification regardless of scheme
+3.12 User &amp; Role Management
+3.12.1 RBAC Permission Matrix
+Permission
+Admin
+Proj
+ Admin
+Developer
+Viewer
+Create Issue
+✓
+✓
+✓
+✗
+Delete Issue
+✓
+✓
+Own only
+✗
+Manage Workflow
+✓
+✓
+✗
+✗
+Manage Users
+✓
+Project scope
+✗
+✗
+View Audit Logs
+✓
+Project scope
+✗
+✗
+Run Automation
+✓
+✓
+✗
+✗
+Export Data
+✓
+✓
+✓
+✗
+3.13 Audit Logs
+AuditLog
+ table: Id, 
+TenantId
+, 
+UserId
+, 
+EntityType
+, 
+EntityId
+, Action, 
+OldValue
+ (JSON), 
+NewValue
+ (JSON), 
+IpAddress
+, 
+UserAgent
+, Timestamp
+All CRUD operations, login events, and permission changes logged
+Tamper-evident: records append-only with hash chain (SHA-256 of 
+prev
+ record)
+Retention policy: configurable per tenant (default 2 years); archived to cold storage
+Queryable
+ via Admin UI with filters: user, date range, entity type, action
+3.14 Integration Support
+3.14.1 REST API
+Method
+Endpoint
+Description
+GET
+/
+api
+/v1/projects
+List projects for tenant with pagination
+POST
+/
+api
+/v1/projects
+Create project; body: 
+ProjectCreateDto
+GET
+/
+api
+/v1/issues/{id}
+Full issue detail including custom fields
+POST
+/
+api
+/v1/issues
+Create issue; returns 201 with location header
+PUT
+/
+api
+/v1/issues/{id}
+Full update; partial updates via PATCH
+POST
+/
+api
+/v1/issues/search
+IQL search; body: 
+{ 
+iql
+, 
+maxResults
+, 
+startAt
+ }
+POST
+/
+api
+/v1/issues/{id}/transitions
+Execute workflow transition; body: 
+{ 
+transitionId
+ }
+GET
+/
+api
+/v1/boards/{id}/sprints
+List sprints for board
+POST
+/
+api
+/v1/webhooks
+Register outbound webhook; body: 
+WebhookDto
+3.14.2 Sample API Payload
+POST /
+api
+/v1/issues
+{
+  "
+projectKey
+": "DIG",
+  "
+issueType
+": "Story",
+  "summary": "Implement OAuth2 login for mobile app",
+  "description": "&lt;p&gt;As a user I want to log in with Google...&lt;/p&gt;",
+  "priority": "Major",
+  "
+assigneeId
+": 42,
+  "
+storyPoints
+": 5,
+  "
+sprintId
+": 17,
+  "labels": ["auth", "mobile"],
+  "
+customFields
+": 
+{ "
+CF_001": "Q3", "CF_004": "2024-09-30
+" }
+}
+4. UI/UX Design — Screen-by-Screen Breakdown
+4.1 Global Layout Shell
+All authenticated screens share a persistent shell layout:
+Top Navigation Bar (56px): Logo, global search (⌘K), notifications bell, user avatar, help menu
+Left Sidebar (240px, collapsible to 56px): Project switcher, starred projects, navigation links, admin section
+Content Area: Fills remaining viewport. Context-sensitive breadcrumb at top (16px, grey)
+Right Panel (360px, 
+slideout
+): Issue detail quick-view panel activated from board/list
+4.2 Login Page
+Centered
+ card (440px wide) on gradient background (#1B3A6B → #2E6DB4)
+Digiprise
+ logo top-
+center
+, animated fade-in
+Email field + Password field with show/hide toggle
+'Remember me' checkbox, 'Forgot password' link (right-aligned below password)
+Primary CTA: 'Sign In' button (full-width, brand blue, 48px height)
+SSO divider: 'Or continue with' + company SSO button if configured
+Error state: red border on field, inline error message below
+Loading state: button shows spinner, fields disabled
+Accessibility: ARIA labels, keyboard tab order, focus ring visible
+4.3 Dashboard Page
+Header: 'Good morning, [Name]' greeting + date. Quick-create button (+) top-right
+Widget grid: 12-column responsive grid, widgets drag-to-reorder via handle icon
+Add Widget: + button reveals widget picker drawer from right
+Each widget: title, settings gear icon (hover), drag handle, resize corner
+Empty state: illustrated placeholder with 'Add your first widget' CTA
+Pinned filters: horizontal chip row below header for fast-access saved IQL filters
+4.4 Project List Page
+Page header: 'Projects' title + 'Create Project' primary button + search input
+Toggle: Card view / Table view (persisted in user preferences)
+Card view: project icon, name, key, description snippet, member avatars (max 5), methodology badge
+Table view: sortable columns: Name, Key, Lead, Type, Updated, Issues count
+Filters: Type (Scrum/Kanban), Category, Lead, Archived (toggle)
+Pagination: 25/50/100 per page; URL-based pagination state
+Context menu (right-click or ⋮): Edit, Archive, Delete, View Settings
+4.5 Issue Detail Page
+The issue detail page is a full-width layout split into two columns:
+Left (65%): Summary (editable inline, click-to-edit), Description (
+TipTap
+ rich editor), Attachments grid, Comment thread, Activity log tabs
+Right (35%): Status dropdown + transition button, Assignee, Reporter, Priority, Labels, Story Points, Sprint, Fix Version, Due Date, Custom fields, Linked Issues section, Child Issues list, Watchers
+Status transition: prominent 'Transition' button with modal listing available transitions per workflow
+Comment composer: 
+TipTap
+ editor with @mention autocomplete, code block, image paste
+Attachment drag-drop zone: file type icons, size limit indicator (25 MB per file, 100 MB per issue)
+Edit mode: inline click-to-edit for all standard fields; save on blur or Enter
+History tab: chronological change log with user avatar, field name, old/new values, timestamp
+4.6 Issue Creation Modal
+Full-screen overlay modal (768px × 90vh); keyboard shortcut: 'C'
+Step 1 — Project + Issue Type selector at top (pre-filled from context)
+Dynamic form renders based on issue type × field configuration scheme
+Required fields marked with red asterisk; inline validation on blur
+Advanced fields: collapsed by default, expandable via 'More Fields' toggle
+Create &amp; Close vs Create &amp; Clone buttons at bottom
+Auto-save draft: 
+localStorage
+ backup every 10 seconds — restored on re-open
+4.7 Kanban Board UI
+Horizontal scroll container with fixed-width columns (280px each)
+Column header: status name, WIP count badge, WIP limit badge (e.g. 5/7), + Add button
+Card: issue key (linked), summary (2-line truncate), avatar, priority icon, story point badge, epic 
+color
+ stripe (left border)
+Drag ghost: semi-transparent card clone follows cursor; drop zone highlighted blue
+Quick filters bar above board: Assignee avatars (click to filter), Priority chips, Label chips, Sprint selector
+Board settings (gear icon): column mapping, 
+swimlanes
+, WIP limits, card fields shown
+Epic panel (optional left sidebar): epic list with progress bars
+4.8 Sprint Planning Screen
+Split-pane layout: Backlog (left 45%) + Sprint bucket (right 55%)
+Backlog panel: search + IQL filter, group by: Epic / Component / None, sortable columns
+Sprint panel header: sprint name, date range, story point sum vs team capacity bar
+Capacity bar: green (under), yellow (near), red (over)
+Drag from backlog → sprint to assign; or right-click &gt; 'Move to Sprint'
+Sprint goal input: rich text field at top of sprint panel
+'Start Sprint' button activates with confirmation dialog: sprint name, dates, goal preview
+4.9 Admin Configuration Screen
+Left sub-nav: Project Settings, Workflow Schemes, Field Configs, Permission Schemes, Notification Schemes, Automation, Integrations, Audit Log
+Each section uses a consistent two-column layout: list on left, edit form on right
+Workflow Schemes: assign workflow to issue type per project via dropdown matrix table
+Permission Schemes: drag-and-drop role-to-permission assignment
+Automation list: rule cards showing trigger icon, name, last run time, enabled toggle
+Integration settings: Git webhook URLs, CI/CD token management, outbound webhook log
+4.10 Workflow Designer UI
+Visual canvas (react-flow or similar): statuses as rounded rectangles, transitions as directional arrows
+Add Status: click + button on canvas, enter name, assign category (To Do / In Progress / Done)
+Add Transition: drag from source status edge to target status
+Click transition arrow: right panel opens for Name, Conditions, Validators, Post-Functions
+Drag to reposition nodes; auto-layout button available
+Publish workflow: version-controlled; active version locked from editing; create new version to modify
+Preview mode: simulate issue through workflow step-by-step
+5. System Architecture
+5.1 High-Level Architecture Overview
+The system follows a layered, service-oriented architecture with the following primary tiers:
+Presentation Tier: React.js SPA served via CDN / Nginx static hosting
+Application Tier: ASP.NET Core 8 Web API, horizontally scalable behind load balancer
+Cache Tier: Redis Cluster for session, query cache, rate limiting
+Search Tier: Elasticsearch cluster for full-text issue search
+Persistence Tier: SQL Server (primary), with read replicas for reporting queries
+Message Tier: RabbitMQ for async job processing (notifications, webhook delivery)
+Real-time Tier: ASP.NET Core 
+SignalR
+ for live board updates and notifications
+5.2 Backend — ASP.NET Core Architecture
+5.2.1 Project Structure
+Digiprise.PMS
+/
+├── 
+Digiprise.PMS.API
+/              # ASP.NET Core Web API (controllers, middleware, DI config)
+├── 
+Digiprise.PMS.Application
+/      # Use cases, commands, queries (
+MediatR
+ CQRS)
+├── 
+Digiprise.PMS.Domain
+/           # Entities, value objects, domain events
+├── 
+Digiprise.PMS.Infrastructure
+/   # EF Core, Redis, Elasticsearch, repos
+├── 
+Digiprise.PMS.Contracts
+/        # DTOs, API request/response models
+└── 
+Digiprise.PMS.Tests
+/            # Unit + integration tests
+5.2.2 Layer Responsibilities
+Layer
+Responsibilities
+API (Controller)
+HTTP routing, authentication middleware, request validation (
+FluentValidation
+), 
+MediatR
+ dispatch, response shaping
+Application
+CQRS via 
+MediatR
+: Commands (write) and Queries (read), business rule orchestration, domain event publishing
+Domain
+Aggregate roots (Project, Issue, Sprint, Workflow), value objects, domain events, business invariants
+Infrastructure
+EF Core 
+DbContext
+, repository implementations, Redis cache, Elasticsearch indexing, email queue publishing
+5.2.3 Authentication &amp; Authorization
+JWT Bearer tokens issued at login; 15-minute access token + 7-day refresh token
+Refresh tokens stored in database (hashed) with device fingerprint
+Claims: 
+UserId
+, 
+TenantId
+, Email, 
+Roles[
+], 
+ProjectPermissions
+ (scoped claim per project)
+Resource-based authorization: 
+IAuthorizationHandler
+ validates project membership and field-level rights
+API rate limiting: ASP.NET Core Rate Limiter middleware — 200 
+req
+/min per user, 5000 
+req
+/min per tenant
+5.2.4 CQRS Pattern Example
+// Command
+public record 
+CreateIssueCommand
+(
+string 
+ProjectKey
+, string 
+IssueType
+, string Summary, ...);
+public class 
+CreateIssueHandler
+ :
+ 
+IRequestHandler
+&lt;
+CreateIssueCommand
+, 
+IssueDto
+&gt;
+{
+    public async Task&lt;
+IssueDto
+&gt; 
+Handle(
+CreateIssueCommand
+ 
+cmd
+, 
+CancellationToken
+ 
+ct
+)
+    {
+        var issue = 
+Issue.Create
+(
+cmd.ProjectKey
+, 
+cmd.IssueType
+, 
+cmd.Summary
+);
+        await _
+repo.AddAsync
+(issue, 
+ct
+);
+        await _
+eventBus.PublishAsync
+(new 
+IssueCreatedEvent
+(
+issue.Id
+));
+        return _
+mapper.Map
+&lt;
+IssueDto
+&gt;(issue);
+    }
+}
+5.3 Frontend Architecture — React.js
+5.3.1 Technology Selection: React.js
+React.js is selected over Angular for the following reasons:
+Smaller bundle size with code splitting vs 
+Angular's
+ larger initial payload
+React's
+ virtual DOM diffing superior for high-frequency board drag-and-drop updates
+Broader ecosystem: react-beautiful-
+dnd
+, react-flow, react-query, 
+TipTap
+Better alignment with existing 
+Digiprise
+ CRM frontend technology choices
+5.3.2 Frontend Project Structure
+src
+/
+├── 
+api
+/            # Axios instances, API clients, React Query hooks
+├── components/     # Reusable atomic components (Button, Badge, Avatar)
+├── features/       # Feature slices: issues/, boards/, sprints/, dashboards/
+├── layouts/        # 
+AppShell
+, 
+AuthLayout
+, 
+AdminLayout
+├── pages/          # Route-level components
+├── store/          # Redux Toolkit slices (
+ui
+, user, notifications)
+├── hooks/          # Custom React hooks
+└── utils/          # IQL parser, date utils, permission helpers
+5.3.3 State Management
+React Query (
+TanStack
+ Query) for all server state: fetch, cache, invalidate
+Redux Toolkit for pure client-side UI state: sidebar open/close, modal state, drag context
+Optimistic updates: mutation applies state immediately, rolls back on API error
+SignalR
+ connection: custom hook 
+useSignalR
+(
+) reconnects with exponential backoff
+5.4 Database Design
+5.4.1 Core Tables
+Table
+Key Columns
+Tenants
+Id, Name, Subdomain, Plan, 
+CreatedAt
+, 
+IsActive
+, Settings (JSON)
+Users
+Id, 
+TenantId
+, Email, DisplayName, 
+AvatarUrl
+, 
+PasswordHash
+, 
+IsActive
+, 
+LastLoginAt
+Projects
+Id, 
+TenantId
+, Key (unique), Name, Description, 
+LeadUserId
+, 
+BoardType
+, 
+TemplateId
+, Status, 
+CreatedAt
+Issues
+Id, 
+TenantId
+, 
+ProjectId
+, 
+IssueKey
+, 
+IssueType
+, Summary, Description, 
+StatusId
+, 
+PriorityId
+, 
+AssigneeId
+, 
+ReporterId
+, 
+ParentIssueId
+, 
+SprintId
+, 
+StoryPoints
+, 
+EpicId
+, 
+CreatedAt
+, 
+UpdatedAt
+, 
+DueDate
+, 
+ResolutionDate
+IssueCustomFields
+Id, 
+IssueId
+, 
+FieldDefinitionId
+, 
+ValueText
+, 
+ValueNumber
+, 
+ValueDate
+, 
+ValueUserId
+, 
+ValueOptionId
+Workflows
+Id, 
+TenantId
+, Name, Version, 
+IsActive
+, Definition (JSON graph), 
+CreatedAt
+WorkflowStatuses
+Id, 
+WorkflowId
+, Name, Category (
+ToDo
+/InProgress/Done), Position, 
+Color
+WorkflowTransitions
+Id, 
+WorkflowId
+, 
+FromStatusId
+, 
+ToStatusId
+, Name, Conditions (JSON), Validators (JSON), 
+PostFunctions
+ (JSON)
+Sprints
+Id, 
+BoardId
+, Name, Goal, StartDate, 
+EndDate
+, State (Created/Active/Closed), 
+VelocityPoints
+Comments
+Id, 
+IssueId
+, 
+UserId
+, Body (HTML), 
+CreatedAt
+, 
+UpdatedAt
+, 
+IsDeleted
+, 
+ParentCommentId
+Attachments
+Id, 
+IssueId
+, 
+UserId
+, 
+FileName
+, 
+FileSize
+, 
+ContentType
+, 
+StoragePath
+, 
+CreatedAt
+IssueLinks
+Id, 
+SourceIssueId
+, 
+TargetIssueId
+, 
+LinkTypeId
+, 
+CreatedAt
+, 
+CreatedByUserId
+IssueHistory
+Id, 
+IssueId
+, 
+UserId
+, 
+ChangeType
+, 
+FieldName
+, 
+OldValue
+, 
+NewValue
+, 
+ChangedAt
+AutomationRules
+Id, 
+ProjectId
+, Name, 
+IsActive
+, 
+TriggerConfig
+ (JSON), 
+ConditionConfig
+ (JSON), 
+ActionConfig
+ (JSON), 
+LastRunAt
+Notifications
+Id, 
+UserId
+, 
+TenantId
+, Title, Body, 
+EntityType
+, 
+EntityId
+, 
+IsRead
+, 
+CreatedAt
+AuditLogs
+Id, 
+TenantId
+, 
+UserId
+, 
+EntityType
+, 
+EntityId
+, Action, 
+OldValue
+, 
+NewValue
+, 
+IpAddress
+, Timestamp, 
+PrevHash
+SprintSnapshots
+Id, 
+SprintId
+, 
+SnapshotDate
+, 
+TotalPoints
+, 
+CompletedPoints
+, 
+RemainingPoints
+, 
+TotalIssues
+, 
+CompletedIssues
+5.4.2 Indexing Strategy
+Issues: composite index on (
+TenantId
+, 
+ProjectId
+, 
+StatusId
+) — board queries
+Issues: index on (
+TenantId
+, 
+AssigneeId
+, 
+UpdatedAt
+) — 'assigned to me' queries
+IssueHistory
+: index on (
+IssueId
+, 
+ChangedAt
+ DESC) — activity feed
+Notifications: index on (
+UserId
+, 
+IsRead
+, 
+CreatedAt
+ DESC) — notification bell
+All tenant-scoped tables: 
+TenantId
+ as leading key in all clustered indexes
+Row-Level Security (RLS) via 
+TenantId
+ filter applied in EF Core global query filter
+5.5 Caching Layer — Redis
+Cache Key Pattern
+TTL
+Purpose
+pms:tenant
+:{id
+}:project
+:{key}
+10 min
+Project metadata cache
+pms:board
+:{id
+}:columns
+5 min
+Board column + WIP config
+pms:iql
+:{hash}
+2 min
+Compiled IQL query result set
+pms:dashboard
+:{
+userId
+}
+3 min
+Dashboard widget data bundle
+pms:session
+:{token}
+15 min
+JWT session validation cache
+pms:permissions
+:{
+userId
+}:{
+projectId
+}
+5 min
+Resolved permission set for user-project
+pms:sprint
+:
+active
+:{
+boardId
+}
+1 min
+Active sprint summary for board header
+Cache invalidation strategy: write-through on mutations. Domain events (e.g., 
+IssueStatusChanged
+) trigger targeted cache key deletion via background event handler.
+5.6 Elasticsearch — Search Engine
+Index: 
+pms_issues
+_{
+tenantId
+} — one index per tenant for data isolation
+Document mapped from Issue + custom fields + linked data
+IQL fields translated to Elasticsearch DSL: text fields → 
+match_phrase
+, 
+enum
+ fields → term, date fields → range
+Autocomplete: edge-
+ngram
+ tokenizer on summary field, used by global search (⌘K)
+Synchronization: domain event 
+IssueIndexEvent
+ → RabbitMQ → Elasticsearch consumer (near real-time, &lt;1s lag)
+Highlight: search result snippets with matched term highlighting
+5.7 Real-Time Communication — 
+SignalR
+Hub: 
+PmsHub
+ — authenticated, tenant-scoped
+Groups: 
+board:{
+boardId
+}, 
+project:{
+projectId
+}, 
+user:{
+userId
+}
+Events: 
+IssueStatusChanged
+, 
+IssueAssigned
+, 
+CommentAdded
+, 
+SprintStarted
+, 
+NotificationReceived
+Board drag-drop: optimistic client update + server broadcast to board group on confirmation
+Scale-out: Redis backplane for 
+SignalR
+ in multi-instance deployment
+5.8 Scalability Design
+Load Balancer (Azure Load Balancer / Nginx): distributes traffic across N API instances
+Stateless API: all session state in Redis — any API instance handles any request
+Read replicas: SQL Server Always 
+On
+ AG with secondary read replica for reports and dashboard queries
+Background workers: separate ASP.NET Core worker service for notifications, automation, Elasticsearch sync
+Message queue: RabbitMQ with dead-letter queue and retry policy (3 attempts, exponential backoff)
+Horizontal pod scaling: Kubernetes HPA triggers on CPU &gt; 60% or active connection count &gt; 800
+6. Performance Requirements
+6.1 Targets
+Metric
+Target
+Measurement Method
+Board Load (50 issues)
+&lt; 1.5 seconds
+Lighthouse / k6 load test
+Issue Search (IQL)
+&lt; 500ms (p95)
+Elasticsearch query time
+Issue Create API
+&lt; 300ms (p99)
+API response time header
+Dashboard Load
+&lt; 2 seconds
+Parallel widget fetch
+Concurrent Users
+1,000+ (sustained)
+k6 ramp test to 1,200 VUs
+Real-time Notification
+&lt; 200ms
+SignalR
+ event latency
+Availability (SLA)
+99.9% uptime
+Monthly rolling window
+6.2 DB Optimization Strategies
+Query plan caching: EF Core compiled queries for hot-path read operations
+Pagination: keyset (cursor) pagination on issue lists — avoids OFFSET performance degradation
+JSON columns: EF Core JSON columns for custom field values reduce join complexity
+Partitioning: Issues table partitioned by 
+TenantId
+ + 
+CreatedAt
+ year for large tenants
+Connection pooling: 
+Npgsql
+/SqlClient with pool size tuned per instance (min 5, max 50)
+Async-all-the-way: every I/O path uses async/await preventing thread pool exhaustion
+7. Infrastructure &amp; Hosting Requirements
+7.1 Server Specifications
+Tier
+Minimum
+Recommended
+Enterprise
+App Server (per node)
+4 vCPU / 8 GB RAM
+8 vCPU / 16 GB RAM
+16 vCPU / 32 GB RAM
+App Server (nodes)
+1 node
+2 nodes
+4+ nodes (K8s)
+SQL Server
+4 vCPU / 16 GB RAM
+8 vCPU / 32 GB RAM
+16 vCPU / 64 GB RAM + replica
+Redis
+2 vCPU / 4 GB RAM
+4 vCPU / 8 GB RAM
+Redis Cluster (3 shards)
+Elasticsearch
+4 vCPU / 8 GB RAM
+4 vCPU / 16 GB RAM
+3-node cluster, 8 vCPU / 32 GB
+Storage (App)
+100 GB SSD
+250 GB SSD
+500 GB 
+NVMe
+ + NAS for attachments
+Storage (DB)
+200 GB SSD
+500 GB SSD
+1 TB 
+NVMe
+ + backup target
+7.2 Network Architecture
+Load Balancer → API nodes (HTTPS, port 443)
+API nodes → SQL Server (port 1433, private subnet only)
+API nodes → Redis (port 6379, private subnet, TLS enabled)
+API nodes → Elasticsearch (port 9200, private subnet)
+API nodes → RabbitMQ (port 5672, private subnet)
+All internal traffic: private VLAN / VPC — no public exposure
+DDoS protection: Cloudflare or Azure Front Door in front of load balancer
+8. Software Requirements
+Component
+Version
+Purpose
+ASP.NET Core
+.NET 8 LTS
+Backend Web API + Worker Services
+Entity Framework Core
+8.x
+ORM for SQL Server
+SQL Server
+2022 / Azure SQL
+Primary relational data store
+Redis
+7.x
+Distributed cache + 
+SignalR
+ backplane
+Elasticsearch
+8.x
+Full-text issue search + IQL resolution
+RabbitMQ
+3.12.x
+Async job queue for notifications and indexing
+React.js
+18.x
+Single-page frontend application
+Redux Toolkit
+2.x
+Client-side UI state management
+TanStack
+ Query
+5.x
+Server state, caching, mutations
+Nginx
+1.25.x
+Reverse proxy, static file serving, SSL termination
+Docker
+26.x
+Containerization
+Kubernetes
+1.29.x
+Container orchestration (production)
+MediatR
+12.x
+CQRS mediator pattern in application layer
+FluentValidation
+11.x
+Request validation pipeline
+Serilog
+3.x
+Structured logging → 
+Seq
+ / ELK Stack
+xUnit
+ + 
+Testcontainers
+Latest
+Unit + integration testing with real DB containers
+9. Security Requirements
+9.1 Authentication
+JWT Bearer: HS256-signed access tokens (15-min TTL) + RS256 option for enterprise
+Refresh token rotation: each use issues new token, old token invalidated
+Multi-factor authentication (TOTP / authenticator app) — optional per tenant
+OAuth 2.0 / OIDC: Google Workspace, Microsoft Entra ID (Azure AD) SSO via 
+OpenIdConnect
+ middleware
+Brute force protection: account locked after 5 failed attempts; exponential backoff on subsequent unlocks
+9.2 Authorization
+RBAC enforced at API layer via [
+Authorize(
+Policy = ...)] attributes on controllers
+Resource-based authorization: 
+IAuthorizationHandler
+ validates per-issue and per-field rights
+Multi-tenant isolation: 
+TenantId
+ injected into every query via EF Core global filter — impossible to query cross-tenant data
+9.3 Data Encryption
+In-transit: TLS 1.3 enforced; HSTS header; certificate pinning optional
+At-rest: SQL Server TDE (Transparent Data Encryption) for database files
+Attachments: AES-256 encrypted at storage layer (Azure Blob Storage server-side encryption)
+Sensitive fields (tokens, webhooks): encrypted in DB using application-level AES-256 with key from Azure Key Vault / environment-managed secret store
+9.4 API Security
+Input sanitization: 
+HtmlSanitizer
+ on rich text fields to prevent stored XSS
+CORS: strict whitelist of allowed origins; no wildcard
+CSP headers: restrictive Content-Security-Policy preventing inline script injection
+SQL injection prevention: parameterized queries only via EF Core — no string-interpolated SQL
+File upload: MIME type validation, virus scan via 
+ClamAV
+ integration, 25 MB limit enforced at middleware
+Dependency scanning: 
+Dependabot
+ / 
+Snyk
+ in CI pipeline for known CVE alerts
+10. DevOps &amp; Deployment
+10.1 CI/CD Pipeline
+Pull Request → GitHub Actions Workflow
+  Step 1: dotnet restore + dotnet build
+  Step 2: dotnet test (unit + integration via 
+Testcontainers
+)
+  Step 3: 
+SonarCloud
+ static analysis (code quality gates)
+  Step 4: Docker build (multi-stage 
+Dockerfile
+)
+  Step 5: Push to container registry (GHCR / ECR)
+  Step 6: Deploy to target environment (
+ArgoCD
+ 
+GitOps
+ or Helm)
+10.2 
+Dockerfile
+ (Multi-Stage)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /
+src
+COPY .
+ .
+RUN dotnet publish 
+Digiprise.PMS.API
+ -c Release -o /publish
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /
+publish .
+ENV ASPNETCORE_URLS=http://+:8080
+ENTRYPOINT ["dotnet", "Digiprise.PMS.API.dll"]
+10.3 Environment Strategy
+Env
+Trigger
+Config
+Development
+Developer push to feature branch
+Local Docker Compose; SQL Server 
+LocalDB
+ or Docker; hot reload
+QA / Staging
+Merge to main branch
+Kubernetes namespace; seeded test data; external Elasticsearch
+Production
+Tagged release (
+vX.
+Y.Z
+)
+Full K8s cluster; multi-node; monitoring stack (Prometheus/Grafana)
+10.4 Health Monitoring
+Health check endpoints: /health/live (liveness) and /health/ready (readiness)
+Checks: SQL Server connectivity, Redis ping, Elasticsearch cluster health, queue depth
+Prometheus metrics: custom counters for issue create rate, search latency, active connections
+Grafana dashboards: API response times, error rates, queue lag, DB query duration
+Alerting: PagerDuty or 
+OpsGenie
+ for P1/P2 incidents (error rate &gt; 1%, p99 latency &gt; 3s)
+11. Non-Functional Requirements
+Attribute
+Requirement
+Implementation Strategy
+Scalability
+1,000+ concurrent users; linear scale-out
+Stateless API, Redis session, K8s HPA, read replicas
+Availability
+99.9% monthly SLA
+Multi-node deployment, health checks, rolling deploys
+Reliability
+No data loss on component failure
+Transactional DB writes, RabbitMQ persistence, idempotent consumers
+Maintainability
+&lt; 2 hours MTTR for bug fixes
+Structured logging, distributed tracing (
+OpenTelemetry
+), feature flags
+Extensibility
+New modules without core changes
+Plugin architecture via domain events + 
+MediatR
+ pipelines
+Observability
+Full request tracing
+OpenTelemetry
+ traces to Jaeger; correlation IDs on all logs
+Accessibility
+WCAG 2.1 AA compliance
+Semantic HTML, ARIA labels, keyboard navigation, focus management
+Internationalization
+UTF-8 full support
+All text columns NVARCHAR; React i18n via react-i18next
+Backup &amp; Recovery
+RPO: 1 hour; RTO: 4 hours
+SQL Server automated backups (hourly), point-in-time restore
