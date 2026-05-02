@@ -905,16 +905,8 @@ async function loadBacklog(){
       api('GET',`/api/v1/issues/project/${currentProject.id}`),
       api('GET',`/api/v1/projects/${currentProject.id}/sprints`).catch(()=>[])
     ]);
-    const key = `issues_${currentProject.id}`;
-    const saved = localStorage.getItem(key);
-
-if (saved) {
-    allIssues = JSON.parse(saved);
-    console.log("📦 Loaded from localStorage");
-} else {
     allIssues = issues;
     console.log("🌐 Loaded from API");
-}
 
 sprints = spList;
 
@@ -1587,14 +1579,14 @@ function dropIssue(event, sprintId) {
     if (issue) {
         issue.sprintId = sprintId;
         console.log("✅ Updated:", issue);
+        
+        // Save to backend API instead of local storage
+        api('PUT', `/api/v1/issues/${droppedId}`, { sprintId: sprintId }).catch(e => {
+            toast('Failed to move issue: ' + e.message, 'err');
+        });
     }
 
-    // 🔥 SAVE TO LOCAL STORAGE
-    const key = `issues_${currentProject.id}`;
-    localStorage.setItem(key, JSON.stringify(allIssues));
-
     renderBacklog(allIssues, sprints);
-    enableDrag();
 }
 </script>
 </body>
