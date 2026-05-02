@@ -12,4 +12,10 @@
     <ProjectReference Include="..\Digiprise.PMS.Infrastructure\Digiprise.PMS.Infrastructure.csproj" />
     <ProjectReference Include="..\Digiprise.PMS.Contracts\Digiprise.PMS.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

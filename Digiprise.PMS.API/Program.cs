@@ -8,20 +8,22 @@ using Digiprise.PMS.Infrastructure.Data;
 using Digiprise.PMS.Infrastructure.Repositories;
 using Digiprise.PMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── In-Memory Data Store (Singleton — shared across all requests) ───────
-builder.Services.AddSingleton<InMemoryDataStore>();
+// ── Entity Framework Core Database ──────────────────────────────────────
+builder.Services.AddDbContext<PmsDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ── Domain Repositories ────────────────────────────────────────────────
-builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IIssueRepository, IssueRepository>();
-builder.Services.AddScoped<ISprintRepository, SprintRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ITenantRepository, TenantRepository>();
-builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();
+builder.Services.AddScoped<IIssueRepository, EfIssueRepository>();
+builder.Services.AddScoped<ISprintRepository, EfSprintRepository>();
+builder.Services.AddScoped<IUserRepository, EfUserRepository>();
+builder.Services.AddScoped<ITenantRepository, EfTenantRepository>();
+builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();
+builder.Services.AddScoped<IAuditLogRepository, EfAuditLogRepository>();
 
 // ── Application Services ───────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -71,9 +73,16 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// ── Seed Demo Data ──────────────────────────────────────────────────────
-var store = app.Services.GetRequiredService<InMemoryDataStore>();
-DataSeeder.Seed(store, app.Logger);
+// ── Apply Migrations & Seed Data ───────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<PmsDbContext>();
+    if (context.Database.IsRelational())
+    {
+        context.Database.Migrate();
+    }
+    await EfDataSeeder.SeedAsync(context, app.Logger);
+}
 
 // ── Middleware Pipeline ─────────────────────────────────────────────────
 app.UseMiddleware<GlobalExceptionMiddleware>();

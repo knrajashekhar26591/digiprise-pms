@@ -8,6 +8,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Digiprise.PMS.Domain\Digiprise.PMS.Domain.csproj" />
     <ProjectReference Include="..\Digiprise.PMS.Application\Digiprise.PMS.Application.csproj" />
   </ItemGroup>
