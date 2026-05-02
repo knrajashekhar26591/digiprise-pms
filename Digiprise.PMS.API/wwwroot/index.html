@@ -235,6 +235,13 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .status-drop-item:hover{background:var(--bg)}
 .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
+.filter-drop{position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--sh3);z-index:100;width:250px;padding:12px;display:none;flex-direction:column;gap:8px}
+.filter-drop.on{display:flex}
+.filter-drop input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-size:13px;outline:none;}
+.filter-drop input:focus{border-color:var(--blue2);}
+.filter-drop button{background:var(--blue2);color:#fff;border:none;border-radius:var(--r);padding:6px 12px;font-size:13px;cursor:pointer;width:100%;margin-top:4px}
+.filter-drop-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-top:4px}
+
 /* Description */
 .dp-desc{font-size:14px;color:var(--text);line-height:1.7;padding:10px 12px;border-radius:var(--r);border:2px solid transparent;outline:none;min-height:80px;width:100%;resize:vertical;background:transparent;font-family:inherit}
 .dp-desc:hover{border-color:var(--border);background:#fff}
@@ -502,7 +509,18 @@ textarea.mi{resize:vertical;min-height:80px}
             <input type="text" placeholder="Search backlog" id="bl-q" oninput="filterBL(this.value)"/>
           </div>
           <div class="bl-avs" id="bl-avs"></div>
-          <button class="bl-btn" onclick="applyIqlFilter('bl-q')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+          <div style="position:relative">
+            <button class="bl-btn" onclick="toggleFilterDrop('bl-filter-drop')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+            <div class="filter-drop" id="bl-filter-drop">
+              <div class="filter-drop-label">Quick Filters</div>
+              <div class="status-drop-item" style="padding:4px 0" onclick="applyIqlMenu('bl-filter-drop', 'assignee = currentUser()')">Only my issues</div>
+              <div class="status-drop-item" style="padding:4px 0" onclick="applyIqlMenu('bl-filter-drop', 'issuetype = Bug')">Only Bugs</div>
+              <div class="filter-drop-label">Advanced IQL</div>
+              <input type="text" id="bl-filter-iql" placeholder="e.g. priority = Critical" onkeydown="if(event.key==='Enter')applyIqlMenu('bl-filter-drop', this.value)"/>
+              <button onclick="applyIqlMenu('bl-filter-drop', document.getElementById('bl-filter-iql').value)">Apply Filter</button>
+              <button style="background:var(--bg);color:var(--text);margin-top:0" onclick="applyIqlMenu('bl-filter-drop', '')">Clear</button>
+            </div>
+          </div>
           <div style="margin-left:auto;display:flex;gap:8px">
             <button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button>
             <button class="bl-btn" onclick="openCreateSprint()">+ Create sprint</button>
@@ -517,7 +535,18 @@ textarea.mi{resize:vertical;min-height:80px}
           <div class="board-bar">
             <span class="board-sprint-name" id="board-sprint-name">Board</span>
             <div class="bl-avs" style="margin-left:8px" id="board-avs"></div>
-            <button class="bl-btn" style="margin-left:8px" onclick="applyIqlFilter('board-q')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+            <div style="position:relative;margin-left:8px">
+              <button class="bl-btn" onclick="toggleFilterDrop('board-filter-drop')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Filter</button>
+              <div class="filter-drop" id="board-filter-drop">
+                <div class="filter-drop-label">Quick Filters</div>
+                <div class="status-drop-item" style="padding:4px 0" onclick="applyIqlMenu('board-filter-drop', 'assignee = currentUser()')">Only my issues</div>
+                <div class="status-drop-item" style="padding:4px 0" onclick="applyIqlMenu('board-filter-drop', 'issuetype = Bug')">Only Bugs</div>
+                <div class="filter-drop-label">Advanced IQL</div>
+                <input type="text" id="board-filter-iql" placeholder="e.g. priority = Critical" onkeydown="if(event.key==='Enter')applyIqlMenu('board-filter-drop', this.value)"/>
+                <button onclick="applyIqlMenu('board-filter-drop', document.getElementById('board-filter-iql').value)">Apply Filter</button>
+                <button style="background:var(--bg);color:var(--text);margin-top:0" onclick="applyIqlMenu('board-filter-drop', '')">Clear</button>
+              </div>
+            </div>
             <div style="margin-left:auto"><button class="bl-btn" onclick="openCreateIssue()">+ Create issue</button></div>
           </div>
           <div class="board-scroll"><div class="board-cols" id="board-cols"></div></div>
@@ -1556,6 +1585,30 @@ function applyIqlFilter(inputId) {
       allIssues = issues;
       if(inputId === 'bl-q') renderBacklog(issues, sprints || []);
       if(inputId === 'board-q') renderBoard(issues);
+      toast(`${issues.length} result(s)`,'info');
+    })
+    .catch(e=>toast(`Filter Error: ${e.message}`, 'err'));
+}
+
+function toggleFilterDrop(id){
+  document.querySelectorAll('.filter-drop').forEach(el=>el.classList.remove('on'));
+  document.getElementById(id)?.classList.toggle('on');
+}
+
+function applyIqlMenu(dropId, q) {
+  document.getElementById(dropId).classList.remove('on');
+  if(!q.trim()) {
+    if(dropId === 'bl-filter-drop') loadBacklog();
+    if(dropId === 'board-filter-drop') loadBoard();
+    return;
+  }
+  const isBl = dropId === 'bl-filter-drop';
+  api('POST','/api/v1/issues/search',{iql:q,maxResults:50,startAt:0})
+    .then(r=>{
+      const issues = r.issues || r;
+      allIssues = issues;
+      if(isBl) renderBacklog(issues, sprints || []);
+      else renderBoard(issues);
       toast(`${issues.length} result(s)`,'info');
     })
     .catch(e=>toast(`Filter Error: ${e.message}`, 'err'));
