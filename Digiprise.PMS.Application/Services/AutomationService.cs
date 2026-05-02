@@ -29,7 +29,7 @@ public class AutomationService : IAutomationService
 
     public async Task<AutomationRuleDto> CreateRuleAsync(int projectId, string name, string trigger, string conditions, string actions, int tenantId, CancellationToken ct = default)
     {
-        var rule = AutomationRule.Create(projectId, name, trigger, conditions, actions);
+        var rule = AutomationRule.Create(tenantId, projectId, name, trigger, conditions, actions);
         await _automation.AddAsync(rule, ct);
         await _automation.SaveChangesAsync(ct);
         return Map(rule);

@@ -6,6 +6,10 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4" />
+    <PackageReference Include="Moq" Version="4.20.70" />
     <ProjectReference Include="..\Digiprise.PMS.Domain\Digiprise.PMS.Domain.csproj" />
     <ProjectReference Include="..\Digiprise.PMS.Application\Digiprise.PMS.Application.csproj" />
     <ProjectReference Include="..\Digiprise.PMS.Infrastructure\Digiprise.PMS.Infrastructure.csproj" />

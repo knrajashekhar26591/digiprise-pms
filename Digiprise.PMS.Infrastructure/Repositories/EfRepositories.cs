@@ -96,12 +96,19 @@ public class EfIssueRepository : EfRepository<Issue>, IIssueRepository
 
     public async Task<IEnumerable<Issue>> GetBacklogAsync(int projectId, CancellationToken ct = default)
     {
-        return await _context.Issues.Where(i => i.ProjectId == projectId && i.SprintId == null).ToListAsync(ct);
+        return await _context.Issues
+            .Include(i => i.Assignee)
+            .Where(i => i.ProjectId == projectId && i.SprintId == null)
+            .ToListAsync(ct);
     }
 
     public async Task<IEnumerable<Issue>> GetByAssigneeAsync(int userId, int tenantId, CancellationToken ct = default)
     {
-        return await _context.Issues.Where(i => i.TenantId == tenantId && i.AssigneeId == userId).ToListAsync(ct);
+        // TenantId is handled by global query filter, but we keep the parameter for interface compatibility
+        return await _context.Issues
+            .Include(i => i.Project)
+            .Where(i => i.AssigneeId == userId)
+            .ToListAsync(ct);
     }
 
     public async Task<string> GenerateIssueKeyAsync(int projectId, string projectKey, CancellationToken ct = default)
@@ -112,8 +119,11 @@ public class EfIssueRepository : EfRepository<Issue>, IIssueRepository
 
     public async Task<IEnumerable<Issue>> SearchByIqlAsync(string iql, int tenantId, int page, int pageSize, CancellationToken ct = default)
     {
-        // Basic IQL mock fallback
-        return await _context.Issues.Where(i => i.TenantId == tenantId).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(ct);
+        return await _context.Issues
+            .Include(i => i.Assignee)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
     }
 
     public async Task<Dictionary<int, string>> GetJournalsAtBaselineAsync(IEnumerable<int> issueIds, DateTimeOffset baseline, CancellationToken ct = default)

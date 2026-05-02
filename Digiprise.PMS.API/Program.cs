@@ -46,9 +46,11 @@ builder.Services.AddScoped<IBudgetRepository, EfBudgetRepository>();
 builder.Services.AddScoped<ISlaRepository, EfSlaRepository>();
 builder.Services.AddScoped<IAutomationRepository, EfAutomationRepository>();
 builder.Services.AddScoped<IReportingRepository, EfReportingRepository>();
+builder.Services.AddScoped<IRepository<Tenant>, EfTenantRepository>();
 builder.Services.AddScoped<IRepository<SystemSetting>, EfRepository<SystemSetting>>();
 builder.Services.AddScoped<IRepository<TenantSetting>, EfRepository<TenantSetting>>();
 builder.Services.AddScoped<IRepository<UserInvite>, EfRepository<UserInvite>>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
 
 
 

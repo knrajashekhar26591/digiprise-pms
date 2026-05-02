@@ -98,7 +98,7 @@ public static class DataSeeder
         store.ProjectMembers[m2.Id] = m2;
 
         // Sprint
-        var sprint = Sprint.Create(project.Id, project.Id, "Sprint 1",
+        var sprint = Sprint.Create(tenant.Id, project.Id, project.Id, "Sprint 1",
             DateTime.UtcNow, DateTime.UtcNow.AddDays(14), "Ship the MVP!");
         InMemoryDataStore.SetId(sprint, store.NextId());
         sprint.Start();

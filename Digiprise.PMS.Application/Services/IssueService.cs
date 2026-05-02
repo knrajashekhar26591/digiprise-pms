@@ -53,7 +53,7 @@ public class IssueService : IIssueService
     {
         var issues = await _issues.GetBacklogAsync(projectId, ct);
         var result = new List<IssueListItemDto>();
-        foreach (var i in issues.Where(x => x.TenantId == tenantId))
+        foreach (var i in issues)
             result.Add(await MapListAsync(i, ct));
         return result;
     }
@@ -249,14 +249,21 @@ public class IssueService : IIssueService
         Sprint? sprint = null;
         if (i.SprintId.HasValue) sprint = await _sprints.GetByIdAsync(i.SprintId.Value, ct);
 
+        string[]? labels = null;
+        try {
+            if (!string.IsNullOrEmpty(i.Labels)) labels = JsonSerializer.Deserialize<string[]>(i.Labels);
+        } catch (Exception ex) {
+            _logger.LogWarning(ex, "Failed to deserialize labels for issue {IssueId}", i.Id);
+        }
+
         return new IssueDto(
             i.Id, i.IssueKey, i.IssueType.ToString(), i.Summary, i.Description,
-            i.ProjectId, project?.Key ?? "",
+            i.ProjectId, project?.Key ?? "PRJ",
             i.StatusId, GetStatusName(i.StatusId), i.StatusId >= 4 ? "Done" : i.StatusId >= 2 ? "InProgress" : "ToDo",
             i.Priority.ToString(), i.AssigneeId, assignee?.DisplayName,
             i.ReporterId, reporter?.DisplayName ?? "Unknown",
             i.ParentIssueId, i.SprintId, sprint?.Name, i.StoryPoints, i.StartDate, i.DueDate,
-            i.Labels != null ? JsonSerializer.Deserialize<string[]>(i.Labels) : null,
+            labels,
             i.CreatedAt, i.UpdatedAt);
     }
 

@@ -100,11 +100,12 @@ public class SprintService : ISprintService
 {
     private readonly ISprintRepository _sprints;
     private readonly IIssueRepository _issues;
+    private readonly IProjectRepository _projects;
     private readonly IEventBus _eventBus;
     private readonly ILogger<SprintService> _logger;
 
-    public SprintService(ISprintRepository sprints, IIssueRepository issues, IEventBus eventBus, ILogger<SprintService> logger)
-    { _sprints = sprints; _issues = issues; _eventBus = eventBus; _logger = logger; }
+    public SprintService(ISprintRepository sprints, IIssueRepository issues, IProjectRepository projects, IEventBus eventBus, ILogger<SprintService> logger)
+    { _sprints = sprints; _issues = issues; _projects = projects; _eventBus = eventBus; _logger = logger; }
 
     public async Task<SprintDto?> GetByIdAsync(int sprintId, CancellationToken ct = default)
     {
@@ -128,7 +129,8 @@ public class SprintService : ISprintService
 
     public async Task<SprintDto> CreateAsync(int projectId, CreateSprintRequest request, CancellationToken ct = default)
     {
-        var sprint = Sprint.Create(projectId, projectId, request.Name, request.StartDate, request.EndDate, request.Goal);
+        var project = await _projects.GetByIdAsync(projectId, ct) ?? throw new KeyNotFoundException("Project not found.");
+        var sprint = Sprint.Create(project.TenantId, projectId, projectId, request.Name, request.StartDate, request.EndDate, request.Goal);
         await _sprints.AddAsync(sprint, ct);
         await _sprints.SaveChangesAsync(ct);
         return await MapAsync(sprint, ct);
@@ -165,13 +167,16 @@ public class SprintService : ISprintService
         var issues = await _issues.GetBySprintAsync(sprintId, ct);
         var totalPoints = issues.Sum(i => i.StoryPoints ?? 0);
         var days = (int)(sprint.EndDate.Value - sprint.StartDate.Value).TotalDays + 1;
+        if (days <= 0) days = 1;
+
         var points = new List<BurndownPointDto>();
 
         for (int d = 0; d < days; d++)
         {
             var date = sprint.StartDate.Value.AddDays(d);
-            var ideal = totalPoints - (int)((double)totalPoints * d / (days - 1));
-            var actual = d < days / 2 ? totalPoints - (totalPoints * d / (days - 1)) : ideal + (int)(totalPoints * 0.1);
+            var divisor = (days > 1) ? (days - 1) : 1;
+            var ideal = totalPoints - (int)((double)totalPoints * d / divisor);
+            var actual = d < days / 2 ? totalPoints - (totalPoints * d / divisor) : ideal + (int)(totalPoints * 0.1);
             points.Add(new BurndownPointDto(date, actual, ideal));
         }
         return points;
@@ -233,13 +238,17 @@ public class DashboardService : IDashboardService
     public async Task<DashboardSummaryDto> GetSummaryAsync(int tenantId, int userId, CancellationToken ct = default)
     {
         var assigned = await _issues.GetByAssigneeAsync(userId, tenantId, ct);
-        var issueList = assigned.ToList();
+        var issueList = assigned?.ToList() ?? new List<Issue>();
+        
         var total = issueList.Count;
         var open = issueList.Count(i => i.StatusId == 1);
         var inProgress = issueList.Count(i => i.StatusId == 2);
         var done = issueList.Count(i => i.StatusId == 3);
-        var byPriority = issueList.GroupBy(i => i.Priority.ToString())
-            .Select(g => new IssueStatDto(g.Key, g.Count()));
+        
+        var byPriority = issueList
+            .GroupBy(i => i.Priority.ToString())
+            .Select(g => new IssueStatDto(g.Key, g.Count()))
+            .ToList();
 
         return new DashboardSummaryDto(total, open, inProgress, done, byPriority);
     }

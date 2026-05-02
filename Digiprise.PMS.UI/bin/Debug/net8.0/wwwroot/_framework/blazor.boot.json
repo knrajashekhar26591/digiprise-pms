@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Digiprise.PMS.UI",
   "resources": {
-    "hash": "sha256-LJAmsbt9x9RTpvrJFz9TubTanhZqfyXnOpulhX+/zDw=",
+    "hash": "sha256-NW52gLvSPavECytqNG+BMRIu66m0PgFL8ItVXyEC0c8=",
     "jsModuleNative": {
       "dotnet.native.8.0.26.txyisw7pu0.js": "sha256-nElGk+CZFyq0PbPm4JU8avD6lER7x9Z1C54BK7qY12Q="
     },
@@ -208,12 +208,12 @@
       "mscorlib.wasm": "sha256-UzRTTeY8BezBltrUF59UgvVNxbmnZS3LeowarsPY8+Y=",
       "netstandard.wasm": "sha256-xHQSNwqHm8E9DM86qW7CTJoRXXsQuGmPeNipDwQFNr8=",
       "System.Private.CoreLib.wasm": "sha256-N9/Djwpe2mX4HdyhCGu9jrxG/DSYKoTPbtsIOv6VFDk=",
-      "Digiprise.PMS.Contracts.wasm": "sha256-CD2rnJNLcgVTBTyJ1Khak+uapWuOfm7isYEoXVMxBEI=",
-      "Digiprise.PMS.UI.wasm": "sha256-zkSloDPl8CEgCQaSVHmdQhPrsY1wEpXqqm/vQ3aZq9o="
+      "Digiprise.PMS.Contracts.wasm": "sha256-fm3LCMMT0xsnr0A/TwXBD2tP8WHzQUjBJv+XgMO6fHM=",
+      "Digiprise.PMS.UI.wasm": "sha256-X+8fEc+O08QqB0Nboe7VI76xRl2GycWkFS5PtG3r+W4="
     },
     "pdb": {
-      "Digiprise.PMS.Contracts.pdb": "sha256-iTekI8fXqBDjc6nnCjZkKqbbk/2crb3hUH0Rr845DVw=",
-      "Digiprise.PMS.UI.pdb": "sha256-/DnZdDkSIVm28mi4iIoFlt8AU82mPxnaJtcll/IQMzI="
+      "Digiprise.PMS.Contracts.pdb": "sha256-/dvasW64GQ4PIeA0uJZ+kOMiaMzEdbz2daZk0BQrnI0=",
+      "Digiprise.PMS.UI.pdb": "sha256-K/GA5RNVOiEQq6KcrahKdzvVHT2wgOUijJfPydnELhE="
     }
   },
   "cacheBootResources": true,

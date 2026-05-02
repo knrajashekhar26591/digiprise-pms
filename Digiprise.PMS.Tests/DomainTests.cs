@@ -124,29 +124,29 @@ public class SprintEntityTests
 {
     [Test] public void Create_ShouldBeCreatedState()
     {
-        var s = Sprint.Create(1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
+        var s = Sprint.Create(1, 1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
         Assert.Equal(SprintState.Created, s.State);
     }
     [Test] public void Start_ShouldBeActive()
     {
-        var s = Sprint.Create(1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
+        var s = Sprint.Create(1, 1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
         s.Start(); Assert.Equal(SprintState.Active, s.State);
     }
     [Test] public void Start_AlreadyActive_ShouldThrow()
     {
-        var s = Sprint.Create(1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
+        var s = Sprint.Create(1, 1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
         s.Start(); Assert.Throws<InvalidOperationException>(() => s.Start());
     }
     [Test] public void Close_Active_ShouldBeClosed()
     {
-        var s = Sprint.Create(1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
+        var s = Sprint.Create(1, 1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
         s.Start(); s.Close(34);
         Assert.Equal(SprintState.Closed, s.State);
         Assert.Equal(34, s.VelocityPoints);
     }
     [Test] public void Close_Created_ShouldThrow()
     {
-        var s = Sprint.Create(1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
+        var s = Sprint.Create(1, 1, 1, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14));
         Assert.Throws<InvalidOperationException>(() => s.Close(0));
     }
 }

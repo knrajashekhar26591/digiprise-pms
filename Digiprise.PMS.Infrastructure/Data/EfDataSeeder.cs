@@ -53,7 +53,7 @@ public static class EfDataSeeder
             context.ProjectMembers.AddRange(m1, m2);
 
             // Sprint
-            var sprint = Sprint.Create(project.Id, project.Id, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14), "Ship the MVP!");
+            var sprint = Sprint.Create(tenant.Id, project.Id, project.Id, "Sprint 1", DateTime.UtcNow, DateTime.UtcNow.AddDays(14), "Ship the MVP!");
             sprint.Start();
             context.Sprints.Add(sprint);
             await context.SaveChangesAsync();

@@ -21,7 +21,7 @@ public class EnterpriseTests
         // Arrange
         var monitor = new SlaMonitorService(_slaRepo.Object, _issueRepo.Object, _slaLogger.Object);
         var breaches = new List<SlaBreach> { 
-            SlaBreach.Create(1, 1, "Resolution", DateTimeOffset.UtcNow.AddHours(-1)) 
+            SlaBreach.Create(1, 1, 1, "Response", DateTimeOffset.UtcNow.AddMinutes(-10), 300) 
         };
         _slaRepo.Setup(r => r.GetActiveBreachesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(breaches);
 
@@ -38,7 +38,7 @@ public class EnterpriseTests
         // Arrange
         var service = new AutomationService(_autoRepo.Object, _issueRepo.Object, _autoLogger.Object);
         var rules = new List<AutomationRule> {
-            AutomationRule.Create(1, "Test Rule", "StatusTransitioned", "[]", "[]")
+            AutomationRule.Create(1, 1, "StatusUpdate", "{}", "[]", "[]")
         };
         _autoRepo.Setup(r => r.GetActiveRulesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(rules);
 

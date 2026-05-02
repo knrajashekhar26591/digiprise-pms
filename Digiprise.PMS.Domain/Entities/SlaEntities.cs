@@ -36,8 +36,9 @@ public class SlaPolicy : BaseEntity, ITenantScoped
 
 }
 
-public class SlaBreach : BaseEntity
+public class SlaBreach : BaseEntity, ITenantScoped
 {
+    public int TenantId { get; private set; }
     public int IssueId { get; private set; }
     public int PolicyId { get; private set; }
     public string Type { get; private set; } = "Resolution"; // Response, Resolution
@@ -52,10 +53,11 @@ public class SlaBreach : BaseEntity
 
     protected SlaBreach() { }
 
-    public static SlaBreach Create(int issueId, int policyId, string type, DateTimeOffset startedAt, int targetSecs)
+    public static SlaBreach Create(int tenantId, int issueId, int policyId, string type, DateTimeOffset startedAt, int targetSecs)
     {
         return new SlaBreach
         {
+            TenantId = tenantId,
             IssueId = issueId,
             PolicyId = policyId,
             Type = type,

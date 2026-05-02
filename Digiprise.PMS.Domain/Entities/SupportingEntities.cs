@@ -3,8 +3,9 @@ using Digiprise.PMS.Domain.Interfaces;
 
 namespace Digiprise.PMS.Domain.Entities;
 
-public class Sprint : BaseEntity
+public class Sprint : BaseEntity, ITenantScoped
 {
+    public int TenantId { get; private set; }
     public int BoardId { get; private set; }
     public int ProjectId { get; private set; }
     public string Name { get; private set; } = string.Empty;
@@ -18,10 +19,11 @@ public class Sprint : BaseEntity
 
     protected Sprint() { }
 
-    public static Sprint Create(int boardId, int projectId, string name, DateTime? startDate, DateTime? endDate, string? goal = null)
+    public static Sprint Create(int tenantId, int boardId, int projectId, string name, DateTime? startDate, DateTime? endDate, string? goal = null)
     {
         return new Sprint
         {
+            TenantId = tenantId,
             BoardId = boardId,
             ProjectId = projectId,
             Name = name,
@@ -269,8 +271,9 @@ public class AuditLog : BaseEntity, ITenantScoped
     }
 }
 
-public class AutomationRule : BaseEntity
+public class AutomationRule : BaseEntity, ITenantScoped
 {
+    public int TenantId { get; private set; }
     public int ProjectId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public bool IsActive { get; private set; } = true;
@@ -284,16 +287,17 @@ public class AutomationRule : BaseEntity
 
     protected AutomationRule() { }
 
-    public static AutomationRule Create(int projectId, string name, string triggerJson, string conditionJson, string actionJson)
-        => new() { ProjectId = projectId, Name = name, TriggerConfig = triggerJson, ConditionConfig = conditionJson, ActionConfig = actionJson };
+    public static AutomationRule Create(int tenantId, int projectId, string name, string triggerJson, string conditionJson, string actionJson)
+        => new() { TenantId = tenantId, ProjectId = projectId, Name = name, TriggerConfig = triggerJson, ConditionConfig = conditionJson, ActionConfig = actionJson };
 
     public void Toggle() { IsActive = !IsActive; Touch(); }
     public void RecordRun() { LastRunAt = DateTime.UtcNow; Touch(); }
 }
 
 // ── Report Definition ────────────────────────────────────────────────
-public class ReportDefinition : BaseEntity
+public class ReportDefinition : BaseEntity, ITenantScoped
 {
+    public int TenantId { get; private set; }
     public int ProjectId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Type { get; private set; } = "Velocity"; // Velocity, CycleTime, LeadTime, SlaPerformance
@@ -305,10 +309,11 @@ public class ReportDefinition : BaseEntity
 
     protected ReportDefinition() { }
 
-    public static ReportDefinition Create(int projectId, string name, string type, string config, int createdBy)
+    public static ReportDefinition Create(int tenantId, int projectId, string name, string type, string config, int createdBy)
     {
         return new ReportDefinition
         {
+            TenantId = tenantId,
             ProjectId = projectId,
             Name = name,
             Type = type,

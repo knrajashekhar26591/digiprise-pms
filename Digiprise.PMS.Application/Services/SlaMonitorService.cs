@@ -68,14 +68,14 @@ public class SlaMonitorService : ISlaMonitorService
             // Start Response SLA if not already started
             if (!existingBreaches.Any(b => b.PolicyId == policy.Id && b.Type == "Response"))
             {
-                var responseBreach = SlaBreach.Create(issueId, policy.Id, "Response", issue.CreatedAt, policy.ResponseSecs);
+                var responseBreach = SlaBreach.Create(issue.TenantId, issueId, policy.Id, "Response", issue.CreatedAt, policy.ResponseSecs);
                 await _sla.AddBreachAsync(responseBreach, ct);
             }
 
             // Start Resolution SLA if not already started
             if (!existingBreaches.Any(b => b.PolicyId == policy.Id && b.Type == "Resolution"))
             {
-                var resolutionBreach = SlaBreach.Create(issueId, policy.Id, "Resolution", issue.CreatedAt, policy.ResolutionSecs);
+                var resolutionBreach = SlaBreach.Create(issue.TenantId, issueId, policy.Id, "Resolution", issue.CreatedAt, policy.ResolutionSecs);
                 await _sla.AddBreachAsync(resolutionBreach, ct);
             }
         }
