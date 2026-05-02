@@ -41,6 +41,24 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .wp-card-title { font-weight: 600; font-size: 15px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
 .wp-card-sub { font-size: 12px; color: var(--text2); }
 
+/* ── SETTINGS PAGE ── */
+#pg-settings { display: none; background: #fff; min-height: calc(100vh - 56px); }
+#pg-settings.on { display: flex; }
+.set-sb { width: 240px; border-right: 1px solid var(--border); background: #fafbfc; padding: 24px 0; flex-shrink: 0; }
+.set-sb-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; padding: 0 16px; margin: 16px 0 8px; }
+.set-sb-title:first-child { margin-top: 0; }
+.set-sb-item { padding: 8px 16px; font-size: 14px; color: var(--text); cursor: pointer; transition: background 0.1s; display: flex; align-items: center; gap: 8px; }
+.set-sb-item:hover { background: var(--bg); }
+.set-sb-item.act { background: #e9f2ff; color: var(--blue2); font-weight: 500; }
+.set-main { flex: 1; padding: 32px 48px; overflow-y: auto; }
+.set-h1 { font-size: 24px; font-weight: 500; margin-bottom: 24px; color: var(--text); }
+.um-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.um-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); font-size: 12px; color: var(--text2); text-transform: uppercase; }
+.um-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.um-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 600; }
+.um-action { color: var(--blue2); cursor: pointer; font-size: 13px; margin-right: 12px; }
+.um-action:hover { text-decoration: underline; }
+
 .lw{width:400px}
 .ll{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:8px}
 .ll-icon{width:44px;height:44px;background:var(--blue2);border-radius:10px;display:flex;align-items:center;justify-content:center}
@@ -89,8 +107,8 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .tn-search input:focus{border-color:var(--blue2);background:#fff;box-shadow:0 0 0 2px rgba(0,101,255,.15)}
 .tn-search input::placeholder{color:var(--text3)}
 .tn-right{display:flex;align-items:center;gap:4px;margin-left:auto}
-.btn-create{background:var(--red);color:#fff;border-radius:var(--r2);padding:0 16px;height:32px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;transition:background .15s}
-.btn-create:hover{background:#bf2600}
+.btn-create{background:var(--blue2);color:#fff;border-radius:var(--r2);padding:0 16px;height:32px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-create:hover{background:#0065ff}
 .tn-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:background .1s;position:relative}
 .tn-icon:hover{background:var(--bg)}
 .tn-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff;display:none}
@@ -499,15 +517,15 @@ textarea.mi{resize:vertical;min-height:80px}
         </div>
         <div class="tn-drop">
           <div class="tn-drop-title">Atlassian Admin</div>
-          <div class="tn-drop-item">User management</div>
-          <div class="tn-drop-item">Billing</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('users')">User management</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('billing')">Billing</div>
           <div class="tn-drop-div"></div>
           <div class="tn-drop-title">Jira Settings</div>
-          <div class="tn-drop-item">System</div>
-          <div class="tn-drop-item">Products</div>
-          <div class="tn-drop-item">Projects</div>
-          <div class="tn-drop-item">Issues</div>
-          <div class="tn-drop-item">Apps</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('system')">System</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('products')">Products</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('projects')">Projects</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('issues')">Issues</div>
+          <div class="tn-drop-item" onclick="showPg('settings');loadSettingsTab('apps')">Apps</div>
         </div>
       </div>
       
@@ -657,6 +675,23 @@ textarea.mi{resize:vertical;min-height:80px}
               <div id="wp-mine" style="padding:0 8px 8px"></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="pg" id="pg-settings">
+        <div class="set-sb">
+          <div class="set-sb-title">Atlassian Admin</div>
+          <div class="set-sb-item" id="set-tab-users" onclick="loadSettingsTab('users')">User management</div>
+          <div class="set-sb-item" id="set-tab-billing" onclick="loadSettingsTab('billing')">Billing</div>
+          <div class="set-sb-title">Jira Settings</div>
+          <div class="set-sb-item" id="set-tab-system" onclick="loadSettingsTab('system')">System</div>
+          <div class="set-sb-item" id="set-tab-products" onclick="loadSettingsTab('products')">Products</div>
+          <div class="set-sb-item" id="set-tab-projects" onclick="loadSettingsTab('projects')">Projects</div>
+          <div class="set-sb-item" id="set-tab-issues" onclick="loadSettingsTab('issues')">Issues</div>
+          <div class="set-sb-item" id="set-tab-apps" onclick="loadSettingsTab('apps')">Apps</div>
+        </div>
+        <div class="set-main" id="set-content">
         </div>
       </div>
 
@@ -1280,6 +1315,120 @@ async function loadWelcomePg(){
         ${statusPill(i.statusName)}
       </div>`).join(''):`<div class="empty-state"><div class="empty-state-icon">🎉</div><div class="empty-state-title">You're all caught up!</div></div>`;
   }catch(e){console.error(e);}
+}
+
+// ── SETTINGS PAGE ──
+function loadSettingsTab(tab) {
+  document.querySelectorAll('.set-sb-item').forEach(e => e.classList.remove('act'));
+  document.getElementById('set-tab-'+tab)?.classList.add('act');
+  const c = document.getElementById('set-content');
+  if(tab === 'users') {
+    c.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <div class="set-h1" style="margin:0">User Management</div>
+        <button class="btn-p" onclick="openInviteModal()">Invite Users</button>
+      </div>
+      <div style="margin-bottom:16px;font-size:14px;color:var(--text2)">Total Users in App: <strong id="um-total">...</strong></div>
+      <table class="um-table">
+        <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="um-tbody"><tr><td colspan="5">Loading...</td></tr></tbody>
+      </table>
+    `;
+    loadUsersAdmin();
+  } else {
+    c.innerHTML = `
+      <div class="set-h1" style="text-transform:capitalize">${tab}</div>
+      <div class="empty-state" style="border:1px dashed var(--border);border-radius:8px;padding:48px"><div class="empty-state-title">Configuration coming soon</div></div>
+    `;
+  }
+}
+
+async function loadUsersAdmin() {
+  try {
+    const users = await api('GET', '/api/v1/users');
+    document.getElementById('um-total').textContent = users.length;
+    document.getElementById('um-tbody').innerHTML = users.map(u => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="um-av" style="background:${avc(u.displayName)}">${avi(u.displayName)}</div>
+            <div>
+              <div style="font-weight:500;color:var(--text)">${u.displayName}</div>
+            </div>
+          </div>
+        </td>
+        <td style="color:var(--text2)">${u.email}</td>
+        <td>
+          <select class="fi" style="padding:4px;height:auto;font-size:13px;width:100px" onchange="updateUserRole(${u.id}, this.value)" ${u.id===currentUser?.id?'disabled title="Cannot change your own role"':''}>
+            <option value="User" ${u.systemRole==='User'?'selected':''}>User</option>
+            <option value="Admin" ${u.systemRole==='Admin'?'selected':''}>Admin</option>
+          </select>
+        </td>
+        <td>${u.isActive ? '<span style="background:#e3fcef;color:#00875a;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">Active</span>' : '<span style="background:#ffebe6;color:#de350b;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">Inactive</span>'}</td>
+        <td>
+          <span class="um-action" onclick="promptRenameUser(${u.id}, '${u.displayName.replace(/'/g, "\\'")}')">Change Name</span>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function updateUserRole(id, role) {
+  try {
+    await api('PUT', `/api/v1/users/${id}/role`, { role });
+    toast('Role updated successfully', 'ok');
+  } catch(e) {
+    toast(e.message, 'err');
+    loadUsersAdmin(); // revert dropdown on error
+  }
+}
+
+async function promptRenameUser(id, currentName) {
+  const newName = prompt('Enter new display name for user:', currentName);
+  if(!newName || newName === currentName) return;
+  try {
+    await api('PUT', `/api/v1/users/${id}/name`, { displayName: newName });
+    toast('Name updated successfully', 'ok');
+    loadUsersAdmin(); // reload table
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+function openInviteModal() {
+  const m = document.getElementById('modal-wrap');
+  m.innerHTML = `
+    <div class="modal" style="width:400px">
+      <div class="modal-hdr"><div class="modal-h1">Invite External User</div><div class="modal-close" onclick="closeModal()">✕</div></div>
+      <div class="modal-body">
+        <div class="fg"><label class="fl">Email Address</label><input type="email" class="fi" id="inv-email" placeholder="e.g. jsmith@example.com"></div>
+        <div class="fg"><label class="fl">Display Name</label><input type="text" class="fi" id="inv-name" placeholder="John Smith"></div>
+        <div class="fg"><label class="fl">Role</label>
+          <select class="fi" id="inv-role">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn-p" onclick="submitInvite()">Invite User</button>
+      </div>
+    </div>
+  `;
+  m.classList.add('on');
+}
+
+async function submitInvite() {
+  const email = document.getElementById('inv-email').value.trim();
+  const name = document.getElementById('inv-name').value.trim();
+  const role = document.getElementById('inv-role').value;
+  if(!email || !name) { toast('Please fill all fields', 'err'); return; }
+  
+  try {
+    await api('POST', '/api/v1/users/invite', { email, displayName: name, role });
+    toast('User invited successfully!', 'ok');
+    closeModal();
+    loadUsersAdmin(); // Refresh the table to show the new user
+  } catch(e) { toast(e.message, 'err'); }
 }
 
 // ── DASHBOARD ──

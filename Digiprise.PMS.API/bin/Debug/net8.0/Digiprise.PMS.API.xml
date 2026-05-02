@@ -157,6 +157,15 @@
         <member name="M:Digiprise.PMS.API.Controllers.UsersController.GetById(System.Int32,System.Threading.CancellationToken)">
             <summary>Get user by id</summary>
         </member>
+        <member name="M:Digiprise.PMS.API.Controllers.UsersController.InviteUser(Digiprise.PMS.API.Controllers.TenantInviteUserRequest,System.Threading.CancellationToken)">
+            <summary>Invite an external user</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.UsersController.UpdateName(System.Int32,Digiprise.PMS.API.Controllers.UpdateNameRequest,System.Threading.CancellationToken)">
+            <summary>Update user display name</summary>
+        </member>
+        <member name="M:Digiprise.PMS.API.Controllers.UsersController.UpdateRole(System.Int32,Digiprise.PMS.API.Controllers.UpdateRoleRequest,System.Threading.CancellationToken)">
+            <summary>Update user role</summary>
+        </member>
         <member name="M:Digiprise.PMS.API.Controllers.IssueLinksController.CreateLink(Digiprise.PMS.API.Controllers.CreateLinkRequest,System.Threading.CancellationToken)">
             <summary>Link two issues together</summary>
         </member>

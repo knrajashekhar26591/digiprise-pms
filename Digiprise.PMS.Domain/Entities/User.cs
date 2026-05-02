@@ -32,6 +32,7 @@ public class User : BaseEntity, ITenantScoped
 
     public void RecordLogin() { LastLoginAt = DateTime.UtcNow; Touch(); }
     public void UpdateProfile(string displayName, string? avatarUrl) { DisplayName = displayName; AvatarUrl = avatarUrl; Touch(); }
+    public void UpdateRole(string role) { SystemRole = role; Touch(); }
     public void Deactivate() { IsActive = false; Touch(); }
     public void SetPasswordHash(string hash) { PasswordHash = hash; Touch(); }
 }

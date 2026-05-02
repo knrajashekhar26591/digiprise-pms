@@ -19,7 +19,7 @@ public class UsersController : BaseController
     public async Task<IActionResult> GetAll(CancellationToken ct)
     {
         var users = await _users.GetByTenantAsync(CurrentTenantId, ct);
-        return Ok(users.Select(u => new { u.Id, u.Email, u.DisplayName, u.AvatarUrl, u.IsActive }));
+        return Ok(users.Select(u => new { u.Id, u.Email, u.DisplayName, u.AvatarUrl, u.IsActive, u.SystemRole }));
     }
 
     /// <summary>Get user by id</summary>
@@ -28,9 +28,52 @@ public class UsersController : BaseController
     {
         var u = await _users.GetByIdAsync(id, ct);
         if (u == null || u.TenantId != CurrentTenantId) return NotFound();
-        return Ok(new { u.Id, u.Email, u.DisplayName, u.AvatarUrl, u.IsActive });
+        return Ok(new { u.Id, u.Email, u.DisplayName, u.AvatarUrl, u.IsActive, u.SystemRole });
+    }
+
+    /// <summary>Invite an external user</summary>
+    [HttpPost("invite")]
+    public async Task<IActionResult> InviteUser([FromBody] TenantInviteUserRequest req, CancellationToken ct)
+    {
+        var existing = await _users.GetByTenantAsync(CurrentTenantId, ct);
+        if (existing.Any(u => u.Email.Equals(req.Email, StringComparison.OrdinalIgnoreCase)))
+            return BadRequest("User with this email already exists in the tenant.");
+
+        // Create with a dummy password hash since there's no email flow
+        var user = Digiprise.PMS.Domain.Entities.User.Create(CurrentTenantId, req.Email, req.DisplayName, "DUMMY_HASH", req.Role);
+        await _users.AddAsync(user, ct);
+        return Ok(new { user.Id, user.Email, user.DisplayName, user.AvatarUrl, user.IsActive, user.SystemRole });
+    }
+
+    /// <summary>Update user display name</summary>
+    [HttpPut("{id:int}/name")]
+    public async Task<IActionResult> UpdateName(int id, [FromBody] UpdateNameRequest req, CancellationToken ct)
+    {
+        var user = await _users.GetByIdAsync(id, ct);
+        if (user == null || user.TenantId != CurrentTenantId) return NotFound();
+
+        user.UpdateProfile(req.DisplayName, user.AvatarUrl);
+        await _users.UpdateAsync(user, ct);
+        return Ok();
+    }
+
+    /// <summary>Update user role</summary>
+    [HttpPut("{id:int}/role")]
+    public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleRequest req, CancellationToken ct)
+    {
+        var user = await _users.GetByIdAsync(id, ct);
+        if (user == null || user.TenantId != CurrentTenantId) return NotFound();
+        if (user.Id == CurrentUserId) return BadRequest("Cannot change your own role."); // Safeguard
+
+        user.UpdateRole(req.Role);
+        await _users.UpdateAsync(user, ct);
+        return Ok();
     }
 }
+
+public record TenantInviteUserRequest(string Email, string DisplayName, string Role);
+public record UpdateNameRequest(string DisplayName);
+public record UpdateRoleRequest(string Role);
 
 // ── Issue Links Controller ────────────────────────────────────────────
 [Authorize]
