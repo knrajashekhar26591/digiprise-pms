@@ -672,6 +672,14 @@ textarea.mi{resize:vertical;min-height:80px}
         </select>
       </div>
 
+      <!-- Epic -->
+      <div class="dp-field">
+        <label class="dp-field-label">Epic</label>
+        <select class="dp-inline" id="dp-epic-sel" onchange="saveField('epic',this.value)">
+          <option value="">None</option>
+        </select>
+      </div>
+
       <!-- Story points -->
       <div class="dp-field">
         <label class="dp-field-label">Story points</label>
@@ -1004,6 +1012,7 @@ function issueRow(i){
     ${typeIc(i.issueType)}
     <span class="ir-key">${i.issueKey}</span>
     <span class="ir-sum" title="${i.summary}">${i.summary}</span>
+    ${i.epicId ? `<span class="ir-epics" title="Epic">${allIssues.find(e=>e.id===i.epicId)?.summary||'Epic'}</span>` : ''}
     <span class="ir-status-pill" style="background:${s.bg};color:${s.color}">${i.statusName||'To Do'}</span>
     <span class="ir-prio">${prioIc(i.priority)}</span>
     ${av}
@@ -1057,6 +1066,7 @@ async function loadBoard(){
         <div class="bcol-body">${ci.length?ci.map(i=>{
           const av=i.assigneeName?`<div class="bcard-av" style="background:${avc(i.assigneeName)}">${avi(i.assigneeName)}</div>`:'';
           return `<div class="bcard" onclick="openDP(${i.id})">
+            ${i.epicId ? `<div style="margin-bottom:4px"><span class="ir-epics" title="Epic">${allIssues.find(e=>e.id===i.epicId)?.summary||'Epic'}</span></div>` : ''}
             <div class="bcard-sum">${i.summary}</div>
             <div class="bcard-foot">
               <div class="bcard-left">
@@ -1194,6 +1204,14 @@ async function openDP(id){
     // Due date
     document.getElementById('dp-due-inp').value=issue.dueDate?new Date(issue.dueDate).toISOString().split('T')[0]:'';
 
+    // Epic
+    const epicSel=document.getElementById('dp-epic-sel');
+    if(epicSel){
+      epicSel.innerHTML='<option value="">None</option>'+
+        (allIssues||[]).filter(i=>i.issueType==='Epic'&&i.id!==issue.id).map(e=>`<option value="${e.id}">${e.summary}</option>`).join('');
+      epicSel.value=issue.epicId||'';
+    }
+
     // Labels
     document.getElementById('dp-labels-inp').value=(issue.labels||[]).join(', ');
 
@@ -1285,6 +1303,7 @@ async function saveField(field,value){
   if(field==='assignee') body.assigneeId=value?parseInt(value):null;
   else if(field==='priority') body.priority=value;
   else if(field==='sprint') body.sprintId=value?parseInt(value):null;
+  else if(field==='epic') body.epicId=value?parseInt(value):null;
   else if(field==='points') body.storyPoints=value?parseInt(value):null;
   else if(field==='type') body.issueType=value;
   else if(field==='labels') body.labels=value?value.split(',').map(l=>l.trim()).filter(Boolean):null;
@@ -1305,7 +1324,7 @@ function renderComments(comments){
         <div class="av-circle" style="background:${avc(c.authorName)};width:24px;height:24px;font-size:10px">${avi(c.authorName)}</div>
         ${c.authorName} <span class="dp-comment-time">${new Date(c.createdAt).toLocaleString()}</span>
       </div>
-      <div class="dp-comment-body">${c.body}</div>
+      <div class="dp-comment-body" style="white-space: pre-wrap;">${c.body.replace(/</g, '&lt;')}</div>
     </div>`).join('');
 }
 async function postComment(){
