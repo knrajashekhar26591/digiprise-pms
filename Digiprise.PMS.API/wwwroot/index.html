@@ -155,7 +155,8 @@ input,textarea,select{font-family:inherit;font-size:14px}
 .sp-btn.primary:hover{background:var(--blue)}
 .sp-menu{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--text3);cursor:pointer;background:transparent}
 .sp-menu:hover{background:var(--bg)}
-.sp-issues{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-top:4px}
+.sp-issues{border:2px solid transparent;outline:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-top:4px;transition:all .2s;min-height:50px}
+.sp-issues.drag-over{background:var(--blue-xlight);border-color:var(--blue-light);outline-color:transparent;border-style:dashed}
 
 /* Issue rows */
 .ir{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;background:#fff}
@@ -734,9 +735,26 @@ textarea.mi{resize:vertical;min-height:80px}
 
 <div id="toast-box"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 <script>
 const API='';
 let token=null,currentUser=null,projects=[],currentProject=null,sprints=[],allIssues=[],tenantUsers=[];
+let connection=null;
+function initSignalR() {
+  if (connection) return;
+  connection = new signalR.HubConnectionBuilder()
+    .withUrl("/hubs/pms?access_token=" + token)
+    .withAutomaticReconnect()
+    .build();
+
+  connection.on("IssueStatusChanged", () => refreshBacklogAndBoard());
+  connection.on("IssueAssigned", () => refreshBacklogAndBoard());
+  connection.on("CommentAdded", () => refreshBacklogAndBoard());
+  connection.on("SprintStarted", () => refreshBacklogAndBoard());
+  connection.on("NotificationReceived", () => loadNotifications());
+
+  connection.start().catch(err => console.error(err.toString()));
+}
 let currentIssueId=null,currentIssueData=null,issueLinks=[];
 
 // ── COLOURS ──
@@ -827,6 +845,7 @@ async function onLoggedIn(){
   loadNotifications();
   // Pre-load tenant users for assignee dropdowns
   api('GET','/api/v1/users').then(u=>{tenantUsers=u||[];}).catch(()=>{});
+  initSignalR();
 }
 
 // ── SIDEBAR ──
@@ -939,6 +958,8 @@ function renderBacklog(issues,spList){
       </div>
       <div id="spb-${s.id}" class="sp-issues"
      ondragover="allowDrop(event)"
+     ondragenter="dragEnter(event)"
+     ondragleave="dragLeave(event)"
      ondrop="dropIssue(event, ${s.id})">
         ${si.length?si.map(i=>issueRow(i)).join(''):`<div style="padding:12px 16px;font-size:13px;color:var(--text3)">No issues. Drag from backlog below.</div>`}
         <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
@@ -959,8 +980,10 @@ function renderBacklog(issues,spList){
       <span style="font-size:12px;color:var(--blue2);cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:background .1s" onclick="event.stopPropagation();openCreateSprint()" onmouseover="this.style.background='var(--blue-xlight)'" onmouseout="this.style.background=''">Create sprint</span>
       <button class="sp-menu" onclick="event.stopPropagation()"><svg width="16" height="4" fill="currentColor" viewBox="0 0 16 4"><circle cx="2" cy="2" r="2"/><circle cx="8" cy="2" r="2"/><circle cx="14" cy="2" r="2"/></svg></button>
     </div>
-    <<div id="spb-bl" class="sp-issues"
+    <div id="spb-bl" class="sp-issues"
      ondragover="allowDrop(event)"
+     ondragenter="dragEnter(event)"
+     ondragleave="dragLeave(event)"
      ondrop="dropIssue(event, null)">
       ${backlog.length?backlog.map(i=>issueRow(i)).join(''):`<div class="drag-hint">Plan a sprint by dragging work items into it, or by dragging the sprint footer.</div>`}
       <div class="bl-create-row" onclick="openCreateIssue()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create issue</div>
@@ -1561,32 +1584,43 @@ function allowDrop(event) {
     event.preventDefault();
 }
 
+function dragEnter(event) {
+    event.preventDefault();
+    const t = event.currentTarget;
+    if(t.classList.contains('sp-issues')) t.classList.add('drag-over');
+}
+
+function dragLeave(event) {
+    const t = event.currentTarget;
+    if(t.classList.contains('sp-issues')) t.classList.remove('drag-over');
+}
+
 // Drop into sprint
 function dropIssue(event, sprintId) {
     event.preventDefault();
+    const t = event.currentTarget;
+    if(t.classList.contains('sp-issues')) t.classList.remove('drag-over');
 
     const droppedId = event.dataTransfer.getData("text/plain");
-
-    console.log("Drop triggered:", droppedId);
-
-    if (!droppedId) {
-        console.log("❌ No dragged ID");
-        return;
-    }
+    if (!droppedId) return;
 
     const issue = allIssues.find(i => String(i.id) === String(droppedId));
 
     if (issue) {
+        const oldSprintId = issue.sprintId;
         issue.sprintId = sprintId;
-        console.log("✅ Updated:", issue);
         
-        // Save to backend API instead of local storage
+        // Optimistic UI update
+        renderBacklog(allIssues, sprints);
+        
+        // Save to backend API
         api('PUT', `/api/v1/issues/${droppedId}`, { sprintId: sprintId }).catch(e => {
+            // Rollback on failure
+            issue.sprintId = oldSprintId;
+            renderBacklog(allIssues, sprints);
             toast('Failed to move issue: ' + e.message, 'err');
         });
     }
-
-    renderBacklog(allIssues, sprints);
 }
 </script>
 </body>
