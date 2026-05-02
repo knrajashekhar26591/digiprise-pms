@@ -272,4 +272,25 @@ public class EfSlaRepository : EfRepository<SlaPolicy>, ISlaRepository
     }
 }
 
+public class EfAutomationRepository : EfRepository<AutomationRule>, IAutomationRepository
+{
+    public EfAutomationRepository(PmsDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<AutomationRule>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await _context.AutomationRules.Where(r => r.ProjectId == projectId).ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<AutomationRule>> GetActiveRulesAsync(int tenantId, CancellationToken ct = default)
+    {
+        // AutomationRule doesn't have TenantId directly in SupportingEntities, but it has ProjectId.
+        // Projects have TenantId.
+        return await _context.AutomationRules
+            .Include(r => r.Project)
+            .Where(r => r.IsActive && r.Project.TenantId == tenantId)
+            .ToListAsync(ct);
+    }
+}
+
+
 

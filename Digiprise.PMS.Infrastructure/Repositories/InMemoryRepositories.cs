@@ -223,11 +223,26 @@ public class SlaRepository : InMemoryRepository<SlaPolicy>, ISlaRepository
         return Task.CompletedTask;
     }
 
-    public Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default)
+    public async Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default)
     {
         _db.SlaBreaches[breach.Id] = breach;
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 }
 
+public class AutomationRepository : InMemoryRepository<AutomationRule>, IAutomationRepository
+{
+    private readonly InMemoryDataStore _db;
+    public AutomationRepository(InMemoryDataStore db) : base(db.AutomationRules, db) { _db = db; }
 
+    public async Task<IEnumerable<AutomationRule>> GetByProjectAsync(int projectId, CancellationToken ct = default)
+    {
+        return await Task.FromResult(_store.Values.Where(r => r.ProjectId == projectId));
+    }
+
+    public async Task<IEnumerable<AutomationRule>> GetActiveRulesAsync(int tenantId, CancellationToken ct = default)
+    {
+        var projects = _db.Projects.Values.Where(p => p.TenantId == tenantId).Select(p => p.Id);
+        return await Task.FromResult(_store.Values.Where(r => r.IsActive && projects.Contains(r.ProjectId)));
+    }
+}

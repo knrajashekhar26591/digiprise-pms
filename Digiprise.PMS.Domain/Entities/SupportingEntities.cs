@@ -279,6 +279,9 @@ public class AutomationRule : BaseEntity
     public string ActionConfig { get; private set; } = "[]"; // JSON
     public DateTime? LastRunAt { get; private set; }
 
+    public Project? Project { get; private set; }
+
+
     protected AutomationRule() { }
 
     public static AutomationRule Create(int projectId, string name, string triggerJson, string conditionJson, string actionJson)

@@ -43,6 +43,8 @@ builder.Services.AddScoped<IAuditLogRepository, EfAuditLogRepository>();
 builder.Services.AddScoped<ICostRepository, EfCostRepository>();
 builder.Services.AddScoped<IBudgetRepository, EfBudgetRepository>();
 builder.Services.AddScoped<ISlaRepository, EfSlaRepository>();
+builder.Services.AddScoped<IAutomationRepository, EfAutomationRepository>();
+
 
 
 // ── Application Services ───────────────────────────────────────────────
@@ -59,8 +61,12 @@ builder.Services.AddScoped<ICostService, CostService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
 builder.Services.AddScoped<ISlaMonitorService, SlaMonitorService>();
+builder.Services.AddScoped<IAutomationService, AutomationService>();
+
 builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueCreatedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();
 builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueStatusChangedEvent>, Digiprise.PMS.Application.Handlers.SlaEventHandler>();
+builder.Services.AddScoped<INotificationHandler<Digiprise.PMS.Domain.Events.IssueStatusChangedEvent>, Digiprise.PMS.Application.Handlers.AutomationEventHandler>();
+
 
 
 

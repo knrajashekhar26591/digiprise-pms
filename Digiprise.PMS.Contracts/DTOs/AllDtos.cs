@@ -49,5 +49,5 @@ public record BudgetDto(int Id, int ProjectId, string Name, decimal MaterialBudg
 public record CostTypeDto(int Id, string Name, string? Description, bool IsDefault);
 public record CostEntryDto(int Id, int IssueId, string IssueKey, int UserId, string UserName, int CostTypeId, string CostTypeName, DateTime SpentOn, decimal Units, long UnitCostCents, string? Comment);
 public record SlaPolicyDto(int Id, int ProjectId, string Name, string? TargetPriority, int ResponseSecs, int ResolutionSecs);
-public record SlaBreachDto(int Id, int IssueId, int PolicyId, string Type, string State, DateTimeOffset StartedAt, DateTimeOffset BreachAt, DateTimeOffset? BreachedAt);
-
+public record SlaBreachDto(long Id, int IssueId, int PolicyId, string Type, string State, DateTimeOffset StartedAt, DateTimeOffset BreachAt, DateTimeOffset? BreachedAt);
+public record AutomationRuleDto(int Id, int ProjectId, string Name, bool IsActive, string TriggerConfig, string ConditionConfig, string ActionConfig, DateTime? LastRunAt);

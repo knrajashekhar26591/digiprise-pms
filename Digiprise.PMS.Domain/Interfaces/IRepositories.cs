@@ -81,4 +81,9 @@ public interface ISlaRepository : IRepository<SlaPolicy>
     Task UpdateBreachAsync(SlaBreach breach, CancellationToken ct = default);
 }
 
+public interface IAutomationRepository : IRepository<AutomationRule>
+{
+    Task<IEnumerable<AutomationRule>> GetByProjectAsync(int projectId, CancellationToken ct = default);
+    Task<IEnumerable<AutomationRule>> GetActiveRulesAsync(int tenantId, CancellationToken ct = default);
+}
 

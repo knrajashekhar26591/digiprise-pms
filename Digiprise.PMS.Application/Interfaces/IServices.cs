@@ -121,8 +121,17 @@ public interface ISlaMonitorService
     Task EvaluateIssueSlaAsync(int issueId, int tenantId, CancellationToken ct = default);
 }
 
+public interface IAutomationService
+{
+    Task<IEnumerable<AutomationRuleDto>> GetByProjectAsync(int projectId, int tenantId, CancellationToken ct = default);
+    Task<AutomationRuleDto> CreateRuleAsync(int projectId, string name, string trigger, string conditions, string actions, int tenantId, CancellationToken ct = default);
+    Task ExecuteAsync(string triggerType, object context, int tenantId, CancellationToken ct = default);
+}
+
+
 public interface INotificationHandler<T> where T : class
 {
     Task Handle(T domainEvent, CancellationToken ct);
 }
+
 
