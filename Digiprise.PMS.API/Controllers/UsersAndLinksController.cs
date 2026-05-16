@@ -12,7 +12,12 @@ namespace Digiprise.PMS.API.Controllers;
 public class UsersController : BaseController
 {
     private readonly IUserRepository _users;
-    public UsersController(IUserRepository users) => _users = users;
+    private readonly IPasswordHasher _hasher;
+    public UsersController(IUserRepository users, IPasswordHasher hasher)
+    {
+        _users = users;
+        _hasher = hasher;
+    }
 
     /// <summary>Get all users in current tenant</summary>
     [HttpGet]
@@ -39,8 +44,9 @@ public class UsersController : BaseController
         if (existing.Any(u => u.Email.Equals(req.Email, StringComparison.OrdinalIgnoreCase)))
             return BadRequest("User with this email already exists in the tenant.");
 
-        // Create with a dummy password hash since there's no email flow
-        var user = Digiprise.PMS.Domain.Entities.User.Create(CurrentTenantId, req.Email, req.DisplayName, "DUMMY_HASH", req.Role);
+        // Create with the provided password hash
+        var hash = _hasher.Hash(req.Password);
+        var user = Digiprise.PMS.Domain.Entities.User.Create(CurrentTenantId, req.Email, req.DisplayName, hash, req.Role);
         await _users.AddAsync(user, ct);
         await _users.SaveChangesAsync(ct);
         return Ok(new { user.Id, user.Email, user.DisplayName, user.AvatarUrl, user.IsActive, user.SystemRole });
@@ -74,7 +80,7 @@ public class UsersController : BaseController
     }
 }
 
-public record TenantInviteUserRequest(string Email, string DisplayName, string Role);
+public record TenantInviteUserRequest(string Email, string DisplayName, string Password, string Role);
 public record UpdateNameRequest(string DisplayName);
 public record UpdateRoleRequest(string Role);
 

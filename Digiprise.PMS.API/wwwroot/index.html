@@ -1460,6 +1460,7 @@ function openInviteModal() {
       <div class="modal-body">
         <div class="fg"><label class="fl">Email Address</label><input type="email" class="fi" id="inv-email" placeholder="e.g. jsmith@example.com"></div>
         <div class="fg"><label class="fl">Display Name</label><input type="text" class="fi" id="inv-name" placeholder="John Smith"></div>
+        <div class="fg"><label class="fl">Initial Password</label><input type="text" class="fi" id="inv-pass" placeholder="Enter a secure password"></div>
         <div class="fg"><label class="fl">Role</label>
           <select class="fi" id="inv-role">
             <option value="User">User</option>
@@ -1479,11 +1480,12 @@ function openInviteModal() {
 async function submitInvite() {
   const email = document.getElementById('inv-email').value.trim();
   const name = document.getElementById('inv-name').value.trim();
+  const pass = document.getElementById('inv-pass').value;
   const role = document.getElementById('inv-role').value;
-  if(!email || !name) { toast('Please fill all fields', 'err'); return; }
+  if(!email || !name || !pass) { toast('Please fill all fields', 'err'); return; }
   
   try {
-    await api('POST', '/api/v1/users/invite', { email, displayName: name, role });
+    await api('POST', '/api/v1/users/invite', { email, displayName: name, password: pass, role });
     toast('User invited successfully!', 'ok');
     closeModal();
     loadUsersAdmin(); // Refresh the table to show the new user
