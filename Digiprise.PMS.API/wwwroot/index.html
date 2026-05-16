@@ -2105,8 +2105,8 @@ function dropIssue(event, sprintId) {
         // Optimistic UI update
         renderBacklog(allIssues, sprints);
         
-        // Save to backend API
-        api('PUT', `/api/v1/issues/${droppedId}`, { sprintId: sprintId }).catch(e => {
+        // Save to backend API (pass 0 for backlog to match backend expectation)
+        api('PUT', `/api/v1/issues/${droppedId}`, { sprintId: sprintId || 0 }).catch(e => {
             // Rollback on failure
             issue.sprintId = oldSprintId;
             renderBacklog(allIssues, sprints);
