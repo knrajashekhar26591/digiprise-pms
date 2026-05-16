@@ -282,6 +282,6 @@ public class IssueService : IIssueService
         return new IssueListItemDto(
             i.Id, i.IssueKey, i.IssueType.ToString(), i.Summary,
             i.Priority.ToString(), GetStatusName(i.StatusId), i.StatusId >= 4 ? "Done" : i.StatusId >= 2 ? "InProgress" : "ToDo",
-            i.AssigneeId, assignee?.DisplayName, i.StoryPoints, i.UpdatedAt);
+            i.AssigneeId, assignee?.DisplayName, i.StoryPoints, i.UpdatedAt, i.SprintId, i.ParentIssueId);
     }
 }

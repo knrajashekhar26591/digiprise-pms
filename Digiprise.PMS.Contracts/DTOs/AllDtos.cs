@@ -19,7 +19,7 @@ public record IssueDto(
 public record IssueListItemDto(
     int Id, string IssueKey, string IssueType, string Summary,
     string Priority, string StatusName, string StatusCategory,
-    int? AssigneeId, string? AssigneeName, int? StoryPoints, DateTime UpdatedAt);
+    int? AssigneeId, string? AssigneeName, int? StoryPoints, DateTime UpdatedAt, int? SprintId = null, int? EpicId = null);
 
 // ── Sprint DTOs ───────────────────────────────────────────────────────
 public record SprintDto(
